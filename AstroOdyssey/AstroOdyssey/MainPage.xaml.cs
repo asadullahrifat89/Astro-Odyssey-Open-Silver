@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Browser;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -32,10 +33,10 @@ namespace AstroOdyssey
         int meteorlimit = 50;
         int meteorSpeed = 2;
 
-        int playerSpeed = 12;
+        int playerSpeed = 15;
 
         int score = 0;
-        int damage = 0;
+        int playerHealth = 100;
 
         Rect playerHitBox;
 
@@ -44,8 +45,10 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        TimeSpan frameInterval = TimeSpan.FromMilliseconds(25);
+        TimeSpan frameInterval = TimeSpan.FromMilliseconds(5);
         TimeSpan laserInterval = TimeSpan.FromMilliseconds(250);
+
+        string baseUrl;
 
         #endregion
 
@@ -65,6 +68,7 @@ namespace AstroOdyssey
         void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged += Current_SizeChanged;
+            baseUrl = HtmlPage.Document.DocumentUri.OriginalString;
         }
 
         //When the window is unloaded, we remove the event Current_SizeChanged
@@ -78,6 +82,9 @@ namespace AstroOdyssey
             windowWidth = e.Size.Width;
             windowHeight = e.Size.Height;
 
+            GameCanvas.Height = windowHeight;
+            GameCanvas.Width = windowWidth;
+
             //TODO: set player y axis
             Canvas.SetTop(Player, windowHeight - 100);
         }
@@ -86,6 +93,9 @@ namespace AstroOdyssey
         {
             windowWidth = Window.Current.Bounds.Width;
             windowHeight = Window.Current.Bounds.Height;
+
+            GameCanvas.Height = windowHeight;
+            GameCanvas.Width = windowWidth;
         }
 
         #endregion
@@ -230,7 +240,7 @@ namespace AstroOdyssey
                     if (IntersectsWith(playerHitBox, enemyHitBox))
                     {
                         removableItems.Add(element);
-                        damage += 5;
+                        playerHealth -= 5;
 
                         PlayPlayerDamageSound();
                     }
@@ -246,7 +256,7 @@ namespace AstroOdyssey
                     if (IntersectsWith(playerHitBox, meteorHitBox))
                     {
                         removableItems.Add(element);
-                        damage += 5;
+                        playerHealth -= 5;
 
                         PlayPlayerDamageSound();
                     }
@@ -257,13 +267,13 @@ namespace AstroOdyssey
         private void UpdateScoreboard()
         {
             ScoreText.Text = "Score: " + score;
-            DamageText.Text = "Damage " + damage;
+            DamageText.Text = "Health: " + playerHealth;
         }
 
         private void CheckIfGameOver()
         {
             // game over
-            if (damage >= 100)
+            if (playerHealth <= 0)
             {
                 //TODO: game over
                 StopGame();
@@ -442,7 +452,7 @@ namespace AstroOdyssey
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            PlayBacgroundMusic();            
+            PlayBacgroundMusic();
 
             StartGame();
             PlayButton.Visibility = Visibility.Collapsed;
@@ -466,50 +476,54 @@ namespace AstroOdyssey
 
         private void PlayBacgroundMusic()
         {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/slow-trap-18565.mp3";
+
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() { 
                 //play audio with out html audio tag
-                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/slow-trap-18565.mp3');
+                var myAudio = new Audio($0);
                 myAudio.loop = true;
                 myAudio.play();
-            }())
-            ");
+            }())", host);
         }
 
         private void PlayLaserSound()
         {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
+
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3');
+                var myAudio = new Audio($0);
                 myAudio.volume = 0.1;                
                 myAudio.play();
-            }())
-            ");
+            }())", host);
         }
 
         private void PlayEnemyDestructionSound()
         {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
+
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3');
+                var myAudio = new Audio($0);
                 myAudio.volume = 0.8;                
                 myAudio.play();
-            }())
-            ");
+            }())", host);
         }
 
         private void PlayMeteorDestructionSound()
         {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
+
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3');
+                var myAudio = new Audio($0);
                 myAudio.volume = 0.8;
                 myAudio.play();
-            }())
-            ");
+            }())", host);
         }
 
         private void PlayPlayerDamageSound()
@@ -519,14 +533,15 @@ namespace AstroOdyssey
             //https://cdn.pixabay.com/download/audio/2022/03/10/audio_c23007ce5b.mp3?filename=explosion-39897.mp3
             //https://cdn.pixabay.com/download/audio/2022/03/10/audio_745451bd70.mp3?filename=8-bit-explosion-low-resonant-45659.mp3
 
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3";
+
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3');
+                var myAudio = new Audio($0);
                 myAudio.volume = 1.0;
                 myAudio.play();
-            }())
-            ");
+            }())", host);
         }
 
         #endregion
