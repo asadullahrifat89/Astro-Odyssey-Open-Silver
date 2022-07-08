@@ -469,7 +469,7 @@ namespace AstroOdyssey
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() { 
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc48af67b2.mp3?filename=slow-trap-18565.mp3');
+                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/slow-trap-18565.mp3');
                 myAudio.loop = true;
                 myAudio.play();
             }())
@@ -481,7 +481,7 @@ namespace AstroOdyssey
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_7bd2768f54.mp3?filename=beam-8-43831.mp3');
+                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3');
                 myAudio.volume = 0.1;                
                 myAudio.play();
             }())
@@ -493,7 +493,7 @@ namespace AstroOdyssey
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_f180bb8ad1.mp3?filename=explosion-36210.mp3');
+                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3');
                 myAudio.volume = 0.8;                
                 myAudio.play();
             }())
@@ -505,7 +505,7 @@ namespace AstroOdyssey
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_f180bb8ad1.mp3?filename=explosion-36210.mp3');
+                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3');
                 myAudio.volume = 0.8;
                 myAudio.play();
             }())
@@ -522,7 +522,7 @@ namespace AstroOdyssey
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c23007ce5b.mp3?filename=explosion-39897.mp3');
+                var myAudio = new Audio('http://localhost:55592/resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3');
                 myAudio.volume = 1.0;
                 myAudio.play();
             }())
