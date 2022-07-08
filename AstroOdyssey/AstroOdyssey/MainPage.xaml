@@ -24,8 +24,9 @@
             Text="Score: 0" />
 
         <TextBlock
-            Name="DamageText"
-            HorizontalAlignment="Right"
+            Name="HealthText"
+            Margin="0,50,0,0"
+            HorizontalAlignment="Left"
             FontFamily="Consolas"
             FontSize="18"
             FontWeight="Bold"
@@ -35,13 +36,22 @@
 
         <TextBlock
             Name="FPSText"
-            Margin="0,100,0,0"
             HorizontalAlignment="Right"
             FontFamily="Consolas"
             FontSize="18"
             FontWeight="Bold"
             Foreground="White"
             Text="FPS: " />
+
+        <TextBlock
+            Name="ObjectsText"
+            Margin="0,50,0,0"
+            HorizontalAlignment="Right"
+            FontFamily="Consolas"
+            FontSize="18"
+            FontWeight="Bold"
+            Foreground="White"
+            Text="Objects: " />
 
         <Button
             x:Name="PlayButton"

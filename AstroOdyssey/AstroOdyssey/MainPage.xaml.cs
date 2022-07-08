@@ -144,9 +144,9 @@ namespace AstroOdyssey
                 UpdateScoreboard();
 
                 GetPlayerCoordinates();
-                
+
                 SpawnEnemy();
-                
+
                 SpawnMeteor();
 
                 MovePlayer();
@@ -165,7 +165,7 @@ namespace AstroOdyssey
 
                 ScaleDifficulty();
 
-                CheckPlayerHealth();               
+                CheckPlayerHealth();
 
                 var frameTime = watch.ElapsedMilliseconds - frameStartTime;
                 var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
@@ -270,6 +270,13 @@ namespace AstroOdyssey
 
                         PlayPlayerDamageSound();
                     }
+                    else
+                    {
+                        if (Canvas.GetTop(enemy) > windowHeight)
+                        {
+                            removableObjects.Add(enemy);
+                        }
+                    }
                 }
 
                 if (element is Meteor meteor)
@@ -287,6 +294,13 @@ namespace AstroOdyssey
 
                         PlayPlayerDamageSound();
                     }
+                    else
+                    {
+                        if (Canvas.GetTop(meteor) > windowHeight)
+                        {
+                            removableObjects.Add(meteor);
+                        }
+                    }
                 }
             }
 
@@ -296,8 +310,9 @@ namespace AstroOdyssey
         private void UpdateScoreboard()
         {
             ScoreText.Text = "Score: " + score;
-            DamageText.Text = "Health: " + playerHealth;
+            HealthText.Text = "Health: " + playerHealth;
             FPSText.Text = "FPS: " + _fpsCount;
+            ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
         }
 
         private void CheckPlayerHealth()
@@ -474,15 +489,15 @@ namespace AstroOdyssey
 
         private void PlayLaserSound()
         {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
+            //var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.volume = 0.1;                
-                myAudio.play();
-            }())", host);
+            //OpenSilver.Interop.ExecuteJavaScript(@"
+            //(function() {
+            //    //play audio with out html audio tag
+            //    var myAudio = new Audio($0);
+            //    myAudio.volume = 0.1;                
+            //    myAudio.play();
+            //}())", host);
         }
 
         private void PlayEnemyDestructionSound()
