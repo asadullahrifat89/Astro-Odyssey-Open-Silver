@@ -5,7 +5,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace AstroOdyssey
 {
-    public class Enemy : Border
+    public class Enemy : GameObject
     {
         public Enemy()
         {

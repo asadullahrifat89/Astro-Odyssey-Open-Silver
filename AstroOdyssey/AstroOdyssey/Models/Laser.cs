@@ -5,7 +5,7 @@ using Windows.UI.Xaml.Media;
 
 namespace AstroOdyssey
 {
-    public class Laser : Border
+    public class Laser : GameObject
     {
         public Laser()
         {

@@ -5,7 +5,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace AstroOdyssey
 {
-    public class Meteor : Border
+    public class Meteor : GameObject
     {
         public Meteor()
         {
