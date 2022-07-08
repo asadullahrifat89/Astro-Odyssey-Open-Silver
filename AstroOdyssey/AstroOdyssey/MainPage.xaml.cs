@@ -18,9 +18,9 @@ namespace AstroOdyssey
     {
         #region Fields
 
-        bool isGameRunning, isMovingLeft, isMovingRight = false;
+        bool isGameRunning;
 
-        List<Border> itemRemover = new List<Border>();
+        List<Border> removableItems = new List<Border>();
 
         Random rand = new Random();
 
@@ -121,7 +121,7 @@ namespace AstroOdyssey
 
 
                 // move right
-                if (pointerX > playerX + 50)
+                if (pointerX - 50 > playerX + 10)
                 {
                     if (playerX + 90 < windowWidth)
                     {
@@ -130,40 +130,10 @@ namespace AstroOdyssey
                 }
 
                 // move left
-                if (pointerX < playerX - 50)
+                if (pointerX - 50 < playerX - 10)
                 {
                     Canvas.SetLeft(Player, playerX - playerSpeed);
                 }
-
-
-                //if (pointerX != Canvas.GetLeft(Player))
-                //{
-                //    if (pointerX + playerSpeed < Canvas.GetLeft(Player))
-                //    {
-                //        isMovingLeft = true;
-                //        isMovingRight = false;
-                //    }
-
-                //    if (pointerX - playerSpeed > Canvas.GetLeft(Player))
-                //    {
-                //        isMovingRight = true;
-                //        isMovingLeft = false;
-                //    }
-                //}
-                //else
-                //{
-                //    isMovingRight = false;
-                //    isMovingLeft = false;
-                //}
-
-                //if (isMovingLeft == true && Canvas.GetLeft(Player) > 0)
-                //{
-                //    Canvas.SetLeft(Player, Canvas.GetLeft(Player) - playerSpeed);
-                //}
-                //if (isMovingRight == true && Canvas.GetLeft(Player) + 90 < windowWidth)
-                //{
-                //    Canvas.SetLeft(Player, Canvas.GetLeft(Player) + playerSpeed);
-                //}
 
                 foreach (var x in GameCanvas.Children.OfType<Border>())
                 {
@@ -175,7 +145,7 @@ namespace AstroOdyssey
 
                         if (Canvas.GetTop(x) < 10)
                         {
-                            itemRemover.Add(x);
+                            removableItems.Add(x);
                         }
 
                         foreach (var y in GameCanvas.Children.OfType<Border>())
@@ -186,13 +156,12 @@ namespace AstroOdyssey
 
                                 if (IntersectsWith(bulletHitBox, enemyHit))
                                 {
-                                    itemRemover.Add(x);
-                                    itemRemover.Add(y);
+                                    removableItems.Add(x);
+                                    removableItems.Add(y);
                                     score++;
                                 }
                             }
                         }
-
                     }
 
                     if (x is Border && (string)x.Tag == "enemy")
@@ -204,14 +173,14 @@ namespace AstroOdyssey
 
                         if (IntersectsWith(playerHitBox, enemyHitBox))
                         {
-                            itemRemover.Add(x);
+                            removableItems.Add(x);
                             damage += 5;
                         }
 
                     }
                 }
 
-                foreach (Border i in itemRemover)
+                foreach (Border i in removableItems)
                 {
                     GameCanvas.Children.Remove(i);
                 }
@@ -304,13 +273,6 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(newEnemy);
         }
 
-        private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            var currentPoint = e.GetCurrentPoint(GameCanvas);
-
-            pointerX = currentPoint.Position.X;
-        }
-
         private bool IntersectsWith(Rect source, Rect target)
         {
             if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
@@ -325,29 +287,15 @@ namespace AstroOdyssey
 
         #region Canvas Events
 
-        private void GameCanvas_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Left)
-            {
-                isMovingLeft = true;
-            }
-            if (e.Key == Windows.System.VirtualKey.Right)
-            {
-                isMovingRight = true;
-            }
+            var currentPoint = e.GetCurrentPoint(GameCanvas);
+
+            pointerX = currentPoint.Position.X;
         }
 
         private void GameCanvas_KeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Left)
-            {
-                isMovingLeft = false;
-            }
-            if (e.Key == Windows.System.VirtualKey.Right)
-            {
-                isMovingRight = false;
-            }
-
             if (e.Key == Windows.System.VirtualKey.Space)
             {
                 Border newBullet = new Border
