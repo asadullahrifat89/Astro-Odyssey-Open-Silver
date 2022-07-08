@@ -143,9 +143,7 @@ namespace AstroOdyssey
 
                 UpdateFrame();
 
-                ScaleDifficulty();
-
-                RemoveRemovables();
+                ScaleDifficulty();                
 
                 CheckIfGameOver();
 
@@ -194,18 +192,22 @@ namespace AstroOdyssey
                         removableItems.Add(laser);
                     }
 
-                    Rect laserHitBox = new Rect(Canvas.GetLeft(laser), Canvas.GetTop(laser), laser.Width, laser.Height);
+                    Rect laserBounds = new Rect(Canvas.GetLeft(laser), Canvas.GetTop(laser), laser.Width, laser.Height);
 
                     foreach (var obstacle in GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser))
                     {
                         if (obstacle is Enemy targetEnemy)
                         {
-                            Rect enemyHit = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(targetEnemy), targetEnemy.Width, targetEnemy.Height);
+                            Rect enemyBounds = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(targetEnemy), targetEnemy.Width, targetEnemy.Height);
 
-                            if (IntersectsWith(laserHitBox, enemyHit))
+                            if (IntersectsWith(laserBounds, enemyBounds))
                             {
+                                laser.IsMarkedToDelete = true;
                                 removableItems.Add(laser);
+
+                                targetEnemy.IsMarkedToDelete = true;
                                 removableItems.Add(targetEnemy);
+
                                 score++;
 
                                 PlayEnemyDestructionSound();
@@ -214,16 +216,20 @@ namespace AstroOdyssey
 
                         if (obstacle is Meteor targetMeteor)
                         {
-                            Rect meteorHit = new Rect(Canvas.GetLeft(targetMeteor), Canvas.GetTop(targetMeteor), targetMeteor.Width, targetMeteor.Height);
+                            Rect meteorBounds = new Rect(Canvas.GetLeft(targetMeteor), Canvas.GetTop(targetMeteor), targetMeteor.Width, targetMeteor.Height);
 
-                            if (IntersectsWith(laserHitBox, meteorHit))
+                            if (IntersectsWith(laserBounds, meteorBounds))
                             {
+                                laser.IsMarkedToDelete = true;
                                 removableItems.Add(laser);
+
                                 targetMeteor.Health--;
 
                                 if (targetMeteor.Health <= 0)
                                 {
+                                    targetMeteor.IsMarkedToDelete = true;
                                     removableItems.Add(targetMeteor);
+
                                     PlayMeteorDestructionSound();
                                 }
                             }
@@ -240,7 +246,9 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerHitBox, enemyHitBox))
                     {
+                        enemy.IsMarkedToDelete = true;
                         removableItems.Add(enemy);
+
                         playerHealth -= 5;
 
                         PlayPlayerDamageSound();
@@ -256,13 +264,17 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerHitBox, meteorHitBox))
                     {
+                        meteor.IsMarkedToDelete = true;
                         removableItems.Add(meteor);
+
                         playerHealth -= 5;
 
                         PlayPlayerDamageSound();
                     }
                 }
             }
+
+            removableItems.ForEach((removableItem) => { GameCanvas.Children.Remove(removableItem); });
         }
 
         private void UpdateScoreboard()
@@ -279,12 +291,7 @@ namespace AstroOdyssey
                 //TODO: game over
                 StopGame();
             }
-        }
-
-        private void RemoveRemovables()
-        {
-            removableItems.ForEach((removableItem) => { GameCanvas.Children.Remove(removableItem); });
-        }
+        }      
 
         private void SpawnEnemy()
         {
@@ -408,7 +415,7 @@ namespace AstroOdyssey
             {
                 if (playerX + 90 < windowWidth)
                 {
-                    Canvas.SetLeft(Player, playerX + playerSpeed);                    
+                    Canvas.SetLeft(Player, playerX + playerSpeed);
                 }
             }
 
