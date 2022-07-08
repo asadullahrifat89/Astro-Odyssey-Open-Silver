@@ -44,7 +44,7 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        TimeSpan frameInterval = TimeSpan.FromMilliseconds(10);
+        TimeSpan frameInterval = TimeSpan.FromMilliseconds(25);
         TimeSpan laserInterval = TimeSpan.FromMilliseconds(250);
 
         #endregion
@@ -197,7 +197,7 @@ namespace AstroOdyssey
                                 removableItems.Add(enemy);
                                 score++;
 
-                                PlayEnemyShipDestructionSound();
+                                PlayEnemyDestructionSound();
                             }
                         }
 
@@ -211,7 +211,10 @@ namespace AstroOdyssey
                                 meteor.Health--;
 
                                 if (meteor.Health <= 0)
+                                {
                                     removableItems.Add(meteor);
+                                    PlayMeteorDestructionSound();
+                                }
                             }
                         }
                     }
@@ -387,8 +390,6 @@ namespace AstroOdyssey
             }
         }
 
-
-
         private void MovePlayer()
         {
             // move right
@@ -441,7 +442,7 @@ namespace AstroOdyssey
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            PlayBacgroundMusic();
+            PlayBacgroundMusic();            
 
             StartGame();
             PlayButton.Visibility = Visibility.Collapsed;
@@ -469,6 +470,7 @@ namespace AstroOdyssey
             (function() { 
                 //play audio with out html audio tag
                 var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc48af67b2.mp3?filename=slow-trap-18565.mp3');
+                myAudio.loop = true;
                 myAudio.play();
             }())
             ");
@@ -480,13 +482,25 @@ namespace AstroOdyssey
             (function() {
                 //play audio with out html audio tag
                 var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_7bd2768f54.mp3?filename=beam-8-43831.mp3');
-                myAudio.volume = 0.1;
+                myAudio.volume = 0.1;                
                 myAudio.play();
             }())
             ");
         }
 
-        private void PlayEnemyShipDestructionSound()
+        private void PlayEnemyDestructionSound()
+        {
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_f180bb8ad1.mp3?filename=explosion-36210.mp3');
+                myAudio.volume = 0.8;                
+                myAudio.play();
+            }())
+            ");
+        }
+
+        private void PlayMeteorDestructionSound()
         {
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
