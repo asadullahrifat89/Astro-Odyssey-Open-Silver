@@ -244,6 +244,8 @@ namespace AstroOdyssey
 
                                 targetMeteor.Health--;
 
+                                PlayLaserHitMeteorSound();
+
                                 if (targetMeteor.Health <= 0)
                                 {
                                     removableObjects.Add(targetMeteor);
@@ -489,15 +491,15 @@ namespace AstroOdyssey
 
         private void PlayLaserSound()
         {
-            //var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
 
-            //OpenSilver.Interop.ExecuteJavaScript(@"
-            //(function() {
-            //    //play audio with out html audio tag
-            //    var myAudio = new Audio($0);
-            //    myAudio.volume = 0.1;                
-            //    myAudio.play();
-            //}())", host);
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio($0);
+                myAudio.volume = 0.1;                
+                myAudio.play();
+            }())", host);
         }
 
         private void PlayEnemyDestructionSound()
@@ -509,6 +511,19 @@ namespace AstroOdyssey
                 //play audio with out html audio tag
                 var myAudio = new Audio($0);
                 myAudio.volume = 0.8;                
+                myAudio.play();
+            }())", host);
+        }
+
+        private void PlayLaserHitMeteorSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-sfx-43814.mp3";
+
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio($0);
+                myAudio.volume = 0.6;
                 myAudio.play();
             }())", host);
         }

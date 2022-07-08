@@ -134,6 +134,7 @@
 		<Content Include="Assets\Sounds\beam-8-43831.mp3" />
 		<Content Include="Assets\Sounds\explosion-36210.mp3" />
 		<Content Include="Assets\Sounds\explosion-39897.mp3" />
+		<Content Include="Assets\Sounds\explosion-sfx-43814.mp3" />
 		<Content Include="Assets\Sounds\slow-trap-18565.mp3" />
 	</ItemGroup>
 
