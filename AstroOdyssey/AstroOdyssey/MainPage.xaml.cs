@@ -34,6 +34,7 @@ namespace AstroOdyssey
         Rect playerHitBox;
 
         double windowWidth, windowHeight;
+        double playerX, playerY, playerWidthHalf;
 
         double pointerX;
 
@@ -114,36 +115,51 @@ namespace AstroOdyssey
         {
             while (isGameRunning)
             {
-                var playerX = Canvas.GetLeft(Player);
-                var playerY = Canvas.GetTop(Player);
-                var playerWidthHalf = Player.Width / 2;
+                UpdateScoreboard();
 
-                ScoreText.Text = "Score: " + score;
-                DamageText.Text = "Damage " + damage;
+                playerX = Canvas.GetLeft(Player);
+                playerY = Canvas.GetTop(Player);
+                playerWidthHalf = Player.Width / 2;
 
                 playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
 
                 SpawnEnemy();
 
-                MovePlayer(playerX, playerWidthHalf);
+                MovePlayer();
 
                 UpdateFrame();
 
                 ScaleDifficulty();
 
-                foreach (Border removableItem in removableItems)
-                {
-                    GameCanvas.Children.Remove(removableItem);
-                }
+                RemoveRemovables();
 
-                // game over
-                if (damage >= 100)
-                {
-                    //TODO: game over
-                    StopGame();
-                }
+                CheckIfGameOver();
 
                 await Task.Delay(frameTime);
+            }
+        }
+
+        private void UpdateScoreboard()
+        {
+            ScoreText.Text = "Score: " + score;
+            DamageText.Text = "Damage " + damage;
+        }
+
+        private void CheckIfGameOver()
+        {
+            // game over
+            if (damage >= 100)
+            {
+                //TODO: game over
+                StopGame();
+            }
+        }
+
+        private void RemoveRemovables()
+        {
+            foreach (Border removableItem in removableItems)
+            {
+                GameCanvas.Children.Remove(removableItem);
             }
         }
 
@@ -153,7 +169,7 @@ namespace AstroOdyssey
             {
                 Border newBullet = new Border
                 {
-                    Tag = "bullet",
+                    Tag = "laser",
                     Height = 20,
                     Width = 5,
                     Background = new SolidColorBrush(Colors.White),
@@ -277,54 +293,52 @@ namespace AstroOdyssey
 
         private void UpdateFrame()
         {
-            foreach (var x in GameCanvas.Children.OfType<Border>())
+            foreach (var element in GameCanvas.Children.OfType<Border>())
             {
-                if (x is Border && (string)x.Tag == "bullet")
+                if (element is Border && (string)element.Tag == "laser")
                 {
-                    Canvas.SetTop(x, Canvas.GetTop(x) - 20);
+                    // move laser up
+                    Canvas.SetTop(element, Canvas.GetTop(element) - 20);
 
-                    Rect bulletHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
-
-                    if (Canvas.GetTop(x) < 10)
+                    if (Canvas.GetTop(element) < 10)
                     {
-                        removableItems.Add(x);
+                        removableItems.Add(element);
                     }
 
-                    foreach (var y in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy"))
+                    Rect bulletHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
+
+                    foreach (var enemy in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy"))
                     {
-                        //if (y is Border && (string)y.Tag == "enemy")
-                        //{
-                        Rect enemyHit = new Rect(Canvas.GetLeft(y), Canvas.GetTop(y), y.Width, y.Height);
+                        Rect enemyHit = new Rect(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
 
                         if (IntersectsWith(bulletHitBox, enemyHit))
                         {
-                            removableItems.Add(x);
-                            removableItems.Add(y);
+                            removableItems.Add(element);
+                            removableItems.Add(enemy);
                             score++;
 
                             PlayEnemyShipDestructionSound();
                         }
-                        //}
                     }
                 }
 
-                if (x is Border && (string)x.Tag == "enemy")
+                if (element is Border && (string)element.Tag == "enemy")
                 {
-                    //TODO: set random speed
-                    Canvas.SetTop(x, Canvas.GetTop(x) + enemySpeed);
+                    // move enemy down
+                    Canvas.SetTop(element, Canvas.GetTop(element) + enemySpeed);
 
-                    Rect enemyHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+                    Rect enemyHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
 
                     if (IntersectsWith(playerHitBox, enemyHitBox))
                     {
-                        removableItems.Add(x);
+                        removableItems.Add(element);
                         damage += 5;
                     }
                 }
             }
         }
 
-        private void MovePlayer(double playerX, double playerWidthHalf)
+        private void MovePlayer()
         {
             // move right
             if (pointerX - playerWidthHalf > playerX + playerSpeed)
@@ -403,7 +417,7 @@ namespace AstroOdyssey
 
         #endregion
 
-        #region Canvas Events
+        #region Button Events
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
@@ -411,9 +425,12 @@ namespace AstroOdyssey
 
             StartGame();
             PlayButton.Visibility = Visibility.Collapsed;
+            Application.Current.Host.Content.IsFullScreen = true;
         }
 
+        #endregion
 
+        #region Canvas Events
 
         private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
