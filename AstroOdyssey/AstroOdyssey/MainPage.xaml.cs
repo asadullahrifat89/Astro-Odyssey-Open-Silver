@@ -37,10 +37,10 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        DispatcherTimer shotTimer;
+        DispatcherTimer laserTimer;
 
         TimeSpan frameTime = TimeSpan.FromMilliseconds(10);
-        TimeSpan shotTime = TimeSpan.FromMilliseconds(200);
+        TimeSpan shootInterval = TimeSpan.FromMilliseconds(250);
 
         #endregion
 
@@ -101,21 +101,21 @@ namespace AstroOdyssey
             isGameRunning = true;
             RunGame();
 
-            shotTimer = new DispatcherTimer();
-            shotTimer.Interval = shotTime;
-            shotTimer.Tick += Timer_Tick;
-            shotTimer.Start();
+            laserTimer = new DispatcherTimer();
+            laserTimer.Interval = shootInterval;
+            laserTimer.Tick += Shoot_Laser;
+            laserTimer.Start();
         }
 
         private void StopGame()
         {
             isGameRunning = false;
-            shotTimer.Stop();
+            laserTimer.Stop();
 
             GameCanvas.Children.Clear();
         }
 
-        private void Timer_Tick(object sender, object e)
+        private void Shoot_Laser(object sender, object e)
         {
             Border newBullet = new Border
             {
@@ -130,6 +130,15 @@ namespace AstroOdyssey
             Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
 
             GameCanvas.Children.Add(newBullet);
+
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_7bd2768f54.mp3?filename=beam-8-43831.mp3');
+                myAudio.volume = 0.1;
+                myAudio.play();
+            }())
+            ");
         }
 
         private async void RunGame()
@@ -223,6 +232,11 @@ namespace AstroOdyssey
                 {
                     enemylimit = 45;
                     enemySpeed = 7;
+
+                    laserTimer.Stop();
+                    shootInterval = TimeSpan.FromMilliseconds(225);
+                    laserTimer.Interval = shootInterval;
+                    laserTimer.Start();
                 }
 
                 // medium
@@ -230,6 +244,11 @@ namespace AstroOdyssey
                 {
                     enemylimit = 35;
                     enemySpeed = 10;
+
+                    laserTimer.Stop();
+                    shootInterval = TimeSpan.FromMilliseconds(200);
+                    laserTimer.Interval = shootInterval;
+                    laserTimer.Start();
                 }
 
                 // hard
@@ -237,6 +256,11 @@ namespace AstroOdyssey
                 {
                     enemylimit = 20;
                     enemySpeed = 15;
+
+                    laserTimer.Stop();
+                    shootInterval = TimeSpan.FromMilliseconds(150);
+                    laserTimer.Interval = shootInterval;
+                    laserTimer.Start();
                 }
 
                 // game over
@@ -360,12 +384,16 @@ namespace AstroOdyssey
             return false;
         }
 
+        #endregion
+
+        #region Canvas Events
+
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() { 
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3');
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc48af67b2.mp3?filename=slow-trap-18565.mp3');
                 myAudio.play();
             }())
             ");
@@ -373,10 +401,6 @@ namespace AstroOdyssey
             StartGame();
             PlayButton.Visibility = Visibility.Collapsed;
         }
-
-        #endregion
-
-        #region Canvas Events
 
         private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
