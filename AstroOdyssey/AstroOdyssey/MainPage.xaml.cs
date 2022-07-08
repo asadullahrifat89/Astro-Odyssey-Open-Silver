@@ -141,6 +141,23 @@ namespace AstroOdyssey
 
                 await Task.Delay(frameInterval);
             }
+        }      
+
+        private async void LaserLoop()
+        {
+            while (isGameRunning)
+            {
+                var newLaser = new Laser();
+
+                Canvas.SetLeft(newLaser, Canvas.GetLeft(Player) + Player.Width / 2 - newLaser.Width / 2);
+                Canvas.SetTop(newLaser, Canvas.GetTop(Player) - newLaser.Height);
+
+                GameCanvas.Children.Add(newLaser);
+
+                PlayLaserSound();
+
+                await Task.Delay(laserInterval);
+            }
         }
 
         private void GetPlayerCoordinates()
@@ -152,27 +169,81 @@ namespace AstroOdyssey
             playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
         }
 
-        private async void LaserLoop()
+        private void UpdateFrame()
         {
-            while (isGameRunning)
+            foreach (var element in GameCanvas.Children.OfType<Border>())
             {
-                Border newBullet = new Border
+                if (element is Border && (string)element.Tag == "laser")
                 {
-                    Tag = "laser",
-                    Height = 20,
-                    Width = 5,
-                    Background = new SolidColorBrush(Colors.White),
-                    CornerRadius = new CornerRadius(50)
-                };
+                    // move laser up
+                    Canvas.SetTop(element, Canvas.GetTop(element) - 20);
 
-                Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2 - newBullet.Width / 2);
-                Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
+                    if (Canvas.GetTop(element) < 10)
+                    {
+                        removableItems.Add(element);
+                    }
 
-                GameCanvas.Children.Add(newBullet);
+                    Rect bulletHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
 
-                PlayLaserSound();
+                    foreach (var obstacle in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy" || (string)x.Tag == "meteor"))
+                    {
+                        if (obstacle is Enemy enemy && (string)obstacle.Tag == "enemy")
+                        {
+                            Rect enemyHit = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
 
-                await Task.Delay(laserInterval);
+                            if (IntersectsWith(bulletHitBox, enemyHit))
+                            {
+                                removableItems.Add(element);
+                                removableItems.Add(enemy);
+                                score++;
+
+                                PlayEnemyShipDestructionSound();
+                            }
+                        }
+
+                        if (obstacle is Meteor meteor && (string)obstacle.Tag == "meteor")
+                        {
+                            Rect meteorHit = new Rect(Canvas.GetLeft(meteor), Canvas.GetTop(meteor), meteor.Width, meteor.Height);
+
+                            if (IntersectsWith(bulletHitBox, meteorHit))
+                            {
+                                removableItems.Add(element);
+                            }
+                        }
+                    }
+                }
+
+                if (element is Border && (string)element.Tag == "enemy")
+                {
+                    // move enemy down
+                    Canvas.SetTop(element, Canvas.GetTop(element) + enemySpeed);
+
+                    Rect enemyHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
+
+                    if (IntersectsWith(playerHitBox, enemyHitBox))
+                    {
+                        removableItems.Add(element);
+                        damage += 5;
+
+                        PlayPlayerDamageSound();
+                    }
+                }
+
+                if (element is Border && (string)element.Tag == "meteor")
+                {
+                    // move meteor down
+                    Canvas.SetTop(element, Canvas.GetTop(element) + meteorSpeed);
+
+                    Rect meteorHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
+
+                    if (IntersectsWith(playerHitBox, meteorHitBox))
+                    {
+                        removableItems.Add(element);
+                        damage += 5;
+
+                        PlayPlayerDamageSound();
+                    }
+                }
             }
         }
 
@@ -312,83 +383,7 @@ namespace AstroOdyssey
             }
         }
 
-        private void UpdateFrame()
-        {
-            foreach (var element in GameCanvas.Children.OfType<Border>())
-            {
-                if (element is Border && (string)element.Tag == "laser")
-                {
-                    // move laser up
-                    Canvas.SetTop(element, Canvas.GetTop(element) - 20);
-
-                    if (Canvas.GetTop(element) < 10)
-                    {
-                        removableItems.Add(element);
-                    }
-
-                    Rect bulletHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
-
-                    foreach (var enemy in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy" || (string)x.Tag == "meteor"))
-                    {
-                        if (enemy is Border && (string)enemy.Tag == "enemy")
-                        {
-                            Rect enemyHit = new Rect(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
-
-                            if (IntersectsWith(bulletHitBox, enemyHit))
-                            {
-                                removableItems.Add(element);
-                                removableItems.Add(enemy);
-                                score++;
-
-                                PlayEnemyShipDestructionSound();
-                            }
-                        }
-
-                        if (enemy is Border && (string)enemy.Tag == "meteor")
-                        {
-                            Rect meteorHit = new Rect(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
-
-                            if (IntersectsWith(bulletHitBox, meteorHit))
-                            {
-                                removableItems.Add(element);
-                            }
-                        }
-                    }
-                }
-
-                if (element is Border && (string)element.Tag == "enemy")
-                {
-                    // move enemy down
-                    Canvas.SetTop(element, Canvas.GetTop(element) + enemySpeed);
-
-                    Rect enemyHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
-
-                    if (IntersectsWith(playerHitBox, enemyHitBox))
-                    {
-                        removableItems.Add(element);
-                        damage += 5;
-
-                        PlayPlayerDamageSound();
-                    }
-                }
-
-                if (element is Border && (string)element.Tag == "meteor")
-                {
-                    // move meteor down
-                    Canvas.SetTop(element, Canvas.GetTop(element) + meteorSpeed);
-
-                    Rect meteorHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
-
-                    if (IntersectsWith(playerHitBox, meteorHitBox))
-                    {
-                        removableItems.Add(element);
-                        damage += 5;
-
-                        PlayPlayerDamageSound();
-                    }
-                }
-            }
-        }
+       
 
         private void MovePlayer()
         {

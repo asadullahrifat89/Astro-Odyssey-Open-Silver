@@ -15,7 +15,9 @@ namespace AstroOdyssey
 
             Uri uri = null;
 
-            var meteorType = new Random().Next(1, 8);
+            var rand = new Random();
+
+            var meteorType = rand.Next(1, 8);
 
             switch (meteorType)
             {
@@ -54,6 +56,9 @@ namespace AstroOdyssey
             };
 
             Child = imgMeteor;
+            Health = rand.Next(1, 4);
         }
+
+        public int Health { get; set; }
     }
 }
