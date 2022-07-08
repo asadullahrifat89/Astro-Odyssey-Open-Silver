@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace AstroOdyssey
 {
-    public class Player : GameObject 
+    public class Player : GameObject
     {
         public Player()
         {
@@ -53,6 +53,8 @@ namespace AstroOdyssey
             };
 
             Child = imgPlayer;
+            Health = 100;
+            HealthSlot = 5;
         }
     }
 }

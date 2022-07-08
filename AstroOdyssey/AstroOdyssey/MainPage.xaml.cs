@@ -42,7 +42,6 @@ namespace AstroOdyssey
         int playerSpeed = 15;
 
         int score = 0;
-        int playerHealth = 100;
 
         Rect playerHitBox;
 
@@ -68,40 +67,7 @@ namespace AstroOdyssey
             this.Unloaded += Window_SizeChanged_Demo_Unloaded;
 
             SetWindowSize();
-        }
-
-        //When the window is loaded, we add the event Current_SizeChanged
-        void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
-        {
-            Window.Current.SizeChanged += Current_SizeChanged;
-            baseUrl = HtmlPage.Document.DocumentUri.OriginalString;
-        }
-
-        //When the window is unloaded, we remove the event Current_SizeChanged
-        void Window_SizeChanged_Demo_Unloaded(object sender, RoutedEventArgs e)
-        {
-            Window.Current.SizeChanged -= Current_SizeChanged;
-        }
-
-        void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
-        {
-            windowWidth = e.Size.Width;
-            windowHeight = e.Size.Height;
-
-            GameCanvas.Height = windowHeight;
-            GameCanvas.Width = windowWidth;
-
-            //TODO: set player y axis
-            Canvas.SetTop(Player, windowHeight - 100);
-        }
-
-        void SetWindowSize()
-        {
-            windowWidth = Window.Current.Bounds.Width;
-            windowHeight = Window.Current.Bounds.Height;
-
-            GameCanvas.Height = windowHeight;
-            GameCanvas.Width = windowWidth;
+            PlayBacgroundMusic();
         }
 
         #endregion
@@ -242,11 +208,11 @@ namespace AstroOdyssey
                             {
                                 removableObjects.Add(laser);
 
-                                targetMeteor.Health--;
+                                targetMeteor.LooseHealth();
 
                                 PlayLaserHitMeteorSound();
 
-                                if (targetMeteor.Health <= 0)
+                                if (targetMeteor.IsDestroyable)
                                 {
                                     removableObjects.Add(targetMeteor);
 
@@ -268,7 +234,7 @@ namespace AstroOdyssey
                     {
                         removableObjects.Add(enemy);
 
-                        playerHealth -= 5;
+                        Player.LooseHealth();
 
                         PlayPlayerDamageSound();
                     }
@@ -292,7 +258,7 @@ namespace AstroOdyssey
                     {
                         removableObjects.Add(meteor);
 
-                        playerHealth -= 5;
+                        Player.LooseHealth();
 
                         PlayPlayerDamageSound();
                     }
@@ -312,7 +278,7 @@ namespace AstroOdyssey
         private void UpdateScoreboard()
         {
             ScoreText.Text = "Score: " + score;
-            HealthText.Text = "Health: " + playerHealth;
+            HealthText.Text = "Health: " + Player.Health;
             FPSText.Text = "FPS: " + _fpsCount;
             ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
         }
@@ -320,7 +286,7 @@ namespace AstroOdyssey
         private void CheckPlayerHealth()
         {
             // game over
-            if (playerHealth <= 0)
+            if (Player.IsDestroyable)
             {
                 //TODO: game over
                 StopGame();
@@ -454,8 +420,6 @@ namespace AstroOdyssey
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            PlayBacgroundMusic();
-
             StartGame();
             PlayButton.Visibility = Visibility.Collapsed;
             Application.Current.Host.Content.IsFullScreen = true;
@@ -470,6 +434,47 @@ namespace AstroOdyssey
             var currentPoint = e.GetCurrentPoint(GameCanvas);
 
             pointerX = currentPoint.Position.X;
+        }
+
+        #endregion
+
+        #region Window Events
+
+        //When the window is loaded, we add the event Current_SizeChanged
+        void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.SizeChanged += Current_SizeChanged;
+            baseUrl = HtmlPage.Document.DocumentUri.OriginalString;
+        }
+
+        //When the window is unloaded, we remove the event Current_SizeChanged
+        void Window_SizeChanged_Demo_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.SizeChanged -= Current_SizeChanged;
+        }
+
+        void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+        {
+            windowWidth = e.Size.Width;
+            windowHeight = e.Size.Height;
+
+            SetGameCanvasSize();
+
+            Canvas.SetTop(Player, windowHeight - 100);
+        }
+
+        void SetWindowSize()
+        {
+            windowWidth = Window.Current.Bounds.Width;
+            windowHeight = Window.Current.Bounds.Height;
+
+            SetGameCanvasSize();
+        }
+
+        private void SetGameCanvasSize()
+        {
+            GameCanvas.Height = windowHeight;
+            GameCanvas.Width = windowWidth;
         }
 
         #endregion

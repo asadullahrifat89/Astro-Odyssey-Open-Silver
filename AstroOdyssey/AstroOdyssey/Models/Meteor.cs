@@ -65,7 +65,5 @@ namespace AstroOdyssey
 
             Child = imgMeteor;
         }
-
-        public int Health { get; set; }
     }
 }
