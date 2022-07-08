@@ -17,10 +17,62 @@
 		<Page Include="MainPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_Button_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_Card_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_CheckBox_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_ChildWindow_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_ComboBox_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_CommonResources.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_ContextMenu_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_DataGrid_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_DatePicker_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_Expander_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_PasswordBox_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_Popup_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_RadioButton_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_TabControl_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_TextBox_Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Styles\Styles.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Include="App.xaml.cs" />
+		<Compile Include="Converters\AccentColorConverter.cs" />
+		<Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+		<Compile Include="Converters\DoubleToCornerRadiusConverter.cs" />
+		<Compile Include="Converters\TextToPlaceholderTextVisibilityConverter.cs" />
 		<Compile Include="MainPage.xaml.cs" />
 	</ItemGroup>
 

@@ -1,0 +1,169 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--<ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="MaterialDesign_Styles_Kit/MaterialDesign_CommonResources.xaml"/>
+    </ResourceDictionary.MergedDictionaries>-->
+    <!--  Requires MaterialDesign_CommonResources  -->
+
+    <!--  ContextMenu  -->
+    <Style x:Key="MaterialDesign_ContextMenu_Style" TargetType="ContextMenu">
+        <Setter Property="Background" Value="{StaticResource DefaultBackgroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource MaterialDesign_DefaultAccentColor}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0,2,0,2" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Path
+                            Width="20"
+                            Height="10"
+                            Margin="10,0,0,-1"
+                            HorizontalAlignment="Left"
+                            Canvas.ZIndex="2"
+                            Data="M0,10 L10,0 20,10Z"
+                            Fill="{TemplateBinding Background}" />
+                        <Border
+                            x:Name="OuterBorder"
+                            Grid.Row="1"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                            <Border
+                                x:Name="InnerBorder"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="5">
+                                <Border.Effect>
+                                    <DropShadowEffect
+                                        x:Name="DropShadowEffect"
+                                        BlurRadius="6"
+                                        Direction="-30"
+                                        Opacity="0.4"
+                                        ShadowDepth="0"
+                                        Color="Gray" />
+                                </Border.Effect>
+                                <ItemsPresenter
+                                    x:Name="ItemsPresenter"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Border>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal" />
+                                    <VisualState Name="PointerOver" />
+                                    <VisualState Name="Pressed" />
+                                    <VisualState Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InnerBorder" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#FFE0E0E0" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#FFA0A0A0" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DropShadowEffect" Storyboard.TargetProperty="Opacity">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  ContextMenuItem  -->
+    <Style x:Key="MaterialDesign_ContextMenuItem_Style" TargetType="MenuItem">
+        <Setter Property="Background" Value="{StaticResource DefaultBackgroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource MaterialDesign_DefaultAccentColor}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="7,5" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border
+                        x:Name="OuterBorder"
+                        Margin="0"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="5">
+                        <Border
+                            x:Name="InnerBorder"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="5">
+                            <StackPanel
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Background="Transparent"
+                                Orientation="Horizontal">
+                                <ContentControl
+                                    x:Name="ContentPresenter"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Background="{TemplateBinding Background}"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    FontWeight="{TemplateBinding FontWeight}"
+                                    Foreground="Black" />
+                                <!--  The following ContentControl serves to inherit the foreground from the parent ComboBox in the VisualState (cannot use a RelativeSource in a Binding on a Timeline since it is not a element that exists in the Visual tree, and Border does not have the Foreground Property). There is probably a better way to do this.  -->
+                                <!--  Note: We find a parent of type ScrollViewer because the element is in a Popup, which has no parent, so we cannot go up the visual tree until we find the ComboBox  -->
+                            </StackPanel>
+                        </Border>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Normal" />
+                                <VisualState Name="PointerOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{TemplateBinding Foreground}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InnerBorder" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFF0F0F0" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFF0F0F0" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Pressed" />
+                                <VisualState Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InnerBorder" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFE0E0E0" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFA0A0A0" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
