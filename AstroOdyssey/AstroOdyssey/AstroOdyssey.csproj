@@ -129,11 +129,10 @@
 		<Content Include="Assets\Images\station_A.png" />
 		<Content Include="Assets\Images\station_B.png" />
 		<Content Include="Assets\Images\station_C.png" />
-		<EmbeddedResource Include="Assets\Sounds\background.mp3">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<Content Include="Assets\Sounds\laser2.mp3" />
-		<Content Include="Assets\Sounds\SampleAudio.mp3" />
+		<Content Include="Assets\Sounds\beam-8-43831.mp3" />
+		<Content Include="Assets\Sounds\explosion-36210.mp3" />
+		<Content Include="Assets\Sounds\explosion-39897.mp3" />
+		<Content Include="Assets\Sounds\slow-trap-18565.mp3" />
 	</ItemGroup>
 
 	<ItemGroup>
