@@ -9,7 +9,10 @@
 
     <Grid>
 
-        <Canvas x:Name="GameCanvas" Background="Black" />
+        <Canvas
+            x:Name="GameCanvas"
+            Background="Black"
+            PointerMoved="GameCanvas_PointerMoved" />
 
         <TextBlock
             Name="ScoreText"
