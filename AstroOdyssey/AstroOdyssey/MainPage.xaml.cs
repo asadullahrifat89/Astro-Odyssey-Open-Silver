@@ -407,7 +407,7 @@ namespace AstroOdyssey
             {
                 if (playerX + 90 < windowWidth)
                 {
-                    Canvas.SetLeft(Player, playerX + playerSpeed);
+                    Canvas.SetLeft(Player, playerX + playerSpeed);                    
                 }
             }
 
