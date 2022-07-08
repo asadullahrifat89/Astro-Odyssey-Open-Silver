@@ -25,7 +25,7 @@ namespace AstroOdyssey
         Random rand = new Random();
 
         int enemyCounter = 100;
-        int playerSpeed = 10;
+        int playerSpeed = 12;
         int enemylimit = 50;
         int score = 0;
         int damage = 0;
@@ -57,9 +57,7 @@ namespace AstroOdyssey
 
             SetWindowSize();
             StartGame();
-            RunGame();
-
-            MediaElementForBackground.Play();
+            RunGame();           
         }
 
         //When the window is loaded, we add the event Current_SizeChanged
@@ -152,7 +150,7 @@ namespace AstroOdyssey
                 }
 
                 // move right
-                if (pointerX - playerWidthHalf > playerX + 10)
+                if (pointerX - playerWidthHalf > playerX + playerSpeed)
                 {
                     if (playerX + 90 < windowWidth)
                     {
@@ -161,7 +159,7 @@ namespace AstroOdyssey
                 }
 
                 // move left
-                if (pointerX - playerWidthHalf < playerX - 10)
+                if (pointerX - playerWidthHalf < playerX - playerSpeed)
                 {
                     Canvas.SetLeft(Player, playerX - playerSpeed);
                 }
