@@ -131,15 +131,8 @@ namespace AstroOdyssey
 
             GameCanvas.Children.Add(newBullet);
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_7bd2768f54.mp3?filename=beam-8-43831.mp3');
-                myAudio.volume = 0.1;
-                myAudio.play();
-            }())
-            ");
-        }
+            PlayLaserSound();
+        }      
 
         private async void RunGame()
         {
@@ -201,6 +194,8 @@ namespace AstroOdyssey
                                     removableItems.Add(x);
                                     removableItems.Add(y);
                                     score++;
+
+                                    PlayEnemyShipDestructionSound();
                                 }
                             }
                         }
@@ -390,6 +385,27 @@ namespace AstroOdyssey
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
+            PlayBacgroundMusic();
+
+            StartGame();
+            PlayButton.Visibility = Visibility.Collapsed;
+        }
+
+      
+
+        private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            var currentPoint = e.GetCurrentPoint(GameCanvas);
+
+            pointerX = currentPoint.Position.X;
+        }
+
+        #endregion
+
+        #region Sounds
+
+        private void PlayBacgroundMusic()
+        {
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() { 
                 //play audio with out html audio tag
@@ -397,16 +413,30 @@ namespace AstroOdyssey
                 myAudio.play();
             }())
             ");
-
-            StartGame();
-            PlayButton.Visibility = Visibility.Collapsed;
         }
 
-        private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private void PlayLaserSound()
         {
-            var currentPoint = e.GetCurrentPoint(GameCanvas);
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_7bd2768f54.mp3?filename=beam-8-43831.mp3');
+                myAudio.volume = 0.1;
+                myAudio.play();
+            }())
+            ");
+        }
 
-            pointerX = currentPoint.Position.X;
+        private void PlayEnemyShipDestructionSound()
+        {
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_f180bb8ad1.mp3?filename=explosion-36210.mp3');
+                myAudio.volume = 0.8;
+                myAudio.play();
+            }())
+            ");
         }
 
         #endregion
