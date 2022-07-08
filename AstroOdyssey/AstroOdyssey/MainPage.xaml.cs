@@ -484,11 +484,13 @@ namespace AstroOdyssey
         {
             //https://cdn.pixabay.com/download/audio/2021/08/09/audio_9788fd890e.mp3?filename=big-impact-7054.mp3
             //https://cdn.pixabay.com/download/audio/2021/08/04/audio_fadfc77b9e.mp3?filename=explosion-6055.mp3
+            //https://cdn.pixabay.com/download/audio/2022/03/10/audio_c23007ce5b.mp3?filename=explosion-39897.mp3
+            //https://cdn.pixabay.com/download/audio/2022/03/10/audio_745451bd70.mp3?filename=8-bit-explosion-low-resonant-45659.mp3
 
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_fadfc77b9e.mp3?filename=explosion-6055.mp3');
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c23007ce5b.mp3?filename=explosion-39897.mp3');
                 myAudio.volume = 1.0;
                 myAudio.play();
             }())
