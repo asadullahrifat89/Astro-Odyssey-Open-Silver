@@ -54,10 +54,6 @@ namespace AstroOdyssey
             this.Unloaded += Window_SizeChanged_Demo_Unloaded;
 
             SetWindowSize();
-            StartGame();
-            RunGame();
-
-          
         }
 
         //When the window is loaded, we add the event Current_SizeChanged
@@ -103,11 +99,20 @@ namespace AstroOdyssey
         {
             SpawnPlayer();
             isGameRunning = true;
+            RunGame();
 
             shotTimer = new DispatcherTimer();
             shotTimer.Interval = shotTime;
             shotTimer.Tick += Timer_Tick;
             shotTimer.Start();
+        }
+
+        private void StopGame()
+        {
+            isGameRunning = false;
+            shotTimer.Stop();
+
+            GameCanvas.Children.Clear();
         }
 
         private void Timer_Tick(object sender, object e)
@@ -355,19 +360,18 @@ namespace AstroOdyssey
             return false;
         }
 
-        private void MediaElementForBackground_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-
-        }
-
-        private void MediaElementForBackground_MediaOpened(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            MediaElementForBackground.Play();
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() { 
+                //play audio with out html audio tag
+                var myAudio = new Audio('https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3');
+                myAudio.play();
+            }())
+            ");
+
+            StartGame();
+            PlayButton.Visibility = Visibility.Collapsed;
         }
 
         #endregion

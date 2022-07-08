@@ -30,18 +30,6 @@
             Foreground="White"
             Text="Score: 0" />
 
-        <MediaElement
-            x:Name="MediaElementForBackground"
-            Width="300"
-            Height="100"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            AutoPlay="False"
-            MediaFailed="MediaElementForBackground_MediaFailed"
-            MediaOpened="MediaElementForBackground_MediaOpened"
-            ShowControls="True"
-            Source="ms-appx:///Assets/Sounds/background.mp3" />
-
         <Button
             x:Name="PlayButton"
             Width="300"
