@@ -15,7 +15,7 @@ namespace AstroOdyssey
 
             Uri uri = null;
 
-            var enemyType = new Random().Next(1, 5);
+            var enemyType = new Random().Next(1, 6);
 
             switch (enemyType)
             {

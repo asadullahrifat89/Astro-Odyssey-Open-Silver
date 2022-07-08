@@ -141,7 +141,7 @@ namespace AstroOdyssey
 
                 await Task.Delay(frameInterval);
             }
-        }      
+        }
 
         private async void LaserLoop()
         {
@@ -208,6 +208,10 @@ namespace AstroOdyssey
                             if (IntersectsWith(bulletHitBox, meteorHit))
                             {
                                 removableItems.Add(element);
+                                meteor.Health--;
+
+                                if (meteor.Health <= 0)
+                                    removableItems.Add(meteor);
                             }
                         }
                     }
@@ -383,7 +387,7 @@ namespace AstroOdyssey
             }
         }
 
-       
+
 
         private void MovePlayer()
         {
