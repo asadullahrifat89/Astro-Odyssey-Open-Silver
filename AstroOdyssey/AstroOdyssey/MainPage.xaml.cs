@@ -21,8 +21,8 @@ namespace AstroOdyssey
         #region Fields
 
         const float FRAME_CAP_MS = 1000.0f / 60.0f;
-        private int _fpsCount;
-        private int _fpsCounter;
+        private int _fpsCount = 0;
+        private int _fpsCounter = 0;
         private float _lastFPSTime = 0;
 
         bool isGameRunning;
@@ -50,7 +50,7 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        TimeSpan frameInterval = TimeSpan.FromMilliseconds(5);
+        //TimeSpan frameInterval = TimeSpan.FromMilliseconds(5);
         TimeSpan laserInterval = TimeSpan.FromMilliseconds(250);
 
         string baseUrl;
@@ -68,6 +68,7 @@ namespace AstroOdyssey
 
             SetWindowSize();
             PlayBacgroundMusic();
+            GameGrid.Visibility = Visibility.Collapsed;
         }
 
         #endregion
@@ -84,8 +85,20 @@ namespace AstroOdyssey
 
         private void StartGame()
         {
+            score = 0;
+            _fpsCount = 0;
+            _fpsCounter = 0;
+            _lastFPSTime = 0;
+
+            GameCanvas.Children.Clear();
+
+            GameGrid.Visibility = Visibility.Visible;
+            PlayButton.Visibility = Visibility.Collapsed;
+
             SpawnPlayer();
+
             isGameRunning = true;
+
             GameLoop();
             LaserLoop();
         }
@@ -93,9 +106,6 @@ namespace AstroOdyssey
         private void StopGame()
         {
             isGameRunning = false;
-
-            GameCanvas.Children.Clear();
-
             PlayButton.Visibility = Visibility.Visible;
         }
 
@@ -119,6 +129,10 @@ namespace AstroOdyssey
 
                 UpdateFrame();
 
+                ScaleDifficulty();
+
+                CheckPlayerHealth();
+
                 // calculate FPS
                 if (_lastFPSTime + 1000 < frameStartTime)
                 {
@@ -128,10 +142,6 @@ namespace AstroOdyssey
                 }
 
                 _fpsCounter++;
-
-                ScaleDifficulty();
-
-                CheckPlayerHealth();
 
                 var frameTime = watch.ElapsedMilliseconds - frameStartTime;
                 var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
@@ -288,7 +298,7 @@ namespace AstroOdyssey
             // game over
             if (Player.IsDestroyable)
             {
-                //TODO: game over
+                HealthText.Text = "Health: " + 0;
                 StopGame();
             }
         }
@@ -421,7 +431,6 @@ namespace AstroOdyssey
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
             StartGame();
-            PlayButton.Visibility = Visibility.Collapsed;
             Application.Current.Host.Content.IsFullScreen = true;
         }
 

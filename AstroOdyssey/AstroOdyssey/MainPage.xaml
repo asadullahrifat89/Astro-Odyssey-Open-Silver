@@ -9,49 +9,51 @@
 
     <Grid x:Name="RootGrid" Background="Black">
 
-        <Canvas
-            x:Name="GameCanvas"
-            Background="Transparent"
-            PointerMoved="GameCanvas_PointerMoved" />
+        <Grid Name="GameGrid">
+            <Canvas
+                x:Name="GameCanvas"
+                Background="Transparent"
+                PointerMoved="GameCanvas_PointerMoved" />
 
-        <TextBlock
-            Name="ScoreText"
-            HorizontalAlignment="Left"
-            FontFamily="Consolas"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="White"
-            Text="Score: 0" />
+            <TextBlock
+                Name="ScoreText"
+                HorizontalAlignment="Left"
+                FontFamily="Consolas"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="Score: 0" />
 
-        <TextBlock
-            Name="HealthText"
-            Margin="0,50,0,0"
-            HorizontalAlignment="Left"
-            FontFamily="Consolas"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="White"
-            Text="Health: 100" />
+            <TextBlock
+                Name="HealthText"
+                Margin="0,50,0,0"
+                HorizontalAlignment="Left"
+                FontFamily="Consolas"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="Health: 100" />
 
 
-        <TextBlock
-            Name="FPSText"
-            HorizontalAlignment="Right"
-            FontFamily="Consolas"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="White"
-            Text="FPS: " />
+            <TextBlock
+                Name="FPSText"
+                HorizontalAlignment="Right"
+                FontFamily="Consolas"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="FPS: " />
 
-        <TextBlock
-            Name="ObjectsText"
-            Margin="0,50,0,0"
-            HorizontalAlignment="Right"
-            FontFamily="Consolas"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="White"
-            Text="Objects: " />
+            <TextBlock
+                Name="ObjectsText"
+                Margin="0,50,0,0"
+                HorizontalAlignment="Right"
+                FontFamily="Consolas"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="Objects: " />
+        </Grid>
 
         <Button
             x:Name="PlayButton"
