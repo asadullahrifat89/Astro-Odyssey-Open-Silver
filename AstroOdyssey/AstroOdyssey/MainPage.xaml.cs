@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,11 @@ namespace AstroOdyssey
     public partial class MainPage : Page
     {
         #region Fields
+
+        const float FRAME_CAP_MS = 1000.0f / 60.0f;
+        private int _fpsCount;
+        private int _fpsCounter;
+        private float _lastFPSTime = 0;
 
         bool isGameRunning;
 
@@ -129,8 +135,12 @@ namespace AstroOdyssey
 
         private async void GameLoop()
         {
+            var watch = Stopwatch.StartNew();
+
             while (isGameRunning)
             {
+                var frameStartTime = watch.ElapsedMilliseconds;
+
                 UpdateScoreboard();
 
                 GetPlayerCoordinates();
@@ -143,11 +153,24 @@ namespace AstroOdyssey
 
                 UpdateFrame();
 
+                // calculate FPS
+                if (_lastFPSTime + 1000 < frameStartTime)
+                {
+                    _fpsCount = _fpsCounter;
+                    _fpsCounter = 0;
+                    _lastFPSTime = frameStartTime;
+                }
+
+                _fpsCounter++;
+
                 ScaleDifficulty();
 
-                CheckPlayerHealth();
+                CheckPlayerHealth();               
 
-                await Task.Delay(frameInterval);
+                var frameTime = watch.ElapsedMilliseconds - frameStartTime;
+                var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
+
+                await Task.Delay(waitTime);
             }
         }
 
@@ -274,6 +297,7 @@ namespace AstroOdyssey
         {
             ScoreText.Text = "Score: " + score;
             DamageText.Text = "Health: " + playerHealth;
+            FPSText.Text = "FPS: " + _fpsCount;
         }
 
         private void CheckPlayerHealth()

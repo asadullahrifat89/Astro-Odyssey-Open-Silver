@@ -32,6 +32,17 @@
             Foreground="White"
             Text="Health: 100" />
 
+
+        <TextBlock
+            Name="FPSText"
+            Margin="0,100,0,0"
+            HorizontalAlignment="Right"
+            FontFamily="Consolas"
+            FontSize="18"
+            FontWeight="Bold"
+            Foreground="White"
+            Text="FPS: " />
+
         <Button
             x:Name="PlayButton"
             Width="300"
