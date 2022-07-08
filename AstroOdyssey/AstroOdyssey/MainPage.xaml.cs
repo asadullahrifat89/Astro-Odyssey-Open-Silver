@@ -50,7 +50,6 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        //TimeSpan frameInterval = TimeSpan.FromMilliseconds(5);
         TimeSpan laserInterval = TimeSpan.FromMilliseconds(250);
 
         string baseUrl;
