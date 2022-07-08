@@ -4,8 +4,9 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<NoXamlPreprocessor>True</NoXamlPreprocessor>
 		<OpenSilverType>4</OpenSilverType>
-		<PublishTrimmed>true</PublishTrimmed>
+		<OpenSilverVersion>1.0.0</OpenSilverVersion>
 		<!--Use .NET 6 to enable the commented options below-->
+		<PublishTrimmed>true</PublishTrimmed>
 		<RunAOTCompilation Condition="'$(IsSecondPass)'!='True'">true</RunAOTCompilation>
 	</PropertyGroup>
 
@@ -15,9 +16,9 @@
 		<PackageReference Include="OpenSilver.UWPCompatible" Version="1.0.0" />
 	</ItemGroup>
 
-	<PropertyGroup>
+	<!--<PropertyGroup>
 		<DisableImplicitNamespaceImports>True</DisableImplicitNamespaceImports>
-	</PropertyGroup>
+	</PropertyGroup>-->
 
 	<ItemGroup>
 		<ProjectReference Include="..\AstroOdyssey\AstroOdyssey.csproj" />

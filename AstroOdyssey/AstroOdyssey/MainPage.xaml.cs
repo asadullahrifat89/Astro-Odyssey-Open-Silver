@@ -42,8 +42,6 @@ namespace AstroOdyssey
         TimeSpan frameTime = TimeSpan.FromMilliseconds(10);
         TimeSpan shotTime = TimeSpan.FromMilliseconds(200);
 
-        //MediaElement mediaElementForLaser;
-
         #endregion
 
         #region Ctor
@@ -57,14 +55,15 @@ namespace AstroOdyssey
 
             SetWindowSize();
             StartGame();
-            RunGame();           
+            RunGame();
+
+          
         }
 
         //When the window is loaded, we add the event Current_SizeChanged
         void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged += Current_SizeChanged;
-            MediaElementForBackground.Play();
         }
 
         //When the window is unloaded, we remove the event Current_SizeChanged
@@ -354,6 +353,21 @@ namespace AstroOdyssey
             }
 
             return false;
+        }
+
+        private void MediaElementForBackground_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+
+        }
+
+        private void MediaElementForBackground_MediaOpened(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            MediaElementForBackground.Play();
         }
 
         #endregion
