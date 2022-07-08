@@ -18,7 +18,8 @@ namespace AstroOdyssey
     {
         #region Fields
 
-        bool moveLeft, moveRight;
+        bool isGameRunning, isMovingLeft, isMovingRight = false;
+
         List<Border> itemRemover = new List<Border>();
 
         Random rand = new Random();
@@ -33,6 +34,8 @@ namespace AstroOdyssey
 
         Rect playerHitBox;
 
+        double windowWidth, windowHeight;
+
         #endregion
 
         #region Ctor
@@ -41,9 +44,36 @@ namespace AstroOdyssey
         {
             this.InitializeComponent();
 
-            AddPlayerToGameCanvas();
+            this.Loaded += Window_SizeChanged_Demo_Loaded;
+            this.Unloaded += Window_SizeChanged_Demo_Unloaded;
 
-            RunGameLoop();
+            SetWindowSize();
+            StartGame();
+            RunGame();
+        }
+
+        //When the window is loaded, we add the event Current_SizeChanged
+        void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.SizeChanged += Current_SizeChanged;
+        }
+
+        //When the window is unloaded, we remove the event Current_SizeChanged
+        void Window_SizeChanged_Demo_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.SizeChanged -= Current_SizeChanged;
+        }
+
+        void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+        {
+            windowWidth = e.Size.Width;
+            windowHeight = e.Size.Height;
+        }
+
+        void SetWindowSize()
+        {
+            windowWidth = Window.Current.Bounds.Width;
+            windowHeight = Window.Current.Bounds.Height;
         }
 
         #endregion
@@ -58,19 +88,15 @@ namespace AstroOdyssey
 
         #region Functionality
 
-        private bool IntersectsWith(Rect source, Rect target)
+        private void StartGame()
         {
-            if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
-            {
-                return target.Y + target.Height >= source.Y;
-            }
-
-            return false;
+            MakePlayer();
+            isGameRunning = true;
         }
 
-        private async void RunGameLoop()
+        private async void RunGame()
         {
-            while (true)
+            while (isGameRunning)
             {
                 playerHitBox = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width, Player.Height);
 
@@ -85,11 +111,11 @@ namespace AstroOdyssey
                     enemyCounter = limit;
                 }
 
-                if (moveLeft == true && Canvas.GetLeft(Player) > 0)
+                if (isMovingLeft == true && Canvas.GetLeft(Player) > 0)
                 {
                     Canvas.SetLeft(Player, Canvas.GetLeft(Player) - playerSpeed);
                 }
-                if (moveRight == true && Canvas.GetLeft(Player) + 90 < Application.Current.MainWindow.Width)
+                if (isMovingRight == true && Canvas.GetLeft(Player) + 90 < windowWidth)
                 {
                     Canvas.SetLeft(Player, Canvas.GetLeft(Player) + playerSpeed);
                 }
@@ -159,11 +185,21 @@ namespace AstroOdyssey
             }
         }
 
+        private bool IntersectsWith(Rect source, Rect target)
+        {
+            if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
+            {
+                return target.Y + target.Height >= source.Y;
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region Player
 
-        private void AddPlayerToGameCanvas()
+        private void MakePlayer()
         {
             var imgPlayer = new Image()
             {
@@ -180,11 +216,11 @@ namespace AstroOdyssey
                 Name = "Player",
                 Background = new SolidColorBrush(Colors.Transparent),
                 Height = 100,
-                Width= 100,
+                Width = 100,
             };
 
             Canvas.SetLeft(Player, 100);
-            Canvas.SetTop(Player, 600);
+            Canvas.SetTop(Player, windowHeight - 100);
 
             GameCanvas.Children.Add(Player);
         }
@@ -236,7 +272,7 @@ namespace AstroOdyssey
             };
 
             Canvas.SetTop(newEnemy, -100);
-            Canvas.SetLeft(newEnemy, rand.Next(30, 430));
+            Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
             GameCanvas.Children.Add(newEnemy);
         }
 
@@ -248,11 +284,11 @@ namespace AstroOdyssey
         {
             if (e.Key == Windows.System.VirtualKey.Left)
             {
-                moveLeft = true;
+                isMovingLeft = true;
             }
             if (e.Key == Windows.System.VirtualKey.Right)
             {
-                moveRight = true;
+                isMovingRight = true;
             }
         }
 
@@ -260,11 +296,11 @@ namespace AstroOdyssey
         {
             if (e.Key == Windows.System.VirtualKey.Left)
             {
-                moveLeft = false;
+                isMovingLeft = false;
             }
             if (e.Key == Windows.System.VirtualKey.Right)
             {
-                moveRight = false;
+                isMovingRight = false;
             }
 
             if (e.Key == Windows.System.VirtualKey.Space)

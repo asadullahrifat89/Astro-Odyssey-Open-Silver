@@ -7,14 +7,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Canvas
-        x:Name="GameCanvas"
-        Background="Black"
-        KeyDown="GameCanvas_KeyDown"
-        KeyUp="GameCanvas_KeyUp">
+    <Grid>
+
+        <Canvas x:Name="GameCanvas" Background="Black" />
 
         <TextBlock
             Name="ScoreText"
+            HorizontalAlignment="Left"
             FontSize="18"
             FontWeight="Bold"
             Foreground="White"
@@ -22,12 +21,12 @@
 
         <TextBlock
             Name="DamageText"
-            Canvas.Left="395"
+            HorizontalAlignment="Right"
             FontSize="18"
             FontWeight="Bold"
             Foreground="White"
             Text="Score: 0" />
 
-    </Canvas>
+    </Grid>
 
 </Page>
