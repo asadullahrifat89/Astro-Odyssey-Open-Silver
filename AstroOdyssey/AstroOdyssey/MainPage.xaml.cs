@@ -37,10 +37,8 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        DispatcherTimer laserTimer;
-
         TimeSpan frameTime = TimeSpan.FromMilliseconds(10);
-        TimeSpan shootInterval = TimeSpan.FromMilliseconds(250);
+        TimeSpan laserTime = TimeSpan.FromMilliseconds(250);
 
         #endregion
 
@@ -99,42 +97,20 @@ namespace AstroOdyssey
         {
             SpawnPlayer();
             isGameRunning = true;
-            RunGame();
-
-            laserTimer = new DispatcherTimer();
-            laserTimer.Interval = shootInterval;
-            laserTimer.Tick += Shoot_Laser;
-            laserTimer.Start();
+            GameLoop();
+            LaserLoop();
         }
 
         private void StopGame()
         {
             isGameRunning = false;
-            laserTimer.Stop();
 
             GameCanvas.Children.Clear();
+
+            PlayButton.Visibility = Visibility.Visible;
         }
 
-        private void Shoot_Laser(object sender, object e)
-        {
-            Border newBullet = new Border
-            {
-                Tag = "bullet",
-                Height = 20,
-                Width = 5,
-                Background = new SolidColorBrush(Colors.White),
-                CornerRadius = new CornerRadius(50)
-            };
-
-            Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2 - newBullet.Width / 2);
-            Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
-
-            GameCanvas.Children.Add(newBullet);
-
-            PlayLaserSound();
-        }      
-
-        private async void RunGame()
+        private async void GameLoop()
         {
             while (isGameRunning)
             {
@@ -142,129 +118,67 @@ namespace AstroOdyssey
                 var playerY = Canvas.GetTop(Player);
                 var playerWidthHalf = Player.Width / 2;
 
-                playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
-
-                enemyCounter -= 1;
-
                 ScoreText.Text = "Score: " + score;
                 DamageText.Text = "Damage " + damage;
 
-                if (enemyCounter < 0)
+                playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
+
+                SpawnEnemy();
+
+                MovePlayer(playerX, playerWidthHalf);
+
+                UpdateFrame();
+
+                ScaleDifficulty();
+
+                foreach (Border removableItem in removableItems)
                 {
-                    SpawnEnemies();
-                    enemyCounter = enemylimit;
-                }
-
-                // move right
-                if (pointerX - playerWidthHalf > playerX + playerSpeed)
-                {
-                    if (playerX + 90 < windowWidth)
-                    {
-                        Canvas.SetLeft(Player, playerX + playerSpeed);
-                    }
-                }
-
-                // move left
-                if (pointerX - playerWidthHalf < playerX - playerSpeed)
-                {
-                    Canvas.SetLeft(Player, playerX - playerSpeed);
-                }
-
-                foreach (var x in GameCanvas.Children.OfType<Border>())
-                {
-                    if (x is Border && (string)x.Tag == "bullet")
-                    {
-                        Canvas.SetTop(x, Canvas.GetTop(x) - 20);
-
-                        Rect bulletHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
-
-                        if (Canvas.GetTop(x) < 10)
-                        {
-                            removableItems.Add(x);
-                        }
-
-                        foreach (var y in GameCanvas.Children.OfType<Border>())
-                        {
-                            if (y is Border && (string)y.Tag == "enemy")
-                            {
-                                Rect enemyHit = new Rect(Canvas.GetLeft(y), Canvas.GetTop(y), y.Width, y.Height);
-
-                                if (IntersectsWith(bulletHitBox, enemyHit))
-                                {
-                                    removableItems.Add(x);
-                                    removableItems.Add(y);
-                                    score++;
-
-                                    PlayEnemyShipDestructionSound();
-                                }
-                            }
-                        }
-                    }
-
-                    if (x is Border && (string)x.Tag == "enemy")
-                    {
-                        //TODO: set random speed
-                        Canvas.SetTop(x, Canvas.GetTop(x) + enemySpeed);
-
-                        Rect enemyHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
-
-                        if (IntersectsWith(playerHitBox, enemyHitBox))
-                        {
-                            removableItems.Add(x);
-                            damage += 5;
-                        }
-
-                    }
-                }
-
-                foreach (Border i in removableItems)
-                {
-                    GameCanvas.Children.Remove(i);
-                }
-
-                // easy
-                if (score > 50)
-                {
-                    enemylimit = 45;
-                    enemySpeed = 7;
-
-                    laserTimer.Stop();
-                    shootInterval = TimeSpan.FromMilliseconds(225);
-                    laserTimer.Interval = shootInterval;
-                    laserTimer.Start();
-                }
-
-                // medium
-                if (score > 100)
-                {
-                    enemylimit = 35;
-                    enemySpeed = 10;
-
-                    laserTimer.Stop();
-                    shootInterval = TimeSpan.FromMilliseconds(200);
-                    laserTimer.Interval = shootInterval;
-                    laserTimer.Start();
-                }
-
-                // hard
-                if (score > 300)
-                {
-                    enemylimit = 20;
-                    enemySpeed = 15;
-
-                    laserTimer.Stop();
-                    shootInterval = TimeSpan.FromMilliseconds(150);
-                    laserTimer.Interval = shootInterval;
-                    laserTimer.Start();
+                    GameCanvas.Children.Remove(removableItem);
                 }
 
                 // game over
                 if (damage >= 100)
                 {
                     //TODO: game over
+                    StopGame();
                 }
 
                 await Task.Delay(frameTime);
+            }
+        }
+
+        private async void LaserLoop()
+        {
+            while (isGameRunning)
+            {
+                Border newBullet = new Border
+                {
+                    Tag = "bullet",
+                    Height = 20,
+                    Width = 5,
+                    Background = new SolidColorBrush(Colors.White),
+                    CornerRadius = new CornerRadius(50)
+                };
+
+                Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2 - newBullet.Width / 2);
+                Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
+
+                GameCanvas.Children.Add(newBullet);
+
+                PlayLaserSound();
+
+                await Task.Delay(laserTime);
+            }
+        }
+
+        private void SpawnEnemy()
+        {
+            enemyCounter -= 1;
+
+            if (enemyCounter < 0)
+            {
+                CreateEnemy();
+                enemyCounter = enemylimit;
             }
         }
 
@@ -322,7 +236,113 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(Player);
         }
 
-        private void SpawnEnemies()
+        private void ScaleDifficulty()
+        {
+            // noob
+            if (score > 10)
+            {
+                enemylimit = 45;
+                enemySpeed = 5;
+
+                laserTime = TimeSpan.FromMilliseconds(225);
+            }
+
+            // easy
+            if (score > 50)
+            {
+                enemylimit = 40;
+                enemySpeed = 10;
+
+                laserTime = TimeSpan.FromMilliseconds(200);
+            }
+
+            // medium
+            if (score > 100)
+            {
+                enemylimit = 35;
+                enemySpeed = 15;
+
+                laserTime = TimeSpan.FromMilliseconds(175);
+            }
+
+            // hard
+            if (score > 300)
+            {
+                enemylimit = 30;
+                enemySpeed = 20;
+
+                laserTime = TimeSpan.FromMilliseconds(150);
+            }
+        }
+
+        private void UpdateFrame()
+        {
+            foreach (var x in GameCanvas.Children.OfType<Border>())
+            {
+                if (x is Border && (string)x.Tag == "bullet")
+                {
+                    Canvas.SetTop(x, Canvas.GetTop(x) - 20);
+
+                    Rect bulletHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+
+                    if (Canvas.GetTop(x) < 10)
+                    {
+                        removableItems.Add(x);
+                    }
+
+                    foreach (var y in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy"))
+                    {
+                        //if (y is Border && (string)y.Tag == "enemy")
+                        //{
+                        Rect enemyHit = new Rect(Canvas.GetLeft(y), Canvas.GetTop(y), y.Width, y.Height);
+
+                        if (IntersectsWith(bulletHitBox, enemyHit))
+                        {
+                            removableItems.Add(x);
+                            removableItems.Add(y);
+                            score++;
+
+                            PlayEnemyShipDestructionSound();
+                        }
+                        //}
+                    }
+                }
+
+                if (x is Border && (string)x.Tag == "enemy")
+                {
+                    //TODO: set random speed
+                    Canvas.SetTop(x, Canvas.GetTop(x) + enemySpeed);
+
+                    Rect enemyHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+
+                    if (IntersectsWith(playerHitBox, enemyHitBox))
+                    {
+                        removableItems.Add(x);
+                        damage += 5;
+                    }
+                }
+            }
+        }
+
+        private void MovePlayer(double playerX, double playerWidthHalf)
+        {
+            // move right
+            if (pointerX - playerWidthHalf > playerX + playerSpeed)
+            {
+                if (playerX + 90 < windowWidth)
+                {
+                    Canvas.SetLeft(Player, playerX + playerSpeed);
+                }
+            }
+
+            // move left
+            if (pointerX - playerWidthHalf < playerX - playerSpeed)
+            {
+                Canvas.SetLeft(Player, playerX - playerSpeed);
+            }
+        }
+
+        private void CreateEnemy()
         {
             Uri uri = null;
 
@@ -369,6 +389,8 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(newEnemy);
         }
 
+
+
         private bool IntersectsWith(Rect source, Rect target)
         {
             if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
@@ -391,7 +413,7 @@ namespace AstroOdyssey
             PlayButton.Visibility = Visibility.Collapsed;
         }
 
-      
+
 
         private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
