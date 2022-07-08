@@ -76,4 +76,59 @@
 		<Compile Include="MainPage.xaml.cs" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Include="Assets\Images\effect_purple.png" />
+	  <Content Include="Assets\Images\effect_yellow.png" />
+	  <Content Include="Assets\Images\enemy_A.png" />
+	  <Content Include="Assets\Images\enemy_B.png" />
+	  <Content Include="Assets\Images\enemy_C.png" />
+	  <Content Include="Assets\Images\enemy_D.png" />
+	  <Content Include="Assets\Images\enemy_E.png" />
+	  <Content Include="Assets\Images\icon_crossLarge.png" />
+	  <Content Include="Assets\Images\icon_crossSmall.png" />
+	  <Content Include="Assets\Images\icon_exclamationLarge.png" />
+	  <Content Include="Assets\Images\icon_exclamationSmall.png" />
+	  <Content Include="Assets\Images\icon_plusLarge.png" />
+	  <Content Include="Assets\Images\icon_plusSmall.png" />
+	  <Content Include="Assets\Images\meteor_detailedLarge.png" />
+	  <Content Include="Assets\Images\meteor_detailedSmall.png" />
+	  <Content Include="Assets\Images\meteor_large.png" />
+	  <Content Include="Assets\Images\meteor_small.png" />
+	  <Content Include="Assets\Images\meteor_squareDetailedLarge.png" />
+	  <Content Include="Assets\Images\meteor_squareDetailedSmall.png" />
+	  <Content Include="Assets\Images\meteor_squareLarge.png" />
+	  <Content Include="Assets\Images\meteor_squareSmall.png" />
+	  <Content Include="Assets\Images\satellite_A.png" />
+	  <Content Include="Assets\Images\satellite_B.png" />
+	  <Content Include="Assets\Images\satellite_C.png" />
+	  <Content Include="Assets\Images\satellite_D.png" />
+	  <Content Include="Assets\Images\ship_A.png" />
+	  <Content Include="Assets\Images\ship_B.png" />
+	  <Content Include="Assets\Images\ship_C.png" />
+	  <Content Include="Assets\Images\ship_D.png" />
+	  <Content Include="Assets\Images\ship_E.png" />
+	  <Content Include="Assets\Images\ship_F.png" />
+	  <Content Include="Assets\Images\ship_G.png" />
+	  <Content Include="Assets\Images\ship_H.png" />
+	  <Content Include="Assets\Images\ship_I.png" />
+	  <Content Include="Assets\Images\ship_J.png" />
+	  <Content Include="Assets\Images\ship_K.png" />
+	  <Content Include="Assets\Images\ship_L.png" />
+	  <Content Include="Assets\Images\ship_sidesA.png" />
+	  <Content Include="Assets\Images\ship_sidesB.png" />
+	  <Content Include="Assets\Images\ship_sidesC.png" />
+	  <Content Include="Assets\Images\ship_sidesD.png" />
+	  <Content Include="Assets\Images\star_large.png" />
+	  <Content Include="Assets\Images\star_medium.png" />
+	  <Content Include="Assets\Images\star_small.png" />
+	  <Content Include="Assets\Images\star_tiny.png" />
+	  <Content Include="Assets\Images\station_A.png" />
+	  <Content Include="Assets\Images\station_B.png" />
+	  <Content Include="Assets\Images\station_C.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Assets\Icons\" />
+	</ItemGroup>
+
 </Project>
