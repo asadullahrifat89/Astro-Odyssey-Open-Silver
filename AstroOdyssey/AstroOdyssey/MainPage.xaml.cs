@@ -21,7 +21,7 @@ namespace AstroOdyssey
 
         bool isGameRunning;
 
-        List<Border> removableItems = new List<Border>();
+        List<Border> removableObjects = new List<Border>();
 
         Random rand = new Random();
 
@@ -102,7 +102,7 @@ namespace AstroOdyssey
 
         #region Properties
 
-        public Border Player { get; set; }
+        public Player Player { get; set; }
 
         #endregion
 
@@ -134,18 +134,18 @@ namespace AstroOdyssey
                 UpdateScoreboard();
 
                 GetPlayerCoordinates();
-
+                
                 SpawnEnemy();
-
+                
                 SpawnMeteor();
 
                 MovePlayer();
 
                 UpdateFrame();
 
-                ScaleDifficulty();                
+                ScaleDifficulty();
 
-                CheckIfGameOver();
+                CheckPlayerHealth();
 
                 await Task.Delay(frameInterval);
             }
@@ -188,8 +188,7 @@ namespace AstroOdyssey
 
                     if (Canvas.GetTop(laser) < 10)
                     {
-                        laser.IsMarkedToDelete = true;
-                        removableItems.Add(laser);
+                        removableObjects.Add(laser);
                     }
 
                     Rect laserBounds = new Rect(Canvas.GetLeft(laser), Canvas.GetTop(laser), laser.Width, laser.Height);
@@ -202,11 +201,9 @@ namespace AstroOdyssey
 
                             if (IntersectsWith(laserBounds, enemyBounds))
                             {
-                                laser.IsMarkedToDelete = true;
-                                removableItems.Add(laser);
+                                removableObjects.Add(laser);
 
-                                targetEnemy.IsMarkedToDelete = true;
-                                removableItems.Add(targetEnemy);
+                                removableObjects.Add(targetEnemy);
 
                                 score++;
 
@@ -220,15 +217,13 @@ namespace AstroOdyssey
 
                             if (IntersectsWith(laserBounds, meteorBounds))
                             {
-                                laser.IsMarkedToDelete = true;
-                                removableItems.Add(laser);
+                                removableObjects.Add(laser);
 
                                 targetMeteor.Health--;
 
                                 if (targetMeteor.Health <= 0)
                                 {
-                                    targetMeteor.IsMarkedToDelete = true;
-                                    removableItems.Add(targetMeteor);
+                                    removableObjects.Add(targetMeteor);
 
                                     PlayMeteorDestructionSound();
                                 }
@@ -246,8 +241,7 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerHitBox, enemyHitBox))
                     {
-                        enemy.IsMarkedToDelete = true;
-                        removableItems.Add(enemy);
+                        removableObjects.Add(enemy);
 
                         playerHealth -= 5;
 
@@ -264,8 +258,7 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerHitBox, meteorHitBox))
                     {
-                        meteor.IsMarkedToDelete = true;
-                        removableItems.Add(meteor);
+                        removableObjects.Add(meteor);
 
                         playerHealth -= 5;
 
@@ -274,7 +267,7 @@ namespace AstroOdyssey
                 }
             }
 
-            removableItems.ForEach((removableItem) => { GameCanvas.Children.Remove(removableItem); });
+            removableObjects.ForEach((removableItem) => { GameCanvas.Children.Remove(removableItem); });
         }
 
         private void UpdateScoreboard()
@@ -283,7 +276,7 @@ namespace AstroOdyssey
             DamageText.Text = "Health: " + playerHealth;
         }
 
-        private void CheckIfGameOver()
+        private void CheckPlayerHealth()
         {
             // game over
             if (playerHealth <= 0)
@@ -291,77 +284,37 @@ namespace AstroOdyssey
                 //TODO: game over
                 StopGame();
             }
-        }      
+        }
 
         private void SpawnEnemy()
         {
+            // each frame progress decreases this counter
             enemyCounter -= 1;
 
+            // when counter reaches zero, create an enemy
             if (enemyCounter < 0)
             {
-                CreateEnemy();
+                GenerateEnemy();
                 enemyCounter = enemylimit;
             }
         }
 
         private void SpawnMeteor()
         {
+            // each frame progress decreases this counter
             meteorCounter -= 1;
 
+            // when counter reaches zero, create a meteor
             if (meteorCounter < 0)
             {
-                CreateMeteor();
+                GenerateMeteor();
                 meteorCounter = meteorlimit;
             }
         }
 
         private void SpawnPlayer()
         {
-            Uri uri = null;
-            var playerShipType = rand.Next(1, 7);
-
-            switch (playerShipType)
-            {
-                case 1:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_A.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 2:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_B.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 3:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_C.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 4:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_D.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 5:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_E.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 6:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_F.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 7:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_G.png", UriKind.RelativeOrAbsolute);
-                    break;
-            }
-
-            var imgPlayer = new Image()
-            {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-                Height = 100,
-                Width = 100,
-                Name = "PlayerImage",
-            };
-
-            Player = new Border()
-            {
-                Child = imgPlayer,
-                Name = "Player",
-                Background = new SolidColorBrush(Colors.Transparent),
-                Height = 100,
-                Width = 100,
-            };
+            Player = new Player();
 
             Canvas.SetLeft(Player, 100);
             Canvas.SetTop(Player, windowHeight - 100);
@@ -426,7 +379,7 @@ namespace AstroOdyssey
             }
         }
 
-        private void CreateEnemy()
+        private void GenerateEnemy()
         {
             var newEnemy = new Enemy();
 
@@ -435,7 +388,7 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(newEnemy);
         }
 
-        private void CreateMeteor()
+        private void GenerateMeteor()
         {
             var newMeteor = new Meteor();
 

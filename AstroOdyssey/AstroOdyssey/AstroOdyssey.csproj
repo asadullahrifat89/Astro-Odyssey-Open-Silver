@@ -79,6 +79,7 @@
 		<Compile Include="Models\GameObject.cs" />
 		<Compile Include="Models\Laser.cs" />
 		<Compile Include="Models\Meteor.cs" />
+		<Compile Include="Models\Player.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

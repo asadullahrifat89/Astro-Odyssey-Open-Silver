@@ -8,7 +8,5 @@ namespace AstroOdyssey
         {
 
         }
-
-        public bool IsMarkedToDelete { get; set; }
     }
 }
