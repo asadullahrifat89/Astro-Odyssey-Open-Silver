@@ -333,6 +333,8 @@ namespace AstroOdyssey
                     {
                         removableItems.Add(element);
                         damage += 5;
+
+                        PlayPlayerDamageSound();
                     }
                 }
             }
@@ -473,6 +475,21 @@ namespace AstroOdyssey
                 //play audio with out html audio tag
                 var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_f180bb8ad1.mp3?filename=explosion-36210.mp3');
                 myAudio.volume = 0.8;
+                myAudio.play();
+            }())
+            ");
+        }
+
+        private void PlayPlayerDamageSound()
+        {
+            //https://cdn.pixabay.com/download/audio/2021/08/09/audio_9788fd890e.mp3?filename=big-impact-7054.mp3
+            //https://cdn.pixabay.com/download/audio/2021/08/04/audio_fadfc77b9e.mp3?filename=explosion-6055.mp3
+
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() {
+                //play audio with out html audio tag
+                var myAudio = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_fadfc77b9e.mp3?filename=explosion-6055.mp3');
+                myAudio.volume = 1.0;
                 myAudio.play();
             }())
             ");
