@@ -25,11 +25,17 @@ namespace AstroOdyssey
         Random rand = new Random();
 
         int enemyCounter = 100;
-        int playerSpeed = 12;
         int enemylimit = 50;
+        int enemySpeed = 5;
+
+        int meteorCounter = 100;
+        int meteorlimit = 50;
+        int meteorSpeed = 2;
+
+        int playerSpeed = 12;
+
         int score = 0;
         int damage = 0;
-        int enemySpeed = 5;
 
         Rect playerHitBox;
 
@@ -38,8 +44,8 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        TimeSpan frameTime = TimeSpan.FromMilliseconds(10);
-        TimeSpan laserTime = TimeSpan.FromMilliseconds(250);
+        TimeSpan frameInterval = TimeSpan.FromMilliseconds(10);
+        TimeSpan laserInterval = TimeSpan.FromMilliseconds(250);
 
         #endregion
 
@@ -117,13 +123,11 @@ namespace AstroOdyssey
             {
                 UpdateScoreboard();
 
-                playerX = Canvas.GetLeft(Player);
-                playerY = Canvas.GetTop(Player);
-                playerWidthHalf = Player.Width / 2;
-
-                playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
+                GetPlayerCoordinates();
 
                 SpawnEnemy();
+
+                SpawnMeteor();
 
                 MovePlayer();
 
@@ -135,7 +139,40 @@ namespace AstroOdyssey
 
                 CheckIfGameOver();
 
-                await Task.Delay(frameTime);
+                await Task.Delay(frameInterval);
+            }
+        }
+
+        private void GetPlayerCoordinates()
+        {
+            playerX = Canvas.GetLeft(Player);
+            playerY = Canvas.GetTop(Player);
+            playerWidthHalf = Player.Width / 2;
+
+            playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
+        }
+
+        private async void LaserLoop()
+        {
+            while (isGameRunning)
+            {
+                Border newBullet = new Border
+                {
+                    Tag = "laser",
+                    Height = 20,
+                    Width = 5,
+                    Background = new SolidColorBrush(Colors.White),
+                    CornerRadius = new CornerRadius(50)
+                };
+
+                Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2 - newBullet.Width / 2);
+                Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
+
+                GameCanvas.Children.Add(newBullet);
+
+                PlayLaserSound();
+
+                await Task.Delay(laserInterval);
             }
         }
 
@@ -163,30 +200,6 @@ namespace AstroOdyssey
             }
         }
 
-        private async void LaserLoop()
-        {
-            while (isGameRunning)
-            {
-                Border newBullet = new Border
-                {
-                    Tag = "laser",
-                    Height = 20,
-                    Width = 5,
-                    Background = new SolidColorBrush(Colors.White),
-                    CornerRadius = new CornerRadius(50)
-                };
-
-                Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2 - newBullet.Width / 2);
-                Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
-
-                GameCanvas.Children.Add(newBullet);
-
-                PlayLaserSound();
-
-                await Task.Delay(laserTime);
-            }
-        }
-
         private void SpawnEnemy()
         {
             enemyCounter -= 1;
@@ -195,6 +208,17 @@ namespace AstroOdyssey
             {
                 CreateEnemy();
                 enemyCounter = enemylimit;
+            }
+        }
+
+        private void SpawnMeteor()
+        {
+            meteorCounter -= 1;
+
+            if (meteorCounter < 0)
+            {
+                CreateMeteor();
+                meteorCounter = meteorlimit;
             }
         }
 
@@ -260,7 +284,7 @@ namespace AstroOdyssey
                 enemylimit = 45;
                 enemySpeed = 5;
 
-                laserTime = TimeSpan.FromMilliseconds(225);
+                laserInterval = TimeSpan.FromMilliseconds(225);
             }
 
             // easy
@@ -269,7 +293,7 @@ namespace AstroOdyssey
                 enemylimit = 40;
                 enemySpeed = 10;
 
-                laserTime = TimeSpan.FromMilliseconds(200);
+                laserInterval = TimeSpan.FromMilliseconds(200);
             }
 
             // medium
@@ -278,7 +302,7 @@ namespace AstroOdyssey
                 enemylimit = 35;
                 enemySpeed = 15;
 
-                laserTime = TimeSpan.FromMilliseconds(175);
+                laserInterval = TimeSpan.FromMilliseconds(175);
             }
 
             // hard
@@ -287,7 +311,7 @@ namespace AstroOdyssey
                 enemylimit = 30;
                 enemySpeed = 20;
 
-                laserTime = TimeSpan.FromMilliseconds(150);
+                laserInterval = TimeSpan.FromMilliseconds(150);
             }
         }
 
@@ -320,6 +344,16 @@ namespace AstroOdyssey
                             PlayEnemyShipDestructionSound();
                         }
                     }
+
+                    foreach (var meteor in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "meteor"))
+                    {
+                        Rect meteorHit = new Rect(Canvas.GetLeft(meteor), Canvas.GetTop(meteor), meteor.Width, meteor.Height);
+
+                        if (IntersectsWith(bulletHitBox, meteorHit))
+                        {
+                            removableItems.Add(element);
+                        }
+                    }
                 }
 
                 if (element is Border && (string)element.Tag == "enemy")
@@ -332,6 +366,22 @@ namespace AstroOdyssey
                     if (IntersectsWith(playerHitBox, enemyHitBox))
                     {
                         removableItems.Add(element);
+                        damage += 5;
+
+                        PlayPlayerDamageSound();
+                    }
+                }
+
+                if (element is Border && (string)element.Tag == "meteor")
+                {
+                    // move meteor down
+                    Canvas.SetTop(element, Canvas.GetTop(element) + meteorSpeed);
+
+                    Rect meteorHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
+
+                    if (IntersectsWith(playerHitBox, meteorHitBox))
+                    {
+                        removableItems.Add(element);                        
                         damage += 5;
 
                         PlayPlayerDamageSound();
@@ -362,9 +412,9 @@ namespace AstroOdyssey
         {
             Uri uri = null;
 
-            var enemyShipType = rand.Next(1, 5);
+            var enemyType = rand.Next(1, 5);
 
-            switch (enemyShipType)
+            switch (enemyType)
             {
                 case 1:
                     uri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
@@ -389,7 +439,6 @@ namespace AstroOdyssey
                 Stretch = Stretch.Uniform,
                 Height = 100,
                 Width = 100,
-                Name = "EnemyImage",
             };
 
             Border newEnemy = new Border
@@ -405,7 +454,60 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(newEnemy);
         }
 
+        private void CreateMeteor()
+        {
+            Uri uri = null;
 
+            var meteorType = rand.Next(1, 8);
+
+            switch (meteorType)
+            {
+                case 1:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_detailedLarge.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 2:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_squareDetailedSmall.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 3:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_squareLarge.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 4:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_squareSmall.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 5:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_large.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 6:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_small.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 7:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_detailedLarge.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 8:
+                    uri = new Uri("ms-appx:///Assets/Images/meteor_detailedSmall.png", UriKind.RelativeOrAbsolute);
+                    break;
+            }
+
+            var imgMeteor = new Image()
+            {
+                Source = new BitmapImage(uri),
+                Stretch = Stretch.Uniform,
+                Height = 100,
+                Width = 100,
+            };
+
+            Border newMeteor = new Border
+            {
+                Tag = "meteor",
+                Height = 100,
+                Width = 100,
+                Child = imgMeteor,
+            };
+
+            Canvas.SetTop(newMeteor, -100);
+            Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));
+            GameCanvas.Children.Add(newMeteor);
+        }
 
         private bool IntersectsWith(Rect source, Rect target)
         {
