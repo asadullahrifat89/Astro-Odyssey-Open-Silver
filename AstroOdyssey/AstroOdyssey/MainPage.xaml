@@ -6,12 +6,28 @@
     xmlns:local="clr-namespace:AstroOdyssey"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <Canvas>
+
+    <Canvas
+        x:Name="GameCanvas"
+        Background="Black"
+        KeyDown="GameCanvas_KeyDown"
+        KeyUp="GameCanvas_KeyUp">
+
         <TextBlock
-            x:Name="TextBlock1"
-            Canvas.Left="20"
-            Canvas.Top="30"
-            Text="Hello World!" />
+            Name="ScoreText"
+            FontSize="18"
+            FontWeight="Bold"
+            Foreground="White"
+            Text="Score: 0" />
+
+        <TextBlock
+            Name="DamageText"
+            Canvas.Left="395"
+            FontSize="18"
+            FontWeight="Bold"
+            Foreground="White"
+            Text="Score: 0" />
+
     </Canvas>
 
 </Page>
