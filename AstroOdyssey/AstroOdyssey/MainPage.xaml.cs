@@ -24,10 +24,9 @@ namespace AstroOdyssey
 
         Random rand = new Random();
 
-        int enemySpriteCounter = 0;
         int enemyCounter = 100;
         int playerSpeed = 10;
-        int limit = 50;
+        int enemylimit = 50;
         int score = 0;
         int damage = 0;
         int enemySpeed = 5;
@@ -37,6 +36,13 @@ namespace AstroOdyssey
         double windowWidth, windowHeight;
 
         double pointerX;
+
+        DispatcherTimer shotTimer;
+
+        TimeSpan frameTime = TimeSpan.FromMilliseconds(10);
+        TimeSpan shotTime = TimeSpan.FromMilliseconds(200);
+
+        //MediaElement mediaElementForLaser;
 
         #endregion
 
@@ -52,12 +58,15 @@ namespace AstroOdyssey
             SetWindowSize();
             StartGame();
             RunGame();
+
+            MediaElementForBackground.Play();
         }
 
         //When the window is loaded, we add the event Current_SizeChanged
         void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged += Current_SizeChanged;
+            MediaElementForBackground.Play();
         }
 
         //When the window is unloaded, we remove the event Current_SizeChanged
@@ -95,8 +104,30 @@ namespace AstroOdyssey
 
         private void StartGame()
         {
-            MakePlayer();
+            SpawnPlayer();
             isGameRunning = true;
+
+            shotTimer = new DispatcherTimer();
+            shotTimer.Interval = shotTime;
+            shotTimer.Tick += Timer_Tick;
+            shotTimer.Start();
+        }
+
+        private void Timer_Tick(object sender, object e)
+        {
+            Border newBullet = new Border
+            {
+                Tag = "bullet",
+                Height = 20,
+                Width = 5,
+                Background = new SolidColorBrush(Colors.White),
+                CornerRadius = new CornerRadius(50)
+            };
+
+            Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2 - newBullet.Width / 2);
+            Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
+
+            GameCanvas.Children.Add(newBullet);
         }
 
         private async void RunGame()
@@ -105,6 +136,7 @@ namespace AstroOdyssey
             {
                 var playerX = Canvas.GetLeft(Player);
                 var playerY = Canvas.GetTop(Player);
+                var playerWidthHalf = Player.Width / 2;
 
                 playerHitBox = new Rect(playerX, playerY, Player.Width, Player.Height);
 
@@ -115,13 +147,12 @@ namespace AstroOdyssey
 
                 if (enemyCounter < 0)
                 {
-                    MakeEnemies();
-                    enemyCounter = limit;
+                    SpawnEnemies();
+                    enemyCounter = enemylimit;
                 }
 
-
                 // move right
-                if (pointerX - 50 > playerX + 10)
+                if (pointerX - playerWidthHalf > playerX + 10)
                 {
                     if (playerX + 90 < windowWidth)
                     {
@@ -130,7 +161,7 @@ namespace AstroOdyssey
                 }
 
                 // move left
-                if (pointerX - 50 < playerX - 10)
+                if (pointerX - playerWidthHalf < playerX - 10)
                 {
                     Canvas.SetLeft(Player, playerX - playerSpeed);
                 }
@@ -185,26 +216,70 @@ namespace AstroOdyssey
                     GameCanvas.Children.Remove(i);
                 }
 
-                if (score > 5)
+                // easy
+                if (score > 50)
                 {
-                    limit = 20;
+                    enemylimit = 45;
+                    enemySpeed = 7;
+                }
+
+                // medium
+                if (score > 100)
+                {
+                    enemylimit = 35;
+                    enemySpeed = 10;
+                }
+
+                // hard
+                if (score > 300)
+                {
+                    enemylimit = 20;
                     enemySpeed = 15;
                 }
 
+                // game over
                 if (damage >= 100)
                 {
                     //TODO: game over
                 }
 
-                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                await Task.Delay(frameTime);
             }
         }
 
-        private void MakePlayer()
+        private void SpawnPlayer()
         {
+            Uri uri = null;
+            var playerShipType = rand.Next(1, 7);
+
+            switch (playerShipType)
+            {
+                case 1:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_A.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 2:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_B.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 3:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_C.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 4:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_D.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 5:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_E.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 6:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_F.png", UriKind.RelativeOrAbsolute);
+                    break;
+                case 7:
+                    uri = new Uri("ms-appx:///Assets/Images/ship_G.png", UriKind.RelativeOrAbsolute);
+                    break;
+            }
+
             var imgPlayer = new Image()
             {
-                Source = new BitmapImage(new Uri("ms-appx:///Assets/Images/ship_H.png", UriKind.RelativeOrAbsolute)),
+                Source = new BitmapImage(uri),
                 Stretch = Stretch.Uniform,
                 Height = 100,
                 Width = 100,
@@ -226,13 +301,13 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(Player);
         }
 
-        private void MakeEnemies()
+        private void SpawnEnemies()
         {
-            enemySpriteCounter = rand.Next(1, 5);
-
             Uri uri = null;
 
-            switch (enemySpriteCounter)
+            var enemyShipType = rand.Next(1, 5);
+
+            switch (enemyShipType)
             {
                 case 1:
                     uri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
@@ -292,25 +367,6 @@ namespace AstroOdyssey
             var currentPoint = e.GetCurrentPoint(GameCanvas);
 
             pointerX = currentPoint.Position.X;
-        }
-
-        private void GameCanvas_KeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Space)
-            {
-                Border newBullet = new Border
-                {
-                    Tag = "bullet",
-                    Height = 20,
-                    Width = 5,
-                    Background = new SolidColorBrush(Colors.Red),
-                };
-
-                Canvas.SetLeft(newBullet, Canvas.GetLeft(Player) + Player.Width / 2);
-                Canvas.SetTop(newBullet, Canvas.GetTop(Player) - newBullet.Height);
-
-                GameCanvas.Children.Add(newBullet);
-            }
         }
 
         #endregion

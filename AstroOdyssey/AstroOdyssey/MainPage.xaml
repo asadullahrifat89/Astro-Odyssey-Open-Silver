@@ -8,6 +8,16 @@
     mc:Ignorable="d">
 
     <Grid>
+        <StackPanel VerticalAlignment="Top">
+            <MediaElement
+                x:Name="MediaElementForBackground"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                AutoPlay="False"
+                IsMuted="False"
+                Source="ms-appx:/Assets/Sounds/background.mp3"
+                Volume="1.0" />
+        </StackPanel>
 
         <Canvas
             x:Name="GameCanvas"

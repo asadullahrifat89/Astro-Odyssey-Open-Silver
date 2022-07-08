@@ -125,6 +125,8 @@
 	  <Content Include="Assets\Images\station_A.png" />
 	  <Content Include="Assets\Images\station_B.png" />
 	  <Content Include="Assets\Images\station_C.png" />
+	  <Content Include="Assets\Sounds\background.mp3" />
+	  <Content Include="Assets\Sounds\laser2.mp3" />
 	</ItemGroup>
 
 	<ItemGroup>
