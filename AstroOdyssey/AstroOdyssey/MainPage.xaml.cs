@@ -194,10 +194,7 @@ namespace AstroOdyssey
 
         private void RemoveRemovables()
         {
-            foreach (Border removableItem in removableItems)
-            {
-                GameCanvas.Children.Remove(removableItem);
-            }
+            removableItems.ForEach((removableItem) => { GameCanvas.Children.Remove(removableItem); });
         }
 
         private void SpawnEnemy()
@@ -331,27 +328,30 @@ namespace AstroOdyssey
 
                     Rect bulletHitBox = new Rect(Canvas.GetLeft(element), Canvas.GetTop(element), element.Width, element.Height);
 
-                    foreach (var enemy in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy"))
+                    foreach (var enemy in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "enemy" || (string)x.Tag == "meteor"))
                     {
-                        Rect enemyHit = new Rect(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
-
-                        if (IntersectsWith(bulletHitBox, enemyHit))
+                        if (enemy is Border && (string)enemy.Tag == "enemy")
                         {
-                            removableItems.Add(element);
-                            removableItems.Add(enemy);
-                            score++;
+                            Rect enemyHit = new Rect(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
 
-                            PlayEnemyShipDestructionSound();
+                            if (IntersectsWith(bulletHitBox, enemyHit))
+                            {
+                                removableItems.Add(element);
+                                removableItems.Add(enemy);
+                                score++;
+
+                                PlayEnemyShipDestructionSound();
+                            }
                         }
-                    }
 
-                    foreach (var meteor in GameCanvas.Children.OfType<Border>().Where(x => (string)x.Tag == "meteor"))
-                    {
-                        Rect meteorHit = new Rect(Canvas.GetLeft(meteor), Canvas.GetTop(meteor), meteor.Width, meteor.Height);
-
-                        if (IntersectsWith(bulletHitBox, meteorHit))
+                        if (enemy is Border && (string)enemy.Tag == "meteor")
                         {
-                            removableItems.Add(element);
+                            Rect meteorHit = new Rect(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
+
+                            if (IntersectsWith(bulletHitBox, meteorHit))
+                            {
+                                removableItems.Add(element);
+                            }
                         }
                     }
                 }
@@ -381,7 +381,7 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerHitBox, meteorHitBox))
                     {
-                        removableItems.Add(element);                        
+                        removableItems.Add(element);
                         damage += 5;
 
                         PlayPlayerDamageSound();
@@ -410,44 +410,7 @@ namespace AstroOdyssey
 
         private void CreateEnemy()
         {
-            Uri uri = null;
-
-            var enemyType = rand.Next(1, 5);
-
-            switch (enemyType)
-            {
-                case 1:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 2:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_B.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 3:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_C.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 4:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_D.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 5:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_E.png", UriKind.RelativeOrAbsolute);
-                    break;
-            }
-
-            var imgEnemy = new Image()
-            {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-                Height = 100,
-                Width = 100,
-            };
-
-            Border newEnemy = new Border
-            {
-                Tag = "enemy",
-                Height = 100,
-                Width = 100,
-                Child = imgEnemy,
-            };
+            var newEnemy = new Enemy();
 
             Canvas.SetTop(newEnemy, -100);
             Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
@@ -456,53 +419,7 @@ namespace AstroOdyssey
 
         private void CreateMeteor()
         {
-            Uri uri = null;
-
-            var meteorType = rand.Next(1, 8);
-
-            switch (meteorType)
-            {
-                case 1:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_detailedLarge.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 2:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_squareDetailedSmall.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 3:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_squareLarge.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 4:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_squareSmall.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 5:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_large.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 6:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_small.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 7:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_detailedLarge.png", UriKind.RelativeOrAbsolute);
-                    break;
-                case 8:
-                    uri = new Uri("ms-appx:///Assets/Images/meteor_detailedSmall.png", UriKind.RelativeOrAbsolute);
-                    break;
-            }
-
-            var imgMeteor = new Image()
-            {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-                Height = 100,
-                Width = 100,
-            };
-
-            Border newMeteor = new Border
-            {
-                Tag = "meteor",
-                Height = 100,
-                Width = 100,
-                Child = imgMeteor,
-            };
+            var newMeteor = new Meteor();
 
             Canvas.SetTop(newMeteor, -100);
             Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));

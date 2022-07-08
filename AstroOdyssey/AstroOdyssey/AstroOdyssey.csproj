@@ -75,6 +75,8 @@
 		<Compile Include="Converters\DoubleToCornerRadiusConverter.cs" />
 		<Compile Include="Converters\TextToPlaceholderTextVisibilityConverter.cs" />
 		<Compile Include="MainPage.xaml.cs" />
+		<Compile Include="Models\Enemy.cs" />
+		<Compile Include="Models\Meteor.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
