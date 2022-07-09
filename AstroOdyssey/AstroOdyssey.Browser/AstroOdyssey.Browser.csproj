@@ -5,6 +5,7 @@
 		<NoXamlPreprocessor>True</NoXamlPreprocessor>
 		<OpenSilverType>4</OpenSilverType>
 		<OpenSilverVersion>1.0.0</OpenSilverVersion>
+		<WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 		<!--Use .NET 6 to enable the commented options below-->
 		<PublishTrimmed>true</PublishTrimmed>
 		<RunAOTCompilation Condition="'$(IsSecondPass)'!='True'">true</RunAOTCompilation>

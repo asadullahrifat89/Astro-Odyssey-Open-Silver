@@ -54,6 +54,8 @@ namespace AstroOdyssey
 
         string baseUrl;
 
+        object backgroundAudio = null;
+
         #endregion
 
         #region Ctor
@@ -66,7 +68,6 @@ namespace AstroOdyssey
             this.Unloaded += Window_SizeChanged_Demo_Unloaded;
 
             SetWindowSize();
-            PlayBacgroundMusic();
             GameGrid.Visibility = Visibility.Collapsed;
         }
 
@@ -84,6 +85,8 @@ namespace AstroOdyssey
 
         private void StartGame()
         {
+            PlayBacgroundMusic();
+
             score = 0;
             _fpsCount = 0;
             _fpsCounter = 0;
@@ -104,6 +107,7 @@ namespace AstroOdyssey
 
         private void StopGame()
         {
+            StopBacgroundMusic();
             isGameRunning = false;
             PlayButton.Visibility = Visibility.Visible;
         }
@@ -437,6 +441,13 @@ namespace AstroOdyssey
 
         #region Canvas Events
 
+        private void GameCanvas_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            var currentPoint = e.GetCurrentPoint(GameCanvas);
+
+            pointerX = currentPoint.Position.X;
+        }
+
         private void GameCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             var currentPoint = e.GetCurrentPoint(GameCanvas);
@@ -491,15 +502,44 @@ namespace AstroOdyssey
 
         private void PlayBacgroundMusic()
         {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/slow-trap-18565.mp3";
+            var musicTrack = rand.Next(1, 4);
+
+            string host = null;
+
+            switch (musicTrack)
+            {
+                case 1: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/slow-trap-18565.mp3"; } break;
+                case 2: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/space-chillout-14194.mp3"; } break;
+                case 3: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/cinematic-space-drone-10623.mp3"; } break;
+                default:
+                    break;
+            }
+
+            backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() { 
+                //play audio with out html audio tag
+                var backgroundAudio = new Audio($0);
+                backgroundAudio.loop = true;
+                return backgroundAudio;
+            }())", host);
 
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() { 
-                //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.loop = true;
-                myAudio.play();
-            }())", host);
+                //play audio with out html audio tag              
+                $0.play();           
+            }())", backgroundAudio);
+        }
+
+        private void StopBacgroundMusic()
+        {
+            if (backgroundAudio is not null)
+            {
+                OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() { 
+                    //play audio with out html audio tag              
+                    $0.pause();           
+                }())", backgroundAudio);
+            }
         }
 
         private void PlayLaserSound()

@@ -47,14 +47,14 @@ namespace AstroOdyssey
             {
                 Source = new BitmapImage(uri),
                 Stretch = Stretch.Uniform,
-                Height = 100,
-                Width = 100,
+                //Height = 100,
+                //Width = 100,
                 Name = "PlayerImage",
             };
 
             Child = imgPlayer;
             Health = 100;
-            HealthSlot = 5;
+            HealthSlot = 50;
         }
     }
 }

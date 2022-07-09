@@ -13,7 +13,7 @@
             <Canvas
                 x:Name="GameCanvas"
                 Background="Transparent"
-                PointerMoved="GameCanvas_PointerMoved" />
+                PointerPressed="GameCanvas_PointerPressed" />
 
             <TextBlock
                 Name="ScoreText"
