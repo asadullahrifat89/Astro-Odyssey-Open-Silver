@@ -17,7 +17,10 @@ namespace AstroOdyssey
         private const float FRAME_CAP_MS = 1000.0f / 60.0f;
         private int fpsCount;
         private int fpsCounter;
-        private float lastFPSTime;
+        private float lastFrameTimeTime;
+        private long frameStartTime;
+        private int frameWaitTime;
+        private long frameTime;
 
         private bool gameIsRunning;
 
@@ -117,7 +120,7 @@ namespace AstroOdyssey
 
             fpsCount = 0;
             fpsCounter = 0;
-            lastFPSTime = 0;
+            lastFrameTimeTime = 0;
 
             laserTime = 235;
             laserSpeed = 20;
@@ -150,9 +153,9 @@ namespace AstroOdyssey
 
             while (gameIsRunning)
             {
-                var frameStartTime = watch.ElapsedMilliseconds;
+                frameStartTime = watch.ElapsedMilliseconds;
 
-                UpdateStats();
+                UpdateGameStats();
 
                 GetPlayerBounds();
 
@@ -170,25 +173,24 @@ namespace AstroOdyssey
 
                 CheckPlayerDeath();
 
-                CalculateFps(frameStartTime);
+                CalculateFps();
 
                 FocusBox.Focus();
 
-                await AwaitFrameTime(watch, frameStartTime);
+                await AwaitFrameTime(watch);
             }
         }
 
         /// <summary>
         /// Awaits the calculated frame time.
         /// </summary>
-        /// <param name="watch"></param>
-        /// <param name="frameStartTime"></param>
+        /// <param name="watch"></param>        
         /// <returns></returns>
-        private async Task AwaitFrameTime(Stopwatch watch, long frameStartTime)
+        private async Task AwaitFrameTime(Stopwatch watch)
         {
-            int frameTime = CalculateFrameTime(watch, frameStartTime);
+            frameWaitTime = CalculateFrameWaitTime(watch);
 
-            await Task.Delay(frameTime);
+            await Task.Delay(frameWaitTime);
         }
 
         /// <summary>
@@ -231,14 +233,13 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Calculates the frame time.
+        /// Calculates the wait time between frames.
         /// </summary>
-        /// <param name="watch"></param>
-        /// <param name="frameStartTime"></param>
+        /// <param name="watch"></param>        
         /// <returns></returns>
-        private int CalculateFrameTime(Stopwatch watch, long frameStartTime)
+        private int CalculateFrameWaitTime(Stopwatch watch)
         {
-            var frameTime = watch.ElapsedMilliseconds - frameStartTime;
+            frameTime = watch.ElapsedMilliseconds - frameStartTime;
             var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
             return waitTime;
         }
@@ -247,14 +248,14 @@ namespace AstroOdyssey
         /// Calculates frames per second.
         /// </summary>
         /// <param name="frameStartTime"></param>
-        private void CalculateFps(long frameStartTime)
+        private void CalculateFps()
         {
             // calculate FPS
-            if (lastFPSTime + 1000 < frameStartTime)
+            if (lastFrameTimeTime + 1000 < frameStartTime)
             {
                 fpsCount = fpsCounter;
                 fpsCounter = 0;
-                lastFPSTime = frameStartTime;
+                lastFrameTimeTime = frameStartTime;
             }
 
             fpsCounter++;
@@ -454,11 +455,12 @@ namespace AstroOdyssey
         /// <summary>
         /// Updates the game score, player health, fps, and objects currently in view.
         /// </summary>
-        private void UpdateStats()
+        private void UpdateGameStats()
         {
             ScoreText.Text = "Score: " + score;
-            HealthText.Text =/* "Health: " +*/ GetPlayerHealthPoints();
-            FPSText.Text = "FPS: " + fpsCount;
+            HealthText.Text = GetPlayerHealthPoints();
+            FPSText.Text = "FPS: " + fpsCount;            
+            FrameTimeText.Text = "Frame time: " + frameWaitTime + "ms";
             ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
         }
 

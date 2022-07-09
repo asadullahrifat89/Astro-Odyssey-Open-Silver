@@ -56,10 +56,22 @@
             Foreground="White"
             Text="FPS:" />
 
+        <!--  This shows frame time  -->
+        <TextBlock
+            Name="FrameTimeText"
+            Margin="5,50,5,5"
+            HorizontalAlignment="Right"
+            FontFamily="Consolas"
+            FontSize="18"
+            FontWeight="Bold"
+            Foreground="White"
+            Text="Frame Time:" />
+
+
         <!--  This shows current objects count in game canvas  -->
         <TextBlock
             Name="ObjectsText"
-            Margin="5,50,5,5"
+            Margin="5,150,5,5"
             HorizontalAlignment="Right"
             FontFamily="Consolas"
             FontSize="18"
