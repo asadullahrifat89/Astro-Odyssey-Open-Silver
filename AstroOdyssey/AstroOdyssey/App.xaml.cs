@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Browser;
 using Windows.UI.Xaml;
 
 namespace AstroOdyssey
@@ -6,6 +7,8 @@ namespace AstroOdyssey
     public sealed partial class App : Application
     {
         private static MainPage mainPage;
+
+        private static string baseUrl;
 
         public App()
         {
@@ -16,11 +19,24 @@ namespace AstroOdyssey
             mainPage = new MainPage();
             Window.Current.Content = mainPage;
 
+            SetBaseUrl();
+
             mainPage.NavigateToPage("/GameStartPage");
+        }
+
+        private void SetBaseUrl()
+        {
+            baseUrl = HtmlPage.Document.DocumentUri.OriginalString;
+        }
+
+        public static string GetBaseUrl()
+        {
+            return baseUrl;
         }
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
+           
             UnhandledException += App_UnhandledException;
         }
 

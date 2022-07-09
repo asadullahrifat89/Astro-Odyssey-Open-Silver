@@ -132,7 +132,7 @@ namespace AstroOdyssey
             //TODO: show score  
             //TODO: ask if want to play again
             App.NavigateToPage("/GameStartPage");
-                      
+
         }
 
         /// <summary>
@@ -506,7 +506,7 @@ namespace AstroOdyssey
             var newLaser = new Laser(laserHeight, laserWidth);
 
             Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
-            Canvas.SetTop(newLaser, Canvas.GetTop(player) - laserSpeed);
+            Canvas.SetTop(newLaser, Canvas.GetTop(player) - 20);
 
             GameCanvas.Children.Add(newLaser);
         }
@@ -728,7 +728,7 @@ namespace AstroOdyssey
         void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged += Current_SizeChanged;
-            baseUrl = HtmlPage.Document.DocumentUri.OriginalString;
+            baseUrl = App.GetBaseUrl();
             StartGame();
         }
 
