@@ -18,7 +18,7 @@ namespace AstroOdyssey
 
         public void LooseHealth()
         {
-            Health = Health - HealthSlot;
+            Health -= HealthSlot;
         }
 
         public Rect GetRect()
