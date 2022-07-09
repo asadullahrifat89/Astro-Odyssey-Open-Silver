@@ -25,14 +25,15 @@
                 Margin="0,100,0,0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
+                Background="White"
                 BorderBrush="White"
-                BorderThickness="0"
+                BorderThickness="5"
                 Click="PlayButton_Click"
                 Content="Play"
                 FontFamily="Consolas"
                 FontSize="30"
-                Foreground="White"
-                Style="{StaticResource MaterialDesign_GlassButton_Style}" />
+                Foreground="Black"
+                Style="{StaticResource MaterialDesign_ColoredRoundButton_Style}" />
         </StackPanel>
 
     </Grid>

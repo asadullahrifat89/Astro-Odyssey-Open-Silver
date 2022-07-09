@@ -624,7 +624,7 @@ namespace AstroOdyssey
             fpsCount = 0;
             fpsCounter = 0;
             lastFrameTime = 0;
-            frameStatUpdateWait = 5;
+            frameStatUpdateWait = 10;
 
             laserTime = 235;
             laserSpeed = 20;
@@ -642,9 +642,13 @@ namespace AstroOdyssey
             StopBackgroundMusic();
             gameIsRunning = false;
 
+
+            //App.NavigateToPage("/GamePage");
+
+
             //TODO: show score  
             //TODO: ask if want to play again
-            App.NavigateToPage("/GameStartPage");
+            //App.NavigateToPage("/GameStartPage");
 
         }
 
