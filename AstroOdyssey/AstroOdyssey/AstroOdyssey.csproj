@@ -76,6 +76,7 @@
 
 	<ItemGroup>
 		<Compile Include="App.xaml.cs" />
+		<Compile Include="Constants.cs" />
 		<Compile Include="Converters\AccentColorConverter.cs" />
 		<Compile Include="Converters\BooleanToVisibilityConverter.cs" />
 		<Compile Include="Converters\DoubleToCornerRadiusConverter.cs" />

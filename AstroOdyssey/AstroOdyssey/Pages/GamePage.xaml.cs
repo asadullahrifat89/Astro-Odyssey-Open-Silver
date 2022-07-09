@@ -7,6 +7,7 @@ using System.Windows.Browser;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using static AstroOdyssey.Constants;
 
 namespace AstroOdyssey
 {
@@ -280,7 +281,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayerScoreByEnemyDestruction()
         {
-            score++;
+            score += 2;
         }
 
         /// <summary>
@@ -288,7 +289,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayerScoreByMeteorDestruction()
         {
-            score += 0.5d;
+            score++;
         }
 
         #endregion
@@ -909,7 +910,7 @@ namespace AstroOdyssey
 
             SetGameCanvasSize();
             SetPlayerCanvasTop();
-        }     
+        }
 
         #endregion
 
@@ -1096,21 +1097,9 @@ namespace AstroOdyssey
                 $0.pause();           
             }())", audio);
         }
-        
+
         #endregion
 
         #endregion
-    }
-
-    public enum Difficulty
-    {
-        Noob,
-        StartUp,
-        Easy,
-        Medium,
-        Hard,
-        VeryHard,
-        Extreme,
-        Pro,
     }
 }
