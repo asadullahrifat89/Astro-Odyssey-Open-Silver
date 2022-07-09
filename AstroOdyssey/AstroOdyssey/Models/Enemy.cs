@@ -14,7 +14,6 @@ namespace AstroOdyssey
             Width = 100;
 
             Uri shipUri = null;
-
             var enemyShipType = new Random().Next(1, 6);
 
             switch (enemyShipType)
@@ -41,13 +40,13 @@ namespace AstroOdyssey
                     break;
             }
 
-            var imgEnemy = new Image()
+            var imgShip = new Image()
             {
                 Source = new BitmapImage(shipUri),
                 Stretch = Stretch.Uniform,
             };
 
-            Child = imgEnemy;
+            Child = imgShip;
         }
     }
 }
