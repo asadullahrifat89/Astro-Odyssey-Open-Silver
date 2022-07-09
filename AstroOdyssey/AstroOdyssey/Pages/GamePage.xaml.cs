@@ -60,6 +60,8 @@ namespace AstroOdyssey
 
         Difficulty difficulty = Difficulty.StartUp;
 
+        bool moveLeft = false, moveRight = false;
+
         #endregion
 
         #region Ctor
@@ -167,6 +169,8 @@ namespace AstroOdyssey
                 CalculateFps(frameStartTime);
 
                 int frameTime = CalculateFrameTime(watch, frameStartTime);
+
+                FocusBox.Focus();
 
                 await Task.Delay(frameTime);
             }
@@ -649,6 +653,12 @@ namespace AstroOdyssey
         /// </summary>
         private void MovePlayer()
         {
+            if (moveLeft && playerX > 0)
+                pointerX -= playerSpeed;
+
+            if (moveRight && playerX + player.Width + 5 < windowWidth)
+                pointerX += playerSpeed;
+
             // move right
             if (pointerX - playerWidthHalf > playerX + playerSpeed)
             {
@@ -949,6 +959,32 @@ namespace AstroOdyssey
                 $0.currentTime =0;
                 $0.play();           
             }())", audio);
+        }
+
+        private void FocusBox_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Left)
+            {
+                moveLeft = true;
+            }
+
+            if (e.Key == Windows.System.VirtualKey.Right)
+            {
+                moveRight = true;
+            }
+        }
+
+        private void FocusBox_KeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Left)
+            {
+                moveLeft = false;
+            }
+
+            if (e.Key == Windows.System.VirtualKey.Right)
+            {
+                moveRight = false;
+            }
         }
 
         /// <summary>

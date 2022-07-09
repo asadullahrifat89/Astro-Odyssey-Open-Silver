@@ -4,13 +4,25 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:AstroOdyssey">
 
-    <Grid x:Name="RootGrid" Background="Black">
+    <Grid x:Name="RootGrid">
 
+        <!--  This is for capturing arrow key events  -->
+        <TextBox
+            x:Name="FocusBox"
+            Width="1"
+            Height="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            KeyDown="FocusBox_KeyDown"
+            KeyUp="FocusBox_KeyUp" />
+
+        <!--  This redenders game objects  -->
         <Canvas
             x:Name="GameCanvas"
-            Background="Transparent"
+            Background="Black"
             PointerPressed="GameCanvas_PointerPressed" />
 
+        <!--  This shows current score  -->
         <TextBlock
             Name="ScoreText"
             Margin="5"
@@ -21,6 +33,7 @@
             Foreground="White"
             Text="Score:" />
 
+        <!--  This shows player health  -->
         <TextBlock
             Name="HealthText"
             Margin="5"
@@ -32,6 +45,7 @@
             Foreground="White"
             Text="Health:" />
 
+        <!--  This shows fps  -->
         <TextBlock
             Name="FPSText"
             Margin="5"
@@ -42,6 +56,7 @@
             Foreground="White"
             Text="FPS:" />
 
+        <!--  This shows current objects count in game canvas  -->
         <TextBlock
             Name="ObjectsText"
             Margin="5,50,5,5"

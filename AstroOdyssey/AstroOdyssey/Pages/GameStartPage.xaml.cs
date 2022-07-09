@@ -10,15 +10,15 @@ namespace AstroOdyssey
         public GameStartPage()
         {
             InitializeComponent();
-        } 
+        }
 
         #endregion
 
         #region Button Events
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
-        {            
-            Application.Current.Host.Content.IsFullScreen = true;            
+        {
+            Application.Current.Host.Content.IsFullScreen = true;
             App.NavigateToPage("/GamePage");
         }
 
