@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml.Controls;
+﻿using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
 
 namespace AstroOdyssey
 {
@@ -18,6 +19,11 @@ namespace AstroOdyssey
         public void LooseHealth()
         {
             Health = Health - HealthSlot;
+        }
+
+        public Rect GetRect()
+        {
+            return new Rect(Canvas.GetLeft(this), Canvas.GetTop(this), Width, Height);
         }
     }
 }

@@ -54,7 +54,7 @@ namespace AstroOdyssey
 
             Child = imgPlayer;
             Health = 100;
-            HealthSlot = 50;
+            HealthSlot = 5;
         }
     }
 }
