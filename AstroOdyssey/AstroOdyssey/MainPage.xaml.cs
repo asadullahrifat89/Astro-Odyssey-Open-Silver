@@ -21,9 +21,9 @@ namespace AstroOdyssey
         #region Fields
 
         const float FRAME_CAP_MS = 1000.0f / 60.0f;
-        private int fpsCount = 0;
-        private int fpsCounter = 0;
-        private float lastFPSTime = 0;
+        private int fpsCount;
+        private int fpsCounter;
+        private float lastFPSTime;
 
         bool isGameRunning;
 
@@ -31,24 +31,25 @@ namespace AstroOdyssey
 
         Random rand = new Random();
 
-        int enemyCounter = 100;
-        int enemySpawnWait = 50;
-        int enemySpeed = 5;
+        int enemyCounter;
+        int enemySpawnWait;
+        int enemySpeed;
 
-        int meteorCounter = 100;
-        int meteorSpawnWait = 50;
-        int meteorSpeed = 2;
+        int meteorCounter;
+        int meteorSpawnWait;
+        int meteorSpeed;
 
-        int playerSpeed = 15;
+        int playerSpeed;
 
-        double score = 0;
+        double score;
 
         double windowWidth, windowHeight;
         double playerX, playerWidthHalf;
 
         double pointerX;
 
-        double laserSpeed = 250;
+        double laserTime;
+        double laserSpeed;
 
         string baseUrl;
 
@@ -60,6 +61,7 @@ namespace AstroOdyssey
         object playerHealthDecreaseAudio = null;
 
         Player player;
+
         Rect playerBounds;
 
         #endregion
@@ -109,7 +111,8 @@ namespace AstroOdyssey
             fpsCounter = 0;
             lastFPSTime = 0;
 
-            laserSpeed = 250;
+            laserTime = 250;
+            laserSpeed = 50;
 
             GameCanvas.Children.Clear();
 
@@ -209,13 +212,13 @@ namespace AstroOdyssey
                 var newLaser = new Laser();
 
                 Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
-                Canvas.SetTop(newLaser, Canvas.GetTop(player) - newLaser.Height);
+                Canvas.SetTop(newLaser, Canvas.GetTop(player) - laserSpeed);
 
                 GameCanvas.Children.Add(newLaser);
 
                 PlayLaserSound();
 
-                await Task.Delay(TimeSpan.FromMilliseconds(laserSpeed));
+                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
             }
         }
 
@@ -496,7 +499,7 @@ namespace AstroOdyssey
                 enemySpawnWait = 45;
                 enemySpeed = 5;
 
-                //laserSpeed = 225;
+                laserSpeed = 30;
             }
 
             // easy
@@ -508,7 +511,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 40;
                 meteorSpeed = 4;
 
-                //laserSpeed = 200;
+                laserSpeed = 40;
             }
 
             // medium
@@ -520,7 +523,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 35;
                 meteorSpeed = 6;
 
-                //laserSpeed = 175;
+                laserSpeed = 50;
             }
 
             // hard
@@ -532,7 +535,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 30;
                 meteorSpeed = 8;
 
-                //laserSpeed = 150;
+                laserSpeed = 60;
             }
 
             // very hard
@@ -544,7 +547,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 25;
                 meteorSpeed = 10;
 
-                //laserSpeed = 125;
+                laserSpeed = 70;
             }
 
             // extreme hard
@@ -556,7 +559,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 20;
                 meteorSpeed = 12;
 
-                //laserSpeed = 100;
+                laserSpeed = 80;
             }
         }
 
