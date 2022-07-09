@@ -20,20 +20,24 @@ namespace AstroOdyssey
         private int fpsCounter;
         private float lastFrameTime;
         private long frameStartTime;
-        private int frameWaitTime;
+        private int frameRenderTime;
         private long frameTime;
         private int frameStatUpdateCounter;
-        private int frameStatUpdateWait;
+        private int frameStatUpdateLimit;
 
         private bool gameIsRunning;
 
         private int enemyCounter;
-        private int enemySpawnWait;
+        private int enemySpawnLimit;
         private int enemySpeed;
 
         private int meteorCounter;
-        private int meteorSpawnWait;
+        private int meteorSpawnLimit;
         private int meteorSpeed;
+
+        private int healthCounter;
+        private int healthSpawnLimit;
+        private int healthSpeed;
 
         private int playerSpeed;
 
@@ -54,7 +58,8 @@ namespace AstroOdyssey
         private object enemyDestructionAudio = null;
         private object meteorDestructionAudio = null;
         private object laserHitObjectAudio = null;
-        private object playerHealthDecreaseAudio = null;
+        private object playerHealthLossAudio = null;
+        private object playerHealthGainAudio = null;
 
         private Player player;
         private Rect playerBounds;
@@ -219,17 +224,17 @@ namespace AstroOdyssey
         /// <returns></returns>
         private async Task AwaitFrameTime(Stopwatch watch)
         {
-            frameWaitTime = CalculateFrameWaitTime(watch);
+            frameRenderTime = CalculateFrameRenderTime(watch);
 
-            await Task.Delay(frameWaitTime);
+            await Task.Delay(frameRenderTime);
         }
 
         /// <summary>
-        /// Calculates the wait time between frames.
+        /// Calculates the render of frames.
         /// </summary>
-        /// <param name="watch"></param>        
+        /// <param name="watch"></param>
         /// <returns></returns>
-        private int CalculateFrameWaitTime(Stopwatch watch)
+        private int CalculateFrameRenderTime(Stopwatch watch)
         {
             frameTime = watch.ElapsedMilliseconds - frameStartTime;
             var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
@@ -265,6 +270,7 @@ namespace AstroOdyssey
                 UpdateLaserElement(element);
                 UpdateEnemyElement(element);
                 UpdateMeteorElement(element);
+                UpdateHealthElement(element);
             });
 
             Parallel.ForEach(destroyableGameObjects, (removableItem) =>
@@ -284,10 +290,10 @@ namespace AstroOdyssey
             if (frameStatUpdateCounter < 0)
             {
                 FPSText.Text = "FPS: " + fpsCount;
-                FrameTimeText.Text = "Frame time: " + frameWaitTime + "ms";
+                FrameTimeText.Text = "Frame time: " + frameRenderTime + "ms";
                 ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
 
-                frameStatUpdateCounter = frameStatUpdateWait;
+                frameStatUpdateCounter = frameStatUpdateLimit;
             }
         }
         #endregion
@@ -398,7 +404,7 @@ namespace AstroOdyssey
                 Rect laserBounds = laser.GetRect();
 
                 // get game objects which are not laser
-                var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser);
+                var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is Enemy || x is Meteor);
 
                 Parallel.ForEach(obstacles, (obstacle) =>
                 {
@@ -475,7 +481,7 @@ namespace AstroOdyssey
             if (enemyCounter < 0)
             {
                 GenerateEnemy();
-                enemyCounter = enemySpawnWait;
+                enemyCounter = enemySpawnLimit;
             }
         }
 
@@ -538,7 +544,7 @@ namespace AstroOdyssey
             if (meteorCounter < 0)
             {
                 GenerateMeteor();
-                meteorCounter = meteorSpawnWait;
+                meteorCounter = meteorSpawnLimit;
             }
         }
 
@@ -587,6 +593,72 @@ namespace AstroOdyssey
 
         #endregion
 
+        #region Health Methods
+
+        /// <summary>
+        /// Spawns a Health.
+        /// </summary>
+        private void SpawnHealth()
+        {
+            if (player.Health <= 60)
+            {
+                // each frame progress decreases this counter
+                healthCounter -= 1;
+
+                // when counter reaches zero, create a Health
+                if (healthCounter < 0)
+                {
+                    GenerateHealth();
+                    healthCounter = healthSpawnLimit;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates a random Health.
+        /// </summary>
+        private void GenerateHealth()
+        {
+            var newHealth = new Health();
+
+            Canvas.SetTop(newHealth, -100);
+            Canvas.SetLeft(newHealth, rand.Next(10, (int)windowWidth - 100));
+            GameCanvas.Children.Add(newHealth);
+        }
+
+        /// <summary>
+        /// Update the health element as per frame.
+        /// </summary>
+        /// <param name="element"></param>
+        private void UpdateHealthElement(GameObject element)
+        {
+            if (element is Health health)
+            {
+                // move Health down
+                Canvas.SetTop(health, Canvas.GetTop(health) + healthSpeed);
+
+                Rect healthHitBox = health.GetRect();
+
+                if (IntersectsWith(playerBounds, healthHitBox))
+                {
+                    destroyableGameObjects.Add(health);
+
+                    player.GainHealth(health.Health);
+
+                    PlayPlayerHealthGainSound();
+                }
+                else
+                {
+                    if (Canvas.GetTop(health) > windowHeight)
+                    {
+                        destroyableGameObjects.Add(health);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Game Methods
 
         /// <summary>
@@ -610,12 +682,16 @@ namespace AstroOdyssey
         private void SetDefaultGameEnvironment()
         {
             enemyCounter = 100;
-            enemySpawnWait = 45;
+            enemySpawnLimit = 45;
             enemySpeed = 5;
 
             meteorCounter = 100;
-            meteorSpawnWait = 50;
+            meteorSpawnLimit = 50;
             meteorSpeed = 2;
+
+            healthCounter = 1000;
+            healthSpawnLimit = 1000;
+            healthSpeed = 3;
 
             playerSpeed = 15;
 
@@ -624,7 +700,7 @@ namespace AstroOdyssey
             fpsCount = 0;
             fpsCounter = 0;
             lastFrameTime = 0;
-            frameStatUpdateWait = 10;
+            frameStatUpdateLimit = 10;
 
             laserTime = 235;
             laserSpeed = 20;
@@ -672,6 +748,8 @@ namespace AstroOdyssey
                 SpawnEnemy();
 
                 SpawnMeteor();
+
+                SpawnHealth();
 
                 MovePlayer();
 
@@ -732,82 +810,94 @@ namespace AstroOdyssey
             {
                 case Difficulty.Noob:
                     {
-                        enemySpawnWait = 45;
+                        enemySpawnLimit = 45;
                         enemySpeed = 5;
                         laserSpeed = 30;
                     }
                     break;
                 case Difficulty.StartUp:
                     {
-                        enemySpawnWait = 45;
+                        enemySpawnLimit = 45;
                         enemySpeed = 5;
                         laserSpeed = 40;
                     }
                     break;
                 case Difficulty.Easy:
                     {
-                        enemySpawnWait = 40;
+                        enemySpawnLimit = 40;
                         enemySpeed = 7;
 
-                        meteorSpawnWait = 40;
+                        meteorSpawnLimit = 40;
                         meteorSpeed = 4;
 
                         laserSpeed = 50;
+
+                        healthSpeed = 5;
                     }
                     break;
                 case Difficulty.Medium:
                     {
-                        enemySpawnWait = 35;
+                        enemySpawnLimit = 35;
                         enemySpeed = 9;
 
-                        meteorSpawnWait = 35;
+                        meteorSpawnLimit = 35;
                         meteorSpeed = 6;
 
                         laserSpeed = 60;
+
+                        healthSpeed = 8;
                     }
                     break;
                 case Difficulty.Hard:
                     {
-                        enemySpawnWait = 30;
+                        enemySpawnLimit = 30;
                         enemySpeed = 11;
 
-                        meteorSpawnWait = 30;
+                        meteorSpawnLimit = 30;
                         meteorSpeed = 8;
 
                         laserSpeed = 70;
+
+                        healthSpeed = 10;
                     }
                     break;
                 case Difficulty.VeryHard:
                     {
-                        enemySpawnWait = 25;
+                        enemySpawnLimit = 25;
                         enemySpeed = 13;
 
-                        meteorSpawnWait = 25;
+                        meteorSpawnLimit = 25;
                         meteorSpeed = 10;
 
                         laserSpeed = 80;
+
+                        healthSpeed = 12;
                     }
                     break;
                 case Difficulty.Extreme:
                     {
-                        enemySpawnWait = 20;
+                        enemySpawnLimit = 20;
                         enemySpeed = 15;
 
-                        meteorSpawnWait = 20;
+                        meteorSpawnLimit = 20;
                         meteorSpeed = 12;
 
                         laserSpeed = 90;
+
+                        healthSpeed = 14;
                     }
                     break;
                 case Difficulty.Pro:
                     {
-                        enemySpawnWait = 15;
+                        enemySpawnLimit = 15;
                         enemySpeed = 17;
 
-                        meteorSpawnWait = 15;
+                        meteorSpawnLimit = 15;
                         meteorSpeed = 14;
 
                         laserSpeed = 100;
+
+                        healthSpeed = 16;
                     }
                     break;
                 default:
@@ -1079,9 +1169,9 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3";
 
-            if (playerHealthDecreaseAudio is null)
+            if (playerHealthLossAudio is null)
             {
-                playerHealthDecreaseAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                playerHealthLossAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
                     var playerHealthDecreaseAudio = new Audio($0);
@@ -1090,7 +1180,28 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(playerHealthDecreaseAudio);
+            PlayAudio(playerHealthLossAudio);
+        }
+
+        /// <summary>
+        /// Plays the sound effect when the player gains health.
+        /// </summary>
+        private void PlayPlayerHealthGainSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/scale-e6-14577.mp3";
+
+            if (playerHealthGainAudio is null)
+            {
+                playerHealthGainAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var playerHealthGainAudio = new Audio($0);
+                    playerHealthGainAudio.volume = 1.0;
+                   return playerHealthGainAudio;
+                }())", host);
+            }
+
+            PlayAudio(playerHealthGainAudio);
         }
 
         /// <summary>

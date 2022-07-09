@@ -18,6 +18,7 @@
 		<Page Include="MainPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
+		<Content Include="Assets\Sounds\scale-e6-14577.mp3" />
 		<Content Include="Pages\GamePage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Content>
@@ -84,6 +85,7 @@
 		<Compile Include="MainPage.xaml.cs" />
 		<Compile Include="Models\Enemy.cs" />
 		<Compile Include="Models\GameObject.cs" />
+		<Compile Include="Models\Health.cs" />
 		<Compile Include="Models\Laser.cs" />
 		<Compile Include="Models\Meteor.cs" />
 		<Compile Include="Models\Player.cs" />
