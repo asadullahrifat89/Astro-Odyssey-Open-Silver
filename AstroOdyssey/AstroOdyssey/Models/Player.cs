@@ -16,7 +16,7 @@ namespace AstroOdyssey
             Width = 100;
 
             Uri shipUri = null, exhaustUri = null;
-            var playerShipType = new Random().Next(1, 8);
+            var playerShipType = new Random().Next(1, 13);
 
             double exhaustHeight = 100;
 
@@ -48,7 +48,27 @@ namespace AstroOdyssey
                     break;
                 case 7:
                     shipUri = new Uri("ms-appx:///Assets/Images/ship_G.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 80;
+                    break;
+                case 8:
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_H.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 80;
+                    break;
+                case 9:
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_I.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 50;
+                    break;
+                case 10:
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_J.png", UriKind.RelativeOrAbsolute);
                     exhaustHeight = 100;
+                    break;
+                case 11:
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_K.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 50;
+                    break;
+                case 12:
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_L.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 50;
                     break;
             }
 

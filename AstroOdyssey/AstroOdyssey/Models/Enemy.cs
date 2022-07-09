@@ -32,7 +32,7 @@ namespace AstroOdyssey
                     break;
                 case 4:
                     shipUri = new Uri("ms-appx:///Assets/Images/enemy_D.png", UriKind.RelativeOrAbsolute);
-                    Health = 2;
+                    Health = 3;
                     break;
                 case 5:
                     shipUri = new Uri("ms-appx:///Assets/Images/enemy_E.png", UriKind.RelativeOrAbsolute);

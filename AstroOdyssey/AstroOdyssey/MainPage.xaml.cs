@@ -21,9 +21,9 @@ namespace AstroOdyssey
         #region Fields
 
         const float FRAME_CAP_MS = 1000.0f / 60.0f;
-        private int _fpsCount = 0;
-        private int _fpsCounter = 0;
-        private float _lastFPSTime = 0;
+        private int fpsCount = 0;
+        private int fpsCounter = 0;
+        private float lastFPSTime = 0;
 
         bool isGameRunning;
 
@@ -48,7 +48,7 @@ namespace AstroOdyssey
 
         double pointerX;
 
-        TimeSpan laserSpeed = TimeSpan.FromMilliseconds(250);
+        double laserSpeed = 250;
 
         string baseUrl;
 
@@ -91,12 +91,25 @@ namespace AstroOdyssey
         /// </summary>
         private void StartGame()
         {
-            PlayBacgroundMusic();
+            PlayBackgroundMusic();
+
+            enemyCounter = 100;
+            enemySpawnWait = 50;
+            enemySpeed = 5;
+
+            meteorCounter = 100;
+            meteorSpawnWait = 50;
+            meteorSpeed = 2;
+
+            playerSpeed = 15;
 
             score = 0;
-            _fpsCount = 0;
-            _fpsCounter = 0;
-            _lastFPSTime = 0;
+
+            fpsCount = 0;
+            fpsCounter = 0;
+            lastFPSTime = 0;
+
+            laserSpeed = 250;
 
             GameCanvas.Children.Clear();
 
@@ -116,7 +129,7 @@ namespace AstroOdyssey
         /// </summary>
         private void StopGame()
         {
-            StopBacgroundMusic();
+            StopBackgroundMusic();
             isGameRunning = false;
             PlayButton.Visibility = Visibility.Visible;
         }
@@ -176,14 +189,14 @@ namespace AstroOdyssey
         private void CalculateFps(long frameStartTime)
         {
             // calculate FPS
-            if (_lastFPSTime + 1000 < frameStartTime)
+            if (lastFPSTime + 1000 < frameStartTime)
             {
-                _fpsCount = _fpsCounter;
-                _fpsCounter = 0;
-                _lastFPSTime = frameStartTime;
+                fpsCount = fpsCounter;
+                fpsCounter = 0;
+                lastFPSTime = frameStartTime;
             }
 
-            _fpsCounter++;
+            fpsCounter++;
         }
 
         /// <summary>
@@ -202,7 +215,7 @@ namespace AstroOdyssey
 
                 PlayLaserSound();
 
-                await Task.Delay(laserSpeed);
+                await Task.Delay(TimeSpan.FromMilliseconds(laserSpeed));
             }
         }
 
@@ -375,7 +388,7 @@ namespace AstroOdyssey
         {
             ScoreText.Text = "Score: " + score;
             HealthText.Text =/* "Health: " +*/ GetPlayerHealthPoints();
-            FPSText.Text = "FPS: " + _fpsCount;
+            FPSText.Text = "FPS: " + fpsCount;
             ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
         }
 
@@ -386,12 +399,12 @@ namespace AstroOdyssey
         private string GetPlayerHealthPoints()
         {
             var healthPoints = player.Health / player.HealthSlot;
-            var healthIcon = /*"•";*/ "❤️";
+            var healthIcon = "❤️";
             var health = string.Empty;
 
             for (int i = 0; i < healthPoints; i++)
             {
-                health = health + healthIcon;
+                health += healthIcon;
             }
 
             return health;
@@ -483,7 +496,7 @@ namespace AstroOdyssey
                 enemySpawnWait = 45;
                 enemySpeed = 5;
 
-                laserSpeed = TimeSpan.FromMilliseconds(225);
+                //laserSpeed = 225;
             }
 
             // easy
@@ -495,7 +508,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 40;
                 meteorSpeed = 4;
 
-                laserSpeed = TimeSpan.FromMilliseconds(200);
+                //laserSpeed = 200;
             }
 
             // medium
@@ -507,7 +520,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 35;
                 meteorSpeed = 6;
 
-                laserSpeed = TimeSpan.FromMilliseconds(175);
+                //laserSpeed = 175;
             }
 
             // hard
@@ -519,7 +532,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 30;
                 meteorSpeed = 8;
 
-                laserSpeed = TimeSpan.FromMilliseconds(150);
+                //laserSpeed = 150;
             }
 
             // very hard
@@ -531,7 +544,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 25;
                 meteorSpeed = 10;
 
-                laserSpeed = TimeSpan.FromMilliseconds(125);
+                //laserSpeed = 125;
             }
 
             // extreme hard
@@ -543,7 +556,7 @@ namespace AstroOdyssey
                 meteorSpawnWait = 20;
                 meteorSpeed = 12;
 
-                laserSpeed = TimeSpan.FromMilliseconds(100);
+                //laserSpeed = 100;
             }
         }
 
@@ -697,7 +710,7 @@ namespace AstroOdyssey
         /// <summary>
         /// Plays the background music.
         /// </summary>
-        private void PlayBacgroundMusic()
+        private void PlayBackgroundMusic()
         {
             var musicTrack = rand.Next(1, 4);
 
@@ -736,7 +749,7 @@ namespace AstroOdyssey
         /// <summary>
         /// Stops the background music.
         /// </summary>
-        private void StopBacgroundMusic()
+        private void StopBackgroundMusic()
         {
             if (backgroundAudio is not null)
             {
