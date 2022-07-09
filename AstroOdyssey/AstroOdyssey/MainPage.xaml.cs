@@ -32,11 +32,11 @@ namespace AstroOdyssey
         Random rand = new Random();
 
         int enemyCounter = 100;
-        int enemyframeWait = 50;
+        int enemySpawnWait = 50;
         int enemySpeed = 5;
 
         int meteorCounter = 100;
-        int meteorframeWait = 50;
+        int meteorSpawnWait = 50;
         int meteorSpeed = 2;
 
         int playerSpeed = 15;
@@ -44,11 +44,11 @@ namespace AstroOdyssey
         int score = 0;
 
         double windowWidth, windowHeight;
-        double playerX, playerY, playerWidthHalf;
+        double playerX, playerWidthHalf;
 
         double pointerX;
 
-        TimeSpan laserInterval = TimeSpan.FromMilliseconds(250);
+        TimeSpan laserSpeed = TimeSpan.FromMilliseconds(250);
 
         string baseUrl;
 
@@ -81,7 +81,7 @@ namespace AstroOdyssey
 
         #region Methods
 
-        #region Functionality
+        #region Game Methods
 
         private void StartGame()
         {
@@ -166,14 +166,13 @@ namespace AstroOdyssey
 
                 PlayLaserSound();
 
-                await Task.Delay(laserInterval);
+                await Task.Delay(laserSpeed);
             }
         }
 
         private void GetPlayerCoordinates()
         {
             playerX = Canvas.GetLeft(player);
-            playerY = Canvas.GetTop(player);
             playerWidthHalf = player.Width / 2;
 
             playerHitBox = player.GetRect();
@@ -199,7 +198,7 @@ namespace AstroOdyssey
 
                     var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser);
 
-                    foreach (var obstacle in obstacles)
+                    Parallel.ForEach(obstacles, (obstacle) =>
                     {
                         if (obstacle is Enemy targetEnemy)
                         {
@@ -237,7 +236,7 @@ namespace AstroOdyssey
                                 }
                             }
                         }
-                    }
+                    });
                 }
 
                 if (element is Enemy enemy)
@@ -319,7 +318,7 @@ namespace AstroOdyssey
             if (enemyCounter < 0)
             {
                 GenerateEnemy();
-                enemyCounter = enemyframeWait;
+                enemyCounter = enemySpawnWait;
             }
         }
 
@@ -332,7 +331,7 @@ namespace AstroOdyssey
             if (meteorCounter < 0)
             {
                 GenerateMeteor();
-                meteorCounter = meteorframeWait;
+                meteorCounter = meteorSpawnWait;
             }
         }
 
@@ -348,40 +347,73 @@ namespace AstroOdyssey
 
         private void ScaleDifficulty()
         {
-            // noob
+            // startup
             if (score > 10)
             {
-                enemyframeWait = 45;
+                enemySpawnWait = 45;
                 enemySpeed = 5;
 
-                laserInterval = TimeSpan.FromMilliseconds(225);
+                laserSpeed = TimeSpan.FromMilliseconds(225);
             }
 
             // easy
             if (score > 50)
             {
-                enemyframeWait = 40;
+                enemySpawnWait = 40;
                 enemySpeed = 10;
 
-                laserInterval = TimeSpan.FromMilliseconds(200);
+                meteorSpawnWait = 40;
+                meteorSpeed = 4;
+
+                laserSpeed = TimeSpan.FromMilliseconds(200);
             }
 
             // medium
             if (score > 100)
             {
-                enemyframeWait = 35;
+                enemySpawnWait = 35;
                 enemySpeed = 15;
 
-                laserInterval = TimeSpan.FromMilliseconds(175);
+                meteorSpawnWait = 35;
+                meteorSpeed = 6;
+
+                laserSpeed = TimeSpan.FromMilliseconds(175);
             }
 
             // hard
             if (score > 300)
             {
-                enemyframeWait = 30;
+                enemySpawnWait = 30;
                 enemySpeed = 20;
 
-                laserInterval = TimeSpan.FromMilliseconds(150);
+                meteorSpawnWait = 30;
+                meteorSpeed = 8;
+
+                laserSpeed = TimeSpan.FromMilliseconds(150);
+            }
+
+            // very hard
+            if (score > 500)
+            {
+                enemySpawnWait = 25;
+                enemySpeed = 25;
+
+                meteorSpawnWait = 25;
+                meteorSpeed = 10;
+
+                laserSpeed = TimeSpan.FromMilliseconds(125);
+            }
+
+            // extreme hard
+            if (score > 700)
+            {
+                enemySpawnWait = 20;
+                enemySpeed = 30;
+
+                meteorSpawnWait = 20;
+                meteorSpeed = 12;
+
+                laserSpeed = TimeSpan.FromMilliseconds(100);
             }
         }
 
@@ -547,9 +579,9 @@ namespace AstroOdyssey
             laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
-                    var myAudio = new Audio($0);
-                    myAudio.volume = 0.1;
-                    return myAudio;
+                    var laserAudio = new Audio($0);
+                    laserAudio.volume = 0.1;
+                    return laserAudio;
                 }())", host);
 
             PlayAudio(laserAudio);
@@ -562,9 +594,9 @@ namespace AstroOdyssey
             enemyDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
-                    var myAudio = new Audio($0);
-                    myAudio.volume = 0.8;                
-                    return myAudio;
+                    var enemyDestructionAudio = new Audio($0);
+                    enemyDestructionAudio.volume = 0.8;                
+                    return enemyDestructionAudio;
                 }())", host);
 
             PlayAudio(enemyDestructionAudio);
@@ -577,9 +609,9 @@ namespace AstroOdyssey
             laserHitMeteorAudio = OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.volume = 0.6;
-                return myAudio;
+                var laserHitMeteorAudio = new Audio($0);
+                laserHitMeteorAudio.volume = 0.6;
+                return laserHitMeteorAudio;
             }())", host);
 
             PlayAudio(laserHitMeteorAudio);
@@ -592,9 +624,9 @@ namespace AstroOdyssey
             meteorDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.volume = 0.8;
-                return myAudio;
+                var meteorDestructionAudio = new Audio($0);
+                meteorDestructionAudio.volume = 0.8;
+                return meteorDestructionAudio;
             }())", host);
 
             PlayAudio(meteorDestructionAudio);
@@ -612,9 +644,9 @@ namespace AstroOdyssey
             playerHealthDecreaseAudio = OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.volume = 1.0;
-               return myAudio;
+                var playerHealthDecreaseAudio = new Audio($0);
+                playerHealthDecreaseAudio.volume = 1.0;
+               return playerHealthDecreaseAudio;
             }())", host);
 
             PlayAudio(playerHealthDecreaseAudio);
