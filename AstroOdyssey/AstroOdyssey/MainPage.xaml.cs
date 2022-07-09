@@ -250,11 +250,21 @@ namespace AstroOdyssey
                             {
                                 removableObjects.Add(laser);
 
-                                removableObjects.Add(targetEnemy);
+                                targetEnemy.LooseHealth();
 
-                                PlayerScoreByEnemyDestruction();
+                                // move the enemy backwards a bit
+                                Canvas.SetTop(targetEnemy, Canvas.GetTop(targetEnemy) - (enemySpeed * 3) / 2);
 
-                                PlayEnemyDestructionSound();
+                                PlayLaserHitMeteorSound();
+
+                                if (targetEnemy.IsDestroyable)
+                                {
+                                    removableObjects.Add(targetEnemy);
+
+                                    PlayerScoreByEnemyDestruction();
+
+                                    PlayEnemyDestructionSound();
+                                }
                             }
                         }
 
@@ -269,7 +279,7 @@ namespace AstroOdyssey
                                 targetMeteor.LooseHealth();
 
                                 // move the meteor backwards a bit
-                                Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - 5);
+                                Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - (meteorSpeed * 4) / 2);
 
                                 PlayLaserHitMeteorSound();
 
