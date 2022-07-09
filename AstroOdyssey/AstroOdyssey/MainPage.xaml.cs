@@ -55,6 +55,11 @@ namespace AstroOdyssey
         string baseUrl;
 
         object backgroundAudio = null;
+        object laserAudio = null;
+        object enemyDestructionAudio = null;
+        object meteorDestructionAudio = null;
+        object laserHitMeteorAudio = null;
+        object playerHealthDecreaseAudio = null;
 
         #endregion
 
@@ -249,7 +254,7 @@ namespace AstroOdyssey
 
                         Player.LooseHealth();
 
-                        PlayPlayerDamageSound();
+                        PlayPlayerHealthDecreaseSound();
                     }
                     else
                     {
@@ -273,7 +278,7 @@ namespace AstroOdyssey
 
                         Player.LooseHealth();
 
-                        PlayPlayerDamageSound();
+                        PlayPlayerHealthDecreaseSound();
                     }
                     else
                     {
@@ -523,22 +528,14 @@ namespace AstroOdyssey
                 return backgroundAudio;
             }())", host);
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() { 
-                //play audio with out html audio tag              
-                $0.play();           
-            }())", backgroundAudio);
+            PlayAudio(backgroundAudio);
         }
 
         private void StopBacgroundMusic()
         {
             if (backgroundAudio is not null)
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() { 
-                    //play audio with out html audio tag              
-                    $0.pause();           
-                }())", backgroundAudio);
+                PauseAudio(backgroundAudio);
             }
         }
 
@@ -546,55 +543,63 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.volume = 0.1;                
-                myAudio.play();
-            }())", host);
+            laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var myAudio = new Audio($0);
+                    myAudio.volume = 0.1;
+                    return myAudio;
+                }())", host);
+
+            PlayAudio(laserAudio);
         }
 
         private void PlayEnemyDestructionSound()
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var myAudio = new Audio($0);
-                myAudio.volume = 0.8;                
-                myAudio.play();
-            }())", host);
+            enemyDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var myAudio = new Audio($0);
+                    myAudio.volume = 0.8;                
+                    return myAudio;
+                }())", host);
+
+            PlayAudio(enemyDestructionAudio);
         }
 
         private void PlayLaserHitMeteorSound()
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-sfx-43814.mp3";
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
+            laserHitMeteorAudio = OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
                 var myAudio = new Audio($0);
                 myAudio.volume = 0.6;
-                myAudio.play();
+                return myAudio;
             }())", host);
+
+            PlayAudio(laserHitMeteorAudio);
         }
 
         private void PlayMeteorDestructionSound()
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
+            meteorDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
                 var myAudio = new Audio($0);
                 myAudio.volume = 0.8;
-                myAudio.play();
+                return myAudio;
             }())", host);
+
+            PlayAudio(meteorDestructionAudio);
         }
 
-        private void PlayPlayerDamageSound()
+        private void PlayPlayerHealthDecreaseSound()
         {
             //https://cdn.pixabay.com/download/audio/2021/08/09/audio_9788fd890e.mp3?filename=big-impact-7054.mp3
             //https://cdn.pixabay.com/download/audio/2021/08/04/audio_fadfc77b9e.mp3?filename=explosion-6055.mp3
@@ -603,15 +608,34 @@ namespace AstroOdyssey
 
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3";
 
-            OpenSilver.Interop.ExecuteJavaScript(@"
+            playerHealthDecreaseAudio = OpenSilver.Interop.ExecuteJavaScript(@"
             (function() {
                 //play audio with out html audio tag
                 var myAudio = new Audio($0);
                 myAudio.volume = 1.0;
-                myAudio.play();
+               return myAudio;
             }())", host);
+
+            PlayAudio(playerHealthDecreaseAudio);
         }
 
+        private void PlayAudio(object audio)
+        {
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() { 
+                //play audio with out html audio tag              
+                $0.play();           
+            }())", audio);
+        }
+
+        private void PauseAudio(object audio)
+        {
+            OpenSilver.Interop.ExecuteJavaScript(@"
+            (function() { 
+                //play audio with out html audio tag              
+                $0.pause();           
+            }())", audio);
+        }
         #endregion
 
         #endregion
