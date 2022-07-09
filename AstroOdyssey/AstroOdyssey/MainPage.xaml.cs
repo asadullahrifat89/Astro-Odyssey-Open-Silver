@@ -268,6 +268,9 @@ namespace AstroOdyssey
 
                                 targetMeteor.LooseHealth();
 
+                                // move the meteor backwards a bit
+                                Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - 5);
+
                                 PlayLaserHitMeteorSound();
 
                                 if (targetMeteor.IsDestroyable)
