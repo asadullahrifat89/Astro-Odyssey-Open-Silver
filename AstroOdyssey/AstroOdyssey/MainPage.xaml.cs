@@ -181,7 +181,9 @@ namespace AstroOdyssey
 
         private void UpdateFrame()
         {
-            foreach (var element in GameCanvas.Children.OfType<GameObject>())
+            var gameObjects = GameCanvas.Children.OfType<GameObject>();
+
+            Parallel.ForEach(gameObjects, (element) =>
             {
                 if (element is Laser laser)
                 {
@@ -195,7 +197,9 @@ namespace AstroOdyssey
 
                     Rect laserBounds = laser.GetRect();
 
-                    foreach (var obstacle in GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser))
+                    var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser);
+
+                    foreach (var obstacle in obstacles)
                     {
                         if (obstacle is Enemy targetEnemy)
                         {
@@ -283,7 +287,7 @@ namespace AstroOdyssey
                         }
                     }
                 }
-            }
+            });
 
             Parallel.ForEach(removableObjects, (removableItem) => { GameCanvas.Children.Remove(removableItem); });
         }
@@ -336,7 +340,7 @@ namespace AstroOdyssey
         {
             player = new Player();
 
-            Canvas.SetLeft(player, 100);
+            Canvas.SetLeft(player, pointerX);
             Canvas.SetTop(player, windowHeight - 100);
 
             GameCanvas.Children.Add(player);
@@ -488,6 +492,8 @@ namespace AstroOdyssey
             windowHeight = Window.Current.Bounds.Height;
 
             SetGameCanvasSize();
+
+            pointerX = windowWidth / 2;
         }
 
         private void SetGameCanvasSize()
