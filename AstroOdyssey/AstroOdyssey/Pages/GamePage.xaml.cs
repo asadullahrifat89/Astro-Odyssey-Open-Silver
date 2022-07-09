@@ -129,7 +129,10 @@ namespace AstroOdyssey
             StopBackgroundMusic();
             isGameRunning = false;
 
-            //TODO: show score            
+            //TODO: show score  
+            //TODO: ask if want to play again
+            App.NavigateToPage("/GameStartPage");
+                      
         }
 
         /// <summary>
@@ -736,7 +739,6 @@ namespace AstroOdyssey
         /// <param name="e"></param>
         void Window_SizeChanged_Demo_Unloaded(object sender, RoutedEventArgs e)
         {
-            StopGame();
             Window.Current.SizeChanged -= Current_SizeChanged;
         }
 
