@@ -13,37 +13,37 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
 
-            Uri uri = null;
+            Uri shipUri = null;
 
-            var enemyType = new Random().Next(1, 6);
+            var enemyShipType = new Random().Next(1, 6);
 
-            switch (enemyType)
+            switch (enemyShipType)
             {
                 case 1:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
                     Health = 3;
                     break;
                 case 2:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_B.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_B.png", UriKind.RelativeOrAbsolute);
                     Health = 2;
                     break;
                 case 3:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_C.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_C.png", UriKind.RelativeOrAbsolute);
                     Health = 1;
                     break;
                 case 4:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_D.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_D.png", UriKind.RelativeOrAbsolute);
                     Health = 2;
                     break;
                 case 5:
-                    uri = new Uri("ms-appx:///Assets/Images/enemy_E.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_E.png", UriKind.RelativeOrAbsolute);
                     Health = 3;
                     break;
             }
 
             var imgEnemy = new Image()
             {
-                Source = new BitmapImage(uri),
+                Source = new BitmapImage(shipUri),
                 Stretch = Stretch.Uniform,
             };
 

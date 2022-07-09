@@ -54,28 +54,28 @@ namespace AstroOdyssey
 
             exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
 
-            var imgPlayer = new Image()
+            var imgShip = new Image()
             {
                 Source = new BitmapImage(shipUri),
                 Stretch = Stretch.Uniform,
             };            
 
-            var exhaustPlayer = new Image()
+            var imgExhaust = new Image()
             {
                 Source = new BitmapImage(exhaustUri),
                 Stretch = Stretch.Uniform,
                 Height = exhaustHeight,
-                Width = imgPlayer.Width
+                Width = imgShip.Width
             };
 
-            exhaustPlayer.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
+            imgExhaust.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
 
             // create ship and exhaust
-            var shipElement = new Grid();
-            shipElement.Children.Add(exhaustPlayer);
-            shipElement.Children.Add(imgPlayer);
+            var playerShip = new Grid();
+            playerShip.Children.Add(imgExhaust);
+            playerShip.Children.Add(imgShip);
 
-            Child = shipElement;
+            Child = playerShip;
             Health = 100;
             HealthSlot = 5;
         }
