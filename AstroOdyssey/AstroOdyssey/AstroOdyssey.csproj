@@ -18,6 +18,12 @@
 		<Page Include="MainPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
+		<Content Include="Pages\GamePage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="Pages\GameStartPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Content>
 		<Page Include="Styles\MaterialDesign_Styles_Kit\MaterialDesign_Button_Styles.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
@@ -80,6 +86,8 @@
 		<Compile Include="Models\Laser.cs" />
 		<Compile Include="Models\Meteor.cs" />
 		<Compile Include="Models\Player.cs" />
+		<Compile Include="Pages\GamePage.xaml.cs" />
+		<Compile Include="Pages\GameStartPage.xaml.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
