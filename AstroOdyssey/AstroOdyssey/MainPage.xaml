@@ -9,26 +9,21 @@
 
     <Grid x:Name="RootGrid" Background="Black">
 
-        <Grid x:Name="Grid_Root">
-
-            <!--  Frame that hosts pages  -->
-            <Frame
-                x:Name="PageContainerFrame"
-                Grid.Row="1"
-                HorizontalContentAlignment="Stretch"
-                VerticalContentAlignment="Stretch"
-                JournalOwnership="Automatic">
-                <Frame.UriMapper>
-                    <UriMapper>
-                        <UriMapping MappedUri="/Pages/{page_name}.xaml" Uri="/{page_name}" />
-                    </UriMapper>
-                </Frame.UriMapper>
-                <Frame.RenderTransform>
-                    <TranslateTransform />
-                </Frame.RenderTransform>
-            </Frame>
-
-        </Grid>      
+        <!--  Frame that hosts pages  -->
+        <Frame
+            x:Name="PageContainerFrame"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            JournalOwnership="Automatic">
+            <Frame.UriMapper>
+                <UriMapper>
+                    <UriMapping MappedUri="/Pages/{page_name}.xaml" Uri="/{page_name}" />
+                </UriMapper>
+            </Frame.UriMapper>
+            <Frame.RenderTransform>
+                <TranslateTransform />
+            </Frame.RenderTransform>
+        </Frame>
 
     </Grid>
 
