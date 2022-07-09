@@ -12,45 +12,70 @@ namespace AstroOdyssey
         {
             Name = "Player";
             Background = new SolidColorBrush(Colors.Transparent);
-            Height = 100;
+            Height = 150;
             Width = 100;
 
-            Uri uri = null;
+            Uri shipUri = null, exhaustUri = null;
             var playerShipType = new Random().Next(1, 8);
+
+            double exhaustHeight = 100;
 
             switch (playerShipType)
             {
                 case 1:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_A.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_A.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 100;
                     break;
                 case 2:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_B.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_B.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 50;
                     break;
                 case 3:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_C.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_C.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 100;
                     break;
                 case 4:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_D.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_D.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 100;
                     break;
                 case 5:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_E.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_E.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 100;
                     break;
                 case 6:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_F.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_F.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 100;
                     break;
                 case 7:
-                    uri = new Uri("ms-appx:///Assets/Images/ship_G.png", UriKind.RelativeOrAbsolute);
+                    shipUri = new Uri("ms-appx:///Assets/Images/ship_G.png", UriKind.RelativeOrAbsolute);
+                    exhaustHeight = 100;
                     break;
             }
 
+            exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
+
             var imgPlayer = new Image()
             {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,                
-                Name = "PlayerImage",
+                Source = new BitmapImage(shipUri),
+                Stretch = Stretch.Uniform,
+            };            
+
+            var exhaustPlayer = new Image()
+            {
+                Source = new BitmapImage(exhaustUri),
+                Stretch = Stretch.Uniform,
+                Height = exhaustHeight,
+                Width = imgPlayer.Width
             };
 
-            Child = imgPlayer;
+            exhaustPlayer.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
+
+            // create ship and exhaust
+            var shipElement = new Grid();
+            shipElement.Children.Add(exhaustPlayer);
+            shipElement.Children.Add(imgPlayer);
+
+            Child = shipElement;
             Health = 100;
             HealthSlot = 5;
         }
