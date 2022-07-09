@@ -19,7 +19,7 @@ namespace AstroOdyssey
         private int fpsCounter;
         private float lastFPSTime;
 
-        private bool isGameRunning;
+        private bool gameIsRunning;
 
         private int enemyCounter;
         private int enemySpawnWait;
@@ -92,7 +92,7 @@ namespace AstroOdyssey
             SetDefaultGameEnvironment();
             SpawnPlayer();
 
-            isGameRunning = true;
+            gameIsRunning = true;
 
             RunGameLoop();
             RunLaserLoop();
@@ -133,7 +133,7 @@ namespace AstroOdyssey
         private void StopGame()
         {
             StopBackgroundMusic();
-            isGameRunning = false;
+            gameIsRunning = false;
 
             //TODO: show score  
             //TODO: ask if want to play again
@@ -148,7 +148,7 @@ namespace AstroOdyssey
         {
             var watch = Stopwatch.StartNew();
 
-            while (isGameRunning)
+            while (gameIsRunning)
             {
                 var frameStartTime = watch.ElapsedMilliseconds;
 
@@ -196,7 +196,7 @@ namespace AstroOdyssey
         /// </summary>
         private async void RunLaserLoop()
         {
-            while (isGameRunning)
+            while (gameIsRunning)
             {
                 // any object falls within player range
                 if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
