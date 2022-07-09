@@ -46,9 +46,7 @@ namespace AstroOdyssey
             var imgPlayer = new Image()
             {
                 Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-                //Height = 100,
-                //Width = 100,
+                Stretch = Stretch.Uniform,                
                 Name = "PlayerImage",
             };
 

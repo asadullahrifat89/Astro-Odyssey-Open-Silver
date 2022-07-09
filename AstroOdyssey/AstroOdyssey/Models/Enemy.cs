@@ -40,8 +40,6 @@ namespace AstroOdyssey
             {
                 Source = new BitmapImage(uri),
                 Stretch = Stretch.Uniform,
-                //Height = 100,
-                //Width = 100,
             };
 
             Child = imgEnemy;

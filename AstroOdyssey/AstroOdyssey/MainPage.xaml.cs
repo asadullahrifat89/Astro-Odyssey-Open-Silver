@@ -41,7 +41,7 @@ namespace AstroOdyssey
 
         int playerSpeed = 15;
 
-        int score = 0;
+        double score = 0;
 
         double windowWidth, windowHeight;
         double playerX, playerWidthHalf;
@@ -73,7 +73,7 @@ namespace AstroOdyssey
             this.Loaded += Window_SizeChanged_Demo_Loaded;
             this.Unloaded += Window_SizeChanged_Demo_Unloaded;
 
-            SetWindowSize();
+            SetWindowSizeAtStartup();
             GameGrid.Visibility = Visibility.Collapsed;
         }
 
@@ -210,7 +210,7 @@ namespace AstroOdyssey
 
                                 removableObjects.Add(targetEnemy);
 
-                                score++;
+                                PlayerScoreByEnemyDestruction();
 
                                 PlayEnemyDestructionSound();
                             }
@@ -231,6 +231,8 @@ namespace AstroOdyssey
                                 if (targetMeteor.IsDestroyable)
                                 {
                                     removableObjects.Add(targetMeteor);
+
+                                    PlayerScoreByMeteorDestruction();
 
                                     PlayMeteorDestructionSound();
                                 }
@@ -291,12 +293,36 @@ namespace AstroOdyssey
             Parallel.ForEach(removableObjects, (removableItem) => { GameCanvas.Children.Remove(removableItem); });
         }
 
+        private void PlayerScoreByEnemyDestruction()
+        {
+            score++;
+        }
+
+        private void PlayerScoreByMeteorDestruction()
+        {
+            score += 0.5d;
+        }
+
         private void UpdateScoreboard()
         {
             ScoreText.Text = "Score: " + score;
-            HealthText.Text = "Health: " + player.Health;
+            HealthText.Text =/* "Health: " +*/ GetPlayerHealthPoints();
             FPSText.Text = "FPS: " + _fpsCount;
             ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
+        }
+
+        private string GetPlayerHealthPoints()
+        {
+            var healthPoints = player.Health / player.HealthSlot;
+            var healthIcon = /*"•";*/ "❤️";
+            var health = string.Empty;
+
+            for (int i = 0; i < healthPoints; i++)
+            {
+                health = health + healthIcon;
+            }
+
+            return health;
         }
 
         private void CheckPlayerHealth()
@@ -340,9 +366,19 @@ namespace AstroOdyssey
             player = new Player();
 
             Canvas.SetLeft(player, pointerX);
-            Canvas.SetTop(player, windowHeight - 100);
+            SetPlayerCanvasTop();
 
             GameCanvas.Children.Add(player);
+        }
+
+        private void SetPlayerCanvasTop()
+        {
+            Canvas.SetTop(player, windowHeight - player.Height - 20);
+        }
+
+        private void SetPlayerCanvasLeft(double x)
+        {
+            Canvas.SetLeft(player, x);
         }
 
         private void ScaleDifficulty()
@@ -422,16 +458,16 @@ namespace AstroOdyssey
             // move right
             if (pointerX - playerWidthHalf > playerX + playerSpeed)
             {
-                if (playerX + 90 < windowWidth)
+                if (playerX + playerWidthHalf < windowWidth)
                 {
-                    Canvas.SetLeft(player, playerX + playerSpeed);
+                    SetPlayerCanvasLeft(playerX + playerSpeed);
                 }
             }
 
             // move left
             if (pointerX - playerWidthHalf < playerX - playerSpeed)
             {
-                Canvas.SetLeft(player, playerX - playerSpeed);
+                SetPlayerCanvasLeft(playerX - playerSpeed);
             }
         }
 
@@ -510,15 +546,14 @@ namespace AstroOdyssey
 
         void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
         {
-            windowWidth = e.Size.Width;
-            windowHeight = e.Size.Height;
+            windowWidth = Window.Current.Bounds.Width;
+            windowHeight = Window.Current.Bounds.Height;
 
             SetGameCanvasSize();
-
-            Canvas.SetTop(player, windowHeight - 100);
+            SetPlayerCanvasTop();
         }
 
-        void SetWindowSize()
+        void SetWindowSizeAtStartup()
         {
             windowWidth = Window.Current.Bounds.Width;
             windowHeight = Window.Current.Bounds.Height;
@@ -553,13 +588,23 @@ namespace AstroOdyssey
                     break;
             }
 
+            //if (backgroundAudio is null)
+            //{
             backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() { 
-                //play audio with out html audio tag
-                var backgroundAudio = new Audio($0);
-                backgroundAudio.loop = true;
-                return backgroundAudio;
-            }())", host);
+                (function() {
+                    var backgroundAudio = new Audio($0);
+                    backgroundAudio.loop = true;
+                    return backgroundAudio;
+                }())", host);
+            //}
+            //else
+            //{
+            //    backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+            //    (function() {
+            //        $0.src = $1;
+            //        return $0;
+            //    }())", backgroundAudio, host);
+            //}
 
             PlayAudio(backgroundAudio);
         }
@@ -576,13 +621,16 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
 
-            laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+            if (laserAudio is null)
+            {
+                laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
                     var laserAudio = new Audio($0);
                     laserAudio.volume = 0.1;
                     return laserAudio;
                 }())", host);
+            }
 
             PlayAudio(laserAudio);
         }
@@ -591,13 +639,16 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
 
-            enemyDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+            if (enemyDestructionAudio is null)
+            {
+                enemyDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
                     var enemyDestructionAudio = new Audio($0);
                     enemyDestructionAudio.volume = 0.8;                
                     return enemyDestructionAudio;
                 }())", host);
+            }
 
             PlayAudio(enemyDestructionAudio);
         }
@@ -606,13 +657,16 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-sfx-43814.mp3";
 
-            laserHitMeteorAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var laserHitMeteorAudio = new Audio($0);
-                laserHitMeteorAudio.volume = 0.6;
-                return laserHitMeteorAudio;
-            }())", host);
+            if (laserHitMeteorAudio is null)
+            {
+                laserHitMeteorAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var laserHitMeteorAudio = new Audio($0);
+                    laserHitMeteorAudio.volume = 0.6;
+                    return laserHitMeteorAudio;
+                }())", host);
+            }
 
             PlayAudio(laserHitMeteorAudio);
         }
@@ -621,13 +675,16 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
 
-            meteorDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var meteorDestructionAudio = new Audio($0);
-                meteorDestructionAudio.volume = 0.8;
-                return meteorDestructionAudio;
-            }())", host);
+            if (meteorDestructionAudio is null)
+            {
+                meteorDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var meteorDestructionAudio = new Audio($0);
+                    meteorDestructionAudio.volume = 0.8;
+                    return meteorDestructionAudio;
+                }())", host);
+            }
 
             PlayAudio(meteorDestructionAudio);
         }
@@ -641,13 +698,16 @@ namespace AstroOdyssey
 
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3";
 
-            playerHealthDecreaseAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                //play audio with out html audio tag
-                var playerHealthDecreaseAudio = new Audio($0);
-                playerHealthDecreaseAudio.volume = 1.0;
-               return playerHealthDecreaseAudio;
-            }())", host);
+            if (playerHealthDecreaseAudio is null)
+            {
+                playerHealthDecreaseAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var playerHealthDecreaseAudio = new Audio($0);
+                    playerHealthDecreaseAudio.volume = 1.0;
+                   return playerHealthDecreaseAudio;
+                }())", host);
+            }
 
             PlayAudio(playerHealthDecreaseAudio);
         }
@@ -656,7 +716,8 @@ namespace AstroOdyssey
         {
             OpenSilver.Interop.ExecuteJavaScript(@"
             (function() { 
-                //play audio with out html audio tag              
+                //play audio with out html audio tag
+                $0.currentTime =0;
                 $0.play();           
             }())", audio);
         }
