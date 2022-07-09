@@ -19,6 +19,7 @@ namespace AstroOdyssey
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Host.Content.IsFullScreen = true;
+
             App.NavigateToPage("/GamePage");
         }
 

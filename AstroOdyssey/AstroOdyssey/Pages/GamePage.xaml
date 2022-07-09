@@ -67,11 +67,10 @@
             Foreground="White"
             Text="Frame Time:" />
 
-
         <!--  This shows current objects count in game canvas  -->
         <TextBlock
             Name="ObjectsText"
-            Margin="5,150,5,5"
+            Margin="5,100,5,5"
             HorizontalAlignment="Right"
             FontFamily="Consolas"
             FontSize="18"

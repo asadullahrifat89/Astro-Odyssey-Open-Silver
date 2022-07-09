@@ -18,10 +18,12 @@ namespace AstroOdyssey
         private const float FRAME_CAP_MS = 1000.0f / 60.0f;
         private int fpsCount;
         private int fpsCounter;
-        private float lastFrameTimeTime;
+        private float lastFrameTime;
         private long frameStartTime;
         private int frameWaitTime;
         private long frameTime;
+        private int frameStatUpdateCounter;
+        private int frameStatUpdateWait;
 
         private bool gameIsRunning;
 
@@ -112,24 +114,6 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Gets the player health points.
-        /// </summary>
-        /// <returns></returns>
-        private string GetPlayerHealthPoints()
-        {
-            var healthPoints = player.Health / player.HealthSlot;
-            var healthIcon = "❤️";
-            var health = string.Empty;
-
-            for (int i = 0; i < healthPoints; i++)
-            {
-                health += healthIcon;
-            }
-
-            return health;
-        }
-
-        /// <summary>
         /// Sets the y axis position of the player on game canvas.
         /// </summary>
         private void SetPlayerCanvasTop()
@@ -194,6 +178,24 @@ namespace AstroOdyssey
         }
 
         /// <summary>
+        /// Gets the player health points.
+        /// </summary>
+        /// <returns></returns>
+        private string GetPlayerHealthPoints()
+        {
+            var healthPoints = player.Health / player.HealthSlot;
+            var healthIcon = "❤️";
+            var health = string.Empty;
+
+            for (int i = 0; i < healthPoints; i++)
+            {
+                health += healthIcon;
+            }
+
+            return health;
+        }
+
+        /// <summary>
         /// Check if player is dead.
         /// </summary>
         private void CheckPlayerDeath()
@@ -201,7 +203,7 @@ namespace AstroOdyssey
             // game over
             if (player.IsDestroyable)
             {
-                HealthText.Text = "Health: " + 0;
+                HealthText.Text = "Game Over";
                 StopGame();
             }
         }
@@ -241,11 +243,11 @@ namespace AstroOdyssey
         private void CalculateFps()
         {
             // calculate FPS
-            if (lastFrameTimeTime + 1000 < frameStartTime)
+            if (lastFrameTime + 1000 < frameStartTime)
             {
                 fpsCount = fpsCounter;
                 fpsCounter = 0;
-                lastFrameTimeTime = frameStartTime;
+                lastFrameTime = frameStartTime;
             }
 
             fpsCounter++;
@@ -272,6 +274,22 @@ namespace AstroOdyssey
             });
         }
 
+        /// <summary>
+        /// Updates the fps, frame time and objects currently in view.
+        /// </summary>
+        private void UpdateFrameStats()
+        {
+            frameStatUpdateCounter -= 1;
+
+            if (frameStatUpdateCounter < 0)
+            {
+                FPSText.Text = "FPS: " + fpsCount;
+                FrameTimeText.Text = "Frame time: " + frameWaitTime + "ms";
+                ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
+
+                frameStatUpdateCounter = frameStatUpdateWait;
+            }
+        }
         #endregion
 
         #region Score Methods
@@ -605,7 +623,8 @@ namespace AstroOdyssey
 
             fpsCount = 0;
             fpsCounter = 0;
-            lastFrameTimeTime = 0;
+            lastFrameTime = 0;
+            frameStatUpdateWait = 5;
 
             laserTime = 235;
             laserSpeed = 20;
@@ -642,6 +661,8 @@ namespace AstroOdyssey
 
                 UpdateGameStats();
 
+                UpdateFrameStats();
+
                 GetPlayerBounds();
 
                 SpawnEnemy();
@@ -667,15 +688,12 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Updates the game score, player health, fps, and objects currently in view.
+        /// Updates the game score, player health.
         /// </summary>
         private void UpdateGameStats()
         {
             ScoreText.Text = "Score: " + score;
             HealthText.Text = GetPlayerHealthPoints();
-            FPSText.Text = "FPS: " + fpsCount;
-            FrameTimeText.Text = "Frame time: " + frameWaitTime + "ms";
-            ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
         }
 
         /// <summary>

@@ -21,6 +21,8 @@ namespace AstroOdyssey
 
             SetBaseUrl();
 
+            
+
             mainPage.NavigateToPage("/GameStartPage");
         }
 
