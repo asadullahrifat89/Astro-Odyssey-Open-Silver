@@ -198,13 +198,36 @@ namespace AstroOdyssey
         {
             while (isGameRunning)
             {
-                // TODO: check if any object is nearby then fire
-                SpawnLaser();
+                // any object falls within player range
+                if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
+                {
+                    SpawnLaser();
 
-                PlayLaserSound();
+                    PlayLaserSound();
+                }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
             }
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the left side range of the player
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private bool IsAnyObjectWithinLeftSideRange(GameObject go)
+        {
+            return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the right side range of the player
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private bool IsAnyObjectWihinRightSideRange(GameObject go)
+        {
+            return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
         }
 
         /// <summary>
@@ -253,7 +276,7 @@ namespace AstroOdyssey
         /// </summary>
         private void UpdateFrame()
         {
-            var gameObjects = GameCanvas.Children.OfType<GameObject>();
+            var gameObjects = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Player);
 
             Parallel.ForEach(gameObjects, (element) =>
             {
