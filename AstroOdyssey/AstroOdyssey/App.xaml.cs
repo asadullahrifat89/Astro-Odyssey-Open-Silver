@@ -19,9 +19,7 @@ namespace AstroOdyssey
             mainPage = new MainPage();
             Window.Current.Content = mainPage;
 
-            SetBaseUrl();
-
-            
+            SetBaseUrl();            
 
             mainPage.NavigateToPage("/GameStartPage");
         }
