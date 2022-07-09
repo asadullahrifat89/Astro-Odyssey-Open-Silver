@@ -332,7 +332,11 @@ namespace AstroOdyssey
                 }
             });
 
-            Parallel.ForEach(removableObjects, (removableItem) => { GameCanvas.Children.Remove(removableItem); });
+            Parallel.ForEach(removableObjects, (removableItem) =>
+            {
+                // TODO: add storyboard animation for destruction
+                GameCanvas.Children.Remove(removableItem);
+            });
         }
 
         /// <summary>
