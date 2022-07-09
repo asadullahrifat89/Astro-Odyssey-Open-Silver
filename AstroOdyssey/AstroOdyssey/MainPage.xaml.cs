@@ -27,7 +27,7 @@ namespace AstroOdyssey
 
         bool isGameRunning;
 
-        List<GameObject> removableObjects = new List<GameObject>();
+        List<GameObject> destroyableGameObjects = new List<GameObject>();
 
         Random rand = new Random();
 
@@ -233,7 +233,7 @@ namespace AstroOdyssey
 
                     if (Canvas.GetTop(laser) < 10)
                     {
-                        removableObjects.Add(laser);
+                        destroyableGameObjects.Add(laser);
                     }
 
                     Rect laserBounds = laser.GetRect();
@@ -248,7 +248,7 @@ namespace AstroOdyssey
 
                             if (IntersectsWith(laserBounds, enemyBounds))
                             {
-                                removableObjects.Add(laser);
+                                destroyableGameObjects.Add(laser);
 
                                 targetEnemy.LooseHealth();
 
@@ -259,7 +259,7 @@ namespace AstroOdyssey
 
                                 if (targetEnemy.IsDestroyable)
                                 {
-                                    removableObjects.Add(targetEnemy);
+                                    destroyableGameObjects.Add(targetEnemy);
 
                                     PlayerScoreByEnemyDestruction();
 
@@ -274,7 +274,7 @@ namespace AstroOdyssey
 
                             if (IntersectsWith(laserBounds, meteorBounds))
                             {
-                                removableObjects.Add(laser);
+                                destroyableGameObjects.Add(laser);
 
                                 targetMeteor.LooseHealth();
 
@@ -285,7 +285,7 @@ namespace AstroOdyssey
 
                                 if (targetMeteor.IsDestroyable)
                                 {
-                                    removableObjects.Add(targetMeteor);
+                                    destroyableGameObjects.Add(targetMeteor);
 
                                     PlayerScoreByMeteorDestruction();
 
@@ -305,7 +305,7 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerBounds, enemyHitBox))
                     {
-                        removableObjects.Add(enemy);
+                        destroyableGameObjects.Add(enemy);
 
                         player.LooseHealth();
 
@@ -315,7 +315,7 @@ namespace AstroOdyssey
                     {
                         if (Canvas.GetTop(enemy) > windowHeight)
                         {
-                            removableObjects.Add(enemy);
+                            destroyableGameObjects.Add(enemy);
                         }
                     }
                 }
@@ -329,7 +329,7 @@ namespace AstroOdyssey
 
                     if (IntersectsWith(playerBounds, meteorHitBox))
                     {
-                        removableObjects.Add(meteor);
+                        destroyableGameObjects.Add(meteor);
 
                         player.LooseHealth();
 
@@ -339,13 +339,13 @@ namespace AstroOdyssey
                     {
                         if (Canvas.GetTop(meteor) > windowHeight)
                         {
-                            removableObjects.Add(meteor);
+                            destroyableGameObjects.Add(meteor);
                         }
                     }
                 }
             });
 
-            Parallel.ForEach(removableObjects, (removableItem) =>
+            Parallel.ForEach(destroyableGameObjects, (removableItem) =>
             {
                 // TODO: add storyboard animation for destruction
                 GameCanvas.Children.Remove(removableItem);
