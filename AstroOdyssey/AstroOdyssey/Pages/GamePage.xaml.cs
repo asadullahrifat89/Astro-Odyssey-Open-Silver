@@ -55,8 +55,8 @@ namespace AstroOdyssey
 
         private Difficulty difficulty = Difficulty.StartUp;
 
-        private Random rand = new Random();
-        private List<GameObject> destroyableGameObjects = new List<GameObject>();
+        private readonly Random rand = new Random();
+        private readonly List<GameObject> destroyableGameObjects = new List<GameObject>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -119,7 +119,7 @@ namespace AstroOdyssey
             fpsCounter = 0;
             lastFPSTime = 0;
 
-            laserTime = 250;
+            laserTime = 235;
             laserSpeed = 20;
 
             difficulty = Difficulty.Noob;
@@ -641,14 +641,13 @@ namespace AstroOdyssey
                     {
                         enemySpawnWait = 45;
                         enemySpeed = 5;
-
                         laserSpeed = 40;
                     }
                     break;
                 case Difficulty.Easy:
                     {
                         enemySpawnWait = 40;
-                        enemySpeed = 10;
+                        enemySpeed = 7;
 
                         meteorSpawnWait = 40;
                         meteorSpeed = 4;
@@ -659,7 +658,7 @@ namespace AstroOdyssey
                 case Difficulty.Medium:
                     {
                         enemySpawnWait = 35;
-                        enemySpeed = 15;
+                        enemySpeed = 9;
 
                         meteorSpawnWait = 35;
                         meteorSpeed = 6;
@@ -670,7 +669,7 @@ namespace AstroOdyssey
                 case Difficulty.Hard:
                     {
                         enemySpawnWait = 30;
-                        enemySpeed = 20;
+                        enemySpeed = 11;
 
                         meteorSpawnWait = 30;
                         meteorSpeed = 8;
@@ -681,7 +680,7 @@ namespace AstroOdyssey
                 case Difficulty.VeryHard:
                     {
                         enemySpawnWait = 25;
-                        enemySpeed = 25;
+                        enemySpeed = 13;
 
                         meteorSpawnWait = 25;
                         meteorSpeed = 10;
@@ -692,7 +691,7 @@ namespace AstroOdyssey
                 case Difficulty.Extreme:
                     {
                         enemySpawnWait = 20;
-                        enemySpeed = 30;
+                        enemySpeed = 15;
 
                         meteorSpawnWait = 20;
                         meteorSpeed = 12;
@@ -703,7 +702,7 @@ namespace AstroOdyssey
                 case Difficulty.Pro:
                     {
                         enemySpawnWait = 15;
-                        enemySpeed = 35;
+                        enemySpeed = 17;
 
                         meteorSpawnWait = 15;
                         meteorSpeed = 14;
