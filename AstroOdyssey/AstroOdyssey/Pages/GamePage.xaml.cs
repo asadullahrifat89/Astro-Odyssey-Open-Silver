@@ -84,6 +84,490 @@ namespace AstroOdyssey
 
         #region Methods
 
+        #region Player Methods
+
+        /// <summary>
+        /// Spawns the player.
+        /// </summary>
+        private void SpawnPlayer()
+        {
+            player = new Player();
+
+            Canvas.SetLeft(player, pointerX);
+            SetPlayerCanvasTop();
+
+            GameCanvas.Children.Add(player);
+        }
+
+        /// <summary>
+        /// Gets the players x axis position and bounds.
+        /// </summary>
+        private void GetPlayerBounds()
+        {
+            playerX = Canvas.GetLeft(player);
+            playerWidthHalf = player.Width / 2;
+
+            playerBounds = player.GetRect();
+        }
+
+        /// <summary>
+        /// Gets the player health points.
+        /// </summary>
+        /// <returns></returns>
+        private string GetPlayerHealthPoints()
+        {
+            var healthPoints = player.Health / player.HealthSlot;
+            var healthIcon = "❤️";
+            var health = string.Empty;
+
+            for (int i = 0; i < healthPoints; i++)
+            {
+                health += healthIcon;
+            }
+
+            return health;
+        }
+
+        /// <summary>
+        /// Sets the y axis position of the player on game canvas.
+        /// </summary>
+        private void SetPlayerCanvasTop()
+        {
+            Canvas.SetTop(player, windowHeight - player.Height - 20);
+        }
+
+        /// <summary>
+        /// Sets the x axis position of the player on game canvas.
+        /// </summary>
+        /// <param name="x"></param>
+        private void SetPlayerCanvasLeft(double x)
+        {
+            Canvas.SetLeft(player, x);
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the left side range of the player
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private bool IsAnyObjectWithinLeftSideRange(GameObject go)
+        {
+            return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the right side range of the player
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private bool IsAnyObjectWihinRightSideRange(GameObject go)
+        {
+            return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
+        }
+
+        /// <summary>
+        /// Moves the player to last pointer pressed position by x axis.
+        /// </summary>
+        private void MovePlayer()
+        {
+            if (moveLeft && playerX > 0)
+                pointerX -= playerSpeed;
+
+            if (moveRight && playerX + player.Width < windowWidth)
+                pointerX += playerSpeed;
+
+            // move right
+            if (pointerX - playerWidthHalf > playerX + playerSpeed)
+            {
+                if (playerX + playerWidthHalf < windowWidth)
+                {
+                    SetPlayerCanvasLeft(playerX + playerSpeed);
+                }
+            }
+
+            // move left
+            if (pointerX - playerWidthHalf < playerX - playerSpeed)
+            {
+                SetPlayerCanvasLeft(playerX - playerSpeed);
+            }
+        }
+
+        /// <summary>
+        /// Check if player is dead.
+        /// </summary>
+        private void CheckPlayerDeath()
+        {
+            // game over
+            if (player.IsDestroyable)
+            {
+                HealthText.Text = "Health: " + 0;
+                StopGame();
+            }
+        }
+
+        #endregion
+
+        #region Frame Methods
+
+        /// <summary>
+        /// Awaits the calculated frame time.
+        /// </summary>
+        /// <param name="watch"></param>        
+        /// <returns></returns>
+        private async Task AwaitFrameTime(Stopwatch watch)
+        {
+            frameWaitTime = CalculateFrameWaitTime(watch);
+
+            await Task.Delay(frameWaitTime);
+        }
+
+        /// <summary>
+        /// Calculates the wait time between frames.
+        /// </summary>
+        /// <param name="watch"></param>        
+        /// <returns></returns>
+        private int CalculateFrameWaitTime(Stopwatch watch)
+        {
+            frameTime = watch.ElapsedMilliseconds - frameStartTime;
+            var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
+            return waitTime;
+        }
+
+        /// <summary>
+        /// Calculates frames per second.
+        /// </summary>
+        /// <param name="frameStartTime"></param>
+        private void CalculateFps()
+        {
+            // calculate FPS
+            if (lastFrameTimeTime + 1000 < frameStartTime)
+            {
+                fpsCount = fpsCounter;
+                fpsCounter = 0;
+                lastFrameTimeTime = frameStartTime;
+            }
+
+            fpsCounter++;
+        }
+
+        /// <summary>
+        /// Updates a frame. Advances game objects in the frame.
+        /// </summary>
+        private void UpdateFrame()
+        {
+            var gameObjects = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Player);
+
+            Parallel.ForEach(gameObjects, (element) =>
+            {
+                UpdateLaserElement(element);
+                UpdateEnemyElement(element);
+                UpdateMeteorElement(element);
+            });
+
+            Parallel.ForEach(destroyableGameObjects, (removableItem) =>
+            {
+                // TODO: add storyboard animation for destruction
+                GameCanvas.Children.Remove(removableItem);
+            });
+        }
+
+        #endregion
+
+        #region Score Methods
+
+        /// <summary>
+        /// Increase player score if an enemy was destroyed.
+        /// </summary>
+        private void PlayerScoreByEnemyDestruction()
+        {
+            score++;
+        }
+
+        /// <summary>
+        /// Increase player score if a meteor was destroyed.
+        /// </summary>
+        private void PlayerScoreByMeteorDestruction()
+        {
+            score += 0.5d;
+        }
+
+        #endregion
+
+        #region Laser Methods
+
+        /// <summary>
+        /// Spawns a laser.
+        /// </summary>
+        private void SpawnLaser()
+        {
+            double laserHeight = 0, laserWidth = 0;
+
+            switch (difficulty)
+            {
+                case Difficulty.Noob:
+                    { laserHeight = 20; laserWidth = 5; }
+                    break;
+                case Difficulty.StartUp:
+                    { laserHeight = 25; laserWidth = 10; }
+                    break;
+                case Difficulty.Easy:
+                    { laserHeight = 30; laserWidth = 15; }
+                    break;
+                case Difficulty.Medium:
+                    { laserHeight = 35; laserWidth = 20; }
+                    break;
+                case Difficulty.Hard:
+                    { laserHeight = 40; laserWidth = 25; }
+                    break;
+                case Difficulty.VeryHard:
+                    { laserHeight = 45; laserWidth = 30; }
+                    break;
+                case Difficulty.Extreme:
+                    { laserHeight = 50; laserWidth = 35; }
+                    break;
+                case Difficulty.Pro:
+                    { laserHeight = 55; laserWidth = 40; }
+                    break;
+                default:
+                    break;
+            }
+
+            var newLaser = new Laser(laserHeight, laserWidth);
+
+            Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
+            Canvas.SetTop(newLaser, Canvas.GetTop(player) - 20);
+
+            GameCanvas.Children.Add(newLaser);
+        }
+
+        /// <summary>
+        /// Runs the laser loop if game is running.
+        /// </summary>
+        private async void RunLaserLoop()
+        {
+            while (gameIsRunning)
+            {
+                // any object falls within player range
+                if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
+                {
+                    SpawnLaser();
+
+                    PlayLaserSound();
+                }
+
+                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
+            }
+        }
+
+        /// <summary>
+        /// Update the laser element as per frame.
+        /// </summary>
+        /// <param name="element"></param>
+        private void UpdateLaserElement(GameObject element)
+        {
+            if (element is Laser laser)
+            {
+                // move laser up
+                Canvas.SetTop(laser, Canvas.GetTop(laser) - laserSpeed);
+
+                // remove laser if outside game canvas
+                if (Canvas.GetTop(laser) < 10)
+                {
+                    destroyableGameObjects.Add(laser);
+                }
+
+                Rect laserBounds = laser.GetRect();
+
+                // get game objects which are not laser
+                var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser);
+
+                Parallel.ForEach(obstacles, (obstacle) =>
+                {
+                    // check if enemy intersects the laser
+                    if (obstacle is Enemy targetEnemy)
+                    {
+                        Rect enemyBounds = targetEnemy.GetRect();
+
+                        if (IntersectsWith(laserBounds, enemyBounds))
+                        {
+                            destroyableGameObjects.Add(laser);
+
+                            targetEnemy.LooseHealth();
+
+                            // move the enemy backwards a bit on laser hit
+                            Canvas.SetTop(targetEnemy, Canvas.GetTop(targetEnemy) - (enemySpeed * 3) / 2);
+
+                            PlayLaserHitObjectSound();
+
+                            if (targetEnemy.IsDestroyable)
+                            {
+                                destroyableGameObjects.Add(targetEnemy);
+
+                                PlayerScoreByEnemyDestruction();
+
+                                PlayEnemyDestructionSound();
+                            }
+                        }
+                    }
+
+                    // check if meteor intersects the laser
+                    if (obstacle is Meteor targetMeteor)
+                    {
+                        Rect meteorBounds = targetMeteor.GetRect();
+
+                        if (IntersectsWith(laserBounds, meteorBounds))
+                        {
+                            destroyableGameObjects.Add(laser);
+
+                            targetMeteor.LooseHealth();
+
+                            // move the meteor backwards a bit on laser hit
+                            Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - (meteorSpeed * 4) / 2);
+
+                            PlayLaserHitObjectSound();
+
+                            if (targetMeteor.IsDestroyable)
+                            {
+                                destroyableGameObjects.Add(targetMeteor);
+
+                                PlayerScoreByMeteorDestruction();
+
+                                PlayMeteorDestructionSound();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        #endregion
+
+        #region Enemy Methods
+
+        /// <summary>
+        /// Spawns an enemy.
+        /// </summary>
+        private void SpawnEnemy()
+        {
+            // each frame progress decreases this counter
+            enemyCounter -= 1;
+
+            // when counter reaches zero, create an enemy
+            if (enemyCounter < 0)
+            {
+                GenerateEnemy();
+                enemyCounter = enemySpawnWait;
+            }
+        }
+
+        /// <summary>
+        /// Update the enemey element as per frame.
+        /// </summary>
+        /// <param name="element"></param>
+        private void UpdateEnemyElement(GameObject element)
+        {
+            if (element is Enemy enemy)
+            {
+                // move enemy down
+                Canvas.SetTop(enemy, Canvas.GetTop(enemy) + enemySpeed);
+
+                Rect enemyHitBox = enemy.GetRect();
+
+                if (IntersectsWith(playerBounds, enemyHitBox))
+                {
+                    destroyableGameObjects.Add(enemy);
+
+                    player.LooseHealth();
+
+                    PlayPlayerHealthLossSound();
+                }
+                else
+                {
+                    if (Canvas.GetTop(enemy) > windowHeight)
+                    {
+                        destroyableGameObjects.Add(enemy);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates a random enemy.
+        /// </summary>
+        private void GenerateEnemy()
+        {
+            var newEnemy = new Enemy();
+
+            Canvas.SetTop(newEnemy, -100);
+            Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
+            GameCanvas.Children.Add(newEnemy);
+        }
+
+        #endregion
+
+        #region Meteor Methods
+
+        /// <summary>
+        /// Spawns a meteor.
+        /// </summary>
+        private void SpawnMeteor()
+        {
+            // each frame progress decreases this counter
+            meteorCounter -= 1;
+
+            // when counter reaches zero, create a meteor
+            if (meteorCounter < 0)
+            {
+                GenerateMeteor();
+                meteorCounter = meteorSpawnWait;
+            }
+        }
+
+        /// <summary>
+        /// Generates a random meteor.
+        /// </summary>
+        private void GenerateMeteor()
+        {
+            var newMeteor = new Meteor();
+
+            Canvas.SetTop(newMeteor, -100);
+            Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));
+            GameCanvas.Children.Add(newMeteor);
+        }
+
+        /// <summary>
+        /// Update the meteor element as per frame.
+        /// </summary>
+        /// <param name="element"></param>
+        private void UpdateMeteorElement(GameObject element)
+        {
+            if (element is Meteor meteor)
+            {
+                // move meteor down
+                Canvas.SetTop(meteor, Canvas.GetTop(meteor) + meteorSpeed);
+
+                Rect meteorHitBox = meteor.GetRect();
+
+                if (IntersectsWith(playerBounds, meteorHitBox))
+                {
+                    destroyableGameObjects.Add(meteor);
+
+                    player.LooseHealth();
+
+                    PlayPlayerHealthLossSound();
+                }
+                else
+                {
+                    if (Canvas.GetTop(meteor) > windowHeight)
+                    {
+                        destroyableGameObjects.Add(meteor);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Game Methods
 
         /// <summary>
@@ -182,424 +666,15 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Awaits the calculated frame time.
-        /// </summary>
-        /// <param name="watch"></param>        
-        /// <returns></returns>
-        private async Task AwaitFrameTime(Stopwatch watch)
-        {
-            frameWaitTime = CalculateFrameWaitTime(watch);
-
-            await Task.Delay(frameWaitTime);
-        }
-
-        /// <summary>
-        /// Runs the laser loop if game is running.
-        /// </summary>
-        private async void RunLaserLoop()
-        {
-            while (gameIsRunning)
-            {
-                // any object falls within player range
-                if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
-                {
-                    SpawnLaser();
-
-                    PlayLaserSound();
-                }
-
-                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
-            }
-        }
-
-        /// <summary>
-        /// Checks if there is any game object within the left side range of the player
-        /// </summary>
-        /// <param name="go"></param>
-        /// <returns></returns>
-        private bool IsAnyObjectWithinLeftSideRange(GameObject go)
-        {
-            return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
-        }
-
-        /// <summary>
-        /// Checks if there is any game object within the right side range of the player
-        /// </summary>
-        /// <param name="go"></param>
-        /// <returns></returns>
-        private bool IsAnyObjectWihinRightSideRange(GameObject go)
-        {
-            return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
-        }
-
-        /// <summary>
-        /// Calculates the wait time between frames.
-        /// </summary>
-        /// <param name="watch"></param>        
-        /// <returns></returns>
-        private int CalculateFrameWaitTime(Stopwatch watch)
-        {
-            frameTime = watch.ElapsedMilliseconds - frameStartTime;
-            var waitTime = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
-            return waitTime;
-        }
-
-        /// <summary>
-        /// Calculates frames per second.
-        /// </summary>
-        /// <param name="frameStartTime"></param>
-        private void CalculateFps()
-        {
-            // calculate FPS
-            if (lastFrameTimeTime + 1000 < frameStartTime)
-            {
-                fpsCount = fpsCounter;
-                fpsCounter = 0;
-                lastFrameTimeTime = frameStartTime;
-            }
-
-            fpsCounter++;
-        }
-
-        /// <summary>
-        /// Gets the players x axis position and bounds.
-        /// </summary>
-        private void GetPlayerBounds()
-        {
-            playerX = Canvas.GetLeft(player);
-            playerWidthHalf = player.Width / 2;
-
-            playerBounds = player.GetRect();
-        }
-
-        /// <summary>
-        /// Updates a frame. Advances game objects in the frame.
-        /// </summary>
-        private void UpdateFrame()
-        {
-            var gameObjects = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Player);
-
-            Parallel.ForEach(gameObjects, (element) =>
-            {
-                UpdateLaserElement(element);
-                UpdateEnemyElement(element);
-                UpdateMeteorElement(element);
-            });
-
-            Parallel.ForEach(destroyableGameObjects, (removableItem) =>
-            {
-                // TODO: add storyboard animation for destruction
-                GameCanvas.Children.Remove(removableItem);
-            });
-        }
-
-        /// <summary>
-        /// Update the laser element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateLaserElement(GameObject element)
-        {
-            if (element is Laser laser)
-            {
-                // move laser up
-                Canvas.SetTop(laser, Canvas.GetTop(laser) - laserSpeed);
-
-                // remove laser if outside game canvas
-                if (Canvas.GetTop(laser) < 10)
-                {
-                    destroyableGameObjects.Add(laser);
-                }
-
-                Rect laserBounds = laser.GetRect();
-
-                // get game objects which are not laser
-                var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Laser);
-
-                Parallel.ForEach(obstacles, (obstacle) =>
-                {
-                    // check if enemy intersects the laser
-                    if (obstacle is Enemy targetEnemy)
-                    {
-                        Rect enemyBounds = targetEnemy.GetRect();
-
-                        if (IntersectsWith(laserBounds, enemyBounds))
-                        {
-                            destroyableGameObjects.Add(laser);
-
-                            targetEnemy.LooseHealth();
-
-                            // move the enemy backwards a bit on laser hit
-                            Canvas.SetTop(targetEnemy, Canvas.GetTop(targetEnemy) - (enemySpeed * 3) / 2);
-
-                            PlayLaserHitObjectSound();
-
-                            if (targetEnemy.IsDestroyable)
-                            {
-                                destroyableGameObjects.Add(targetEnemy);
-
-                                PlayerScoreByEnemyDestruction();
-
-                                PlayEnemyDestructionSound();
-                            }
-                        }
-                    }
-
-                    // check if meteor intersects the laser
-                    if (obstacle is Meteor targetMeteor)
-                    {
-                        Rect meteorBounds = targetMeteor.GetRect();
-
-                        if (IntersectsWith(laserBounds, meteorBounds))
-                        {
-                            destroyableGameObjects.Add(laser);
-
-                            targetMeteor.LooseHealth();
-
-                            // move the meteor backwards a bit on laser hit
-                            Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - (meteorSpeed * 4) / 2);
-
-                            PlayLaserHitObjectSound();
-
-                            if (targetMeteor.IsDestroyable)
-                            {
-                                destroyableGameObjects.Add(targetMeteor);
-
-                                PlayerScoreByMeteorDestruction();
-
-                                PlayMeteorDestructionSound();
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        /// <summary>
-        /// Update the enemey element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateEnemyElement(GameObject element)
-        {
-            if (element is Enemy enemy)
-            {
-                // move enemy down
-                Canvas.SetTop(enemy, Canvas.GetTop(enemy) + enemySpeed);
-
-                Rect enemyHitBox = enemy.GetRect();
-
-                if (IntersectsWith(playerBounds, enemyHitBox))
-                {
-                    destroyableGameObjects.Add(enemy);
-
-                    player.LooseHealth();
-
-                    PlayPlayerHealthLossSound();
-                }
-                else
-                {
-                    if (Canvas.GetTop(enemy) > windowHeight)
-                    {
-                        destroyableGameObjects.Add(enemy);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update the meteor element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateMeteorElement(GameObject element)
-        {
-            if (element is Meteor meteor)
-            {
-                // move meteor down
-                Canvas.SetTop(meteor, Canvas.GetTop(meteor) + meteorSpeed);
-
-                Rect meteorHitBox = meteor.GetRect();
-
-                if (IntersectsWith(playerBounds, meteorHitBox))
-                {
-                    destroyableGameObjects.Add(meteor);
-
-                    player.LooseHealth();
-
-                    PlayPlayerHealthLossSound();
-                }
-                else
-                {
-                    if (Canvas.GetTop(meteor) > windowHeight)
-                    {
-                        destroyableGameObjects.Add(meteor);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Increase player score if an enemy was destroyed.
-        /// </summary>
-        private void PlayerScoreByEnemyDestruction()
-        {
-            score++;
-        }
-
-        /// <summary>
-        /// Increase player score if a meteor was destroyed.
-        /// </summary>
-        private void PlayerScoreByMeteorDestruction()
-        {
-            score += 0.5d;
-        }
-
-        /// <summary>
         /// Updates the game score, player health, fps, and objects currently in view.
         /// </summary>
         private void UpdateGameStats()
         {
             ScoreText.Text = "Score: " + score;
             HealthText.Text = GetPlayerHealthPoints();
-            FPSText.Text = "FPS: " + fpsCount;            
+            FPSText.Text = "FPS: " + fpsCount;
             FrameTimeText.Text = "Frame time: " + frameWaitTime + "ms";
             ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
-        }
-
-        /// <summary>
-        /// Gets the player health points.
-        /// </summary>
-        /// <returns></returns>
-        private string GetPlayerHealthPoints()
-        {
-            var healthPoints = player.Health / player.HealthSlot;
-            var healthIcon = "❤️";
-            var health = string.Empty;
-
-            for (int i = 0; i < healthPoints; i++)
-            {
-                health += healthIcon;
-            }
-
-            return health;
-        }
-
-        /// <summary>
-        /// Check if player is dead.
-        /// </summary>
-        private void CheckPlayerDeath()
-        {
-            // game over
-            if (player.IsDestroyable)
-            {
-                HealthText.Text = "Health: " + 0;
-                StopGame();
-            }
-        }
-
-        /// <summary>
-        /// Spawns an enemy.
-        /// </summary>
-        private void SpawnEnemy()
-        {
-            // each frame progress decreases this counter
-            enemyCounter -= 1;
-
-            // when counter reaches zero, create an enemy
-            if (enemyCounter < 0)
-            {
-                GenerateEnemy();
-                enemyCounter = enemySpawnWait;
-            }
-        }
-
-        /// <summary>
-        /// Spawns a meteor.
-        /// </summary>
-        private void SpawnMeteor()
-        {
-            // each frame progress decreases this counter
-            meteorCounter -= 1;
-
-            // when counter reaches zero, create a meteor
-            if (meteorCounter < 0)
-            {
-                GenerateMeteor();
-                meteorCounter = meteorSpawnWait;
-            }
-        }
-
-        /// <summary>
-        /// Spawns the player.
-        /// </summary>
-        private void SpawnPlayer()
-        {
-            player = new Player();
-
-            Canvas.SetLeft(player, pointerX);
-            SetPlayerCanvasTop();
-
-            GameCanvas.Children.Add(player);
-        }
-
-        /// <summary>
-        /// Spawns a laser.
-        /// </summary>
-        private void SpawnLaser()
-        {
-            double laserHeight = 0, laserWidth = 0;
-
-            switch (difficulty)
-            {
-                case Difficulty.Noob:
-                    { laserHeight = 20; laserWidth = 5; }
-                    break;
-                case Difficulty.StartUp:
-                    { laserHeight = 25; laserWidth = 10; }
-                    break;
-                case Difficulty.Easy:
-                    { laserHeight = 30; laserWidth = 15; }
-                    break;
-                case Difficulty.Medium:
-                    { laserHeight = 35; laserWidth = 20; }
-                    break;
-                case Difficulty.Hard:
-                    { laserHeight = 40; laserWidth = 25; }
-                    break;
-                case Difficulty.VeryHard:
-                    { laserHeight = 45; laserWidth = 30; }
-                    break;
-                case Difficulty.Extreme:
-                    { laserHeight = 50; laserWidth = 35; }
-                    break;
-                case Difficulty.Pro:
-                    { laserHeight = 55; laserWidth = 40; }
-                    break;
-                default:
-                    break;
-            }
-
-            var newLaser = new Laser(laserHeight, laserWidth);
-
-            Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
-            Canvas.SetTop(newLaser, Canvas.GetTop(player) - 20);
-
-            GameCanvas.Children.Add(newLaser);
-        }
-
-        /// <summary>
-        /// Sets the y axis position of the player on game canvas.
-        /// </summary>
-        private void SetPlayerCanvasTop()
-        {
-            Canvas.SetTop(player, windowHeight - player.Height - 20);
-        }
-
-        /// <summary>
-        /// Sets the x axis position of the player on game canvas.
-        /// </summary>
-        /// <param name="x"></param>
-        private void SetPlayerCanvasLeft(double x)
-        {
-            Canvas.SetLeft(player, x);
         }
 
         /// <summary>
@@ -718,57 +793,6 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Moves the player to last pointer pressed position by x axis.
-        /// </summary>
-        private void MovePlayer()
-        {
-            if (moveLeft && playerX > 0)
-                pointerX -= playerSpeed;
-
-            if (moveRight && playerX + player.Width < windowWidth)
-                pointerX += playerSpeed;
-
-            // move right
-            if (pointerX - playerWidthHalf > playerX + playerSpeed)
-            {
-                if (playerX + playerWidthHalf < windowWidth)
-                {
-                    SetPlayerCanvasLeft(playerX + playerSpeed);
-                }
-            }
-
-            // move left
-            if (pointerX - playerWidthHalf < playerX - playerSpeed)
-            {
-                SetPlayerCanvasLeft(playerX - playerSpeed);
-            }
-        }
-
-        /// <summary>
-        /// Generates a random enemy.
-        /// </summary>
-        private void GenerateEnemy()
-        {
-            var newEnemy = new Enemy();
-
-            Canvas.SetTop(newEnemy, -100);
-            Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newEnemy);
-        }
-
-        /// <summary>
-        /// Generates a random meteor.
-        /// </summary>
-        private void GenerateMeteor()
-        {
-            var newMeteor = new Meteor();
-
-            Canvas.SetTop(newMeteor, -100);
-            Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newMeteor);
-        }
-
-        /// <summary>
         /// Checks if a two rects intersect.
         /// </summary>
         /// <param name="source"></param>
@@ -784,6 +808,28 @@ namespace AstroOdyssey
             return false;
         }
 
+        /// <summary>
+        /// Sets the window and canvas size on startup.
+        /// </summary>
+        private void SetWindowSizeAtStartup()
+        {
+            windowWidth = Window.Current.Bounds.Width;
+            windowHeight = Window.Current.Bounds.Height;
+
+            SetGameCanvasSize();
+
+            pointerX = windowWidth / 2;
+        }
+
+        /// <summary>
+        /// Sets the game canvas size according to current window size.
+        /// </summary>
+        private void SetGameCanvasSize()
+        {
+            GameCanvas.Height = windowHeight;
+            GameCanvas.Width = windowWidth;
+        }
+
         #endregion
 
         #region Canvas Events
@@ -793,6 +839,36 @@ namespace AstroOdyssey
             var currentPoint = e.GetCurrentPoint(GameCanvas);
 
             pointerX = currentPoint.Position.X;
+        }
+
+        #endregion
+
+        #region Focus Events
+
+        private void FocusBox_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Left)
+            {
+                moveLeft = true;
+            }
+
+            if (e.Key == Windows.System.VirtualKey.Right)
+            {
+                moveRight = true;
+            }
+        }
+
+        private void FocusBox_KeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Left)
+            {
+                moveLeft = false;
+            }
+
+            if (e.Key == Windows.System.VirtualKey.Right)
+            {
+                moveRight = false;
+            }
         }
 
         #endregion
@@ -833,29 +909,7 @@ namespace AstroOdyssey
 
             SetGameCanvasSize();
             SetPlayerCanvasTop();
-        }
-
-        /// <summary>
-        /// Sets the window and canvas size on startup.
-        /// </summary>
-        void SetWindowSizeAtStartup()
-        {
-            windowWidth = Window.Current.Bounds.Width;
-            windowHeight = Window.Current.Bounds.Height;
-
-            SetGameCanvasSize();
-
-            pointerX = windowWidth / 2;
-        }
-
-        /// <summary>
-        /// Sets the game canvas size according to current window size.
-        /// </summary>
-        private void SetGameCanvasSize()
-        {
-            GameCanvas.Height = windowHeight;
-            GameCanvas.Width = windowWidth;
-        }
+        }     
 
         #endregion
 
@@ -1030,32 +1084,6 @@ namespace AstroOdyssey
             }())", audio);
         }
 
-        private void FocusBox_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Left)
-            {
-                moveLeft = true;
-            }
-
-            if (e.Key == Windows.System.VirtualKey.Right)
-            {
-                moveRight = true;
-            }
-        }
-
-        private void FocusBox_KeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Left)
-            {
-                moveLeft = false;
-            }
-
-            if (e.Key == Windows.System.VirtualKey.Right)
-            {
-                moveRight = false;
-            }
-        }
-
         /// <summary>
         /// Pauses the provided js audio object.
         /// </summary>
@@ -1068,20 +1096,21 @@ namespace AstroOdyssey
                 $0.pause();           
             }())", audio);
         }
+        
         #endregion
 
         #endregion
+    }
 
-        public enum Difficulty
-        {
-            Noob,
-            StartUp,
-            Easy,
-            Medium,
-            Hard,
-            VeryHard,
-            Extreme,
-            Pro,
-        }
+    public enum Difficulty
+    {
+        Noob,
+        StartUp,
+        Easy,
+        Medium,
+        Hard,
+        VeryHard,
+        Extreme,
+        Pro,
     }
 }
