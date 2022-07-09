@@ -7,11 +7,11 @@ namespace AstroOdyssey
 {
     public class Laser : GameObject
     {
-        public Laser()
+        public Laser(double height = 20, double width = 5)
         {
             Tag = "laser";
-            Height = 20;
-            Width = 5;
+            Height = height;
+            Width = width;
             Background = new SolidColorBrush(Colors.White);
             CornerRadius = new CornerRadius(50);
         }

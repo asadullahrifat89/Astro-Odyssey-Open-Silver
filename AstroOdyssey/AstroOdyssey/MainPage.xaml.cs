@@ -64,6 +64,8 @@ namespace AstroOdyssey
 
         Rect playerBounds;
 
+        Difficulty difficulty = Difficulty.StartUp;
+
         #endregion
 
         #region Ctor
@@ -96,7 +98,7 @@ namespace AstroOdyssey
             PlayBackgroundMusic();
 
             enemyCounter = 100;
-            enemySpawnWait = 50;
+            enemySpawnWait = 45;
             enemySpeed = 5;
 
             meteorCounter = 100;
@@ -112,7 +114,9 @@ namespace AstroOdyssey
             lastFPSTime = 0;
 
             laserTime = 250;
-            laserSpeed = 50;
+            laserSpeed = 20;
+
+            difficulty = Difficulty.Noob;
 
             GameCanvas.Children.Clear();
 
@@ -160,6 +164,8 @@ namespace AstroOdyssey
 
                 UpdateFrame();
 
+                SetDifficulty();
+
                 ScaleDifficulty();
 
                 CheckPlayerDeath();
@@ -169,6 +175,21 @@ namespace AstroOdyssey
                 int frameTime = CalculateFrameTime(watch, frameStartTime);
 
                 await Task.Delay(frameTime);
+            }
+        }
+
+        /// <summary>
+        /// Runs the laser loop if game is running.
+        /// </summary>
+        private async void LaserLoop()
+        {
+            while (isGameRunning)
+            {
+                SpawnLaser();
+
+                PlayLaserSound();
+
+                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
             }
         }
 
@@ -203,26 +224,6 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Runs the laser loop if game is running.
-        /// </summary>
-        private async void LaserLoop()
-        {
-            while (isGameRunning)
-            {
-                var newLaser = new Laser();
-
-                Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
-                Canvas.SetTop(newLaser, Canvas.GetTop(player) - laserSpeed);
-
-                GameCanvas.Children.Add(newLaser);
-
-                PlayLaserSound();
-
-                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
-            }
-        }
-
-        /// <summary>
         /// Gets the players x axis position and bounds.
         /// </summary>
         private void GetPlayerBounds()
@@ -245,7 +246,7 @@ namespace AstroOdyssey
                 if (element is Laser laser)
                 {
                     // move laser up
-                    Canvas.SetTop(laser, Canvas.GetTop(laser) - 20);
+                    Canvas.SetTop(laser, Canvas.GetTop(laser) - laserSpeed);
 
                     if (Canvas.GetTop(laser) < 10)
                     {
@@ -472,6 +473,51 @@ namespace AstroOdyssey
         }
 
         /// <summary>
+        /// Spawns a laser.
+        /// </summary>
+        private void SpawnLaser()
+        {
+            double laserHeight = 0, laserWidth = 0;
+
+            switch (difficulty)
+            {
+                case Difficulty.Noob:
+                    { laserHeight = 20; laserWidth = 5; }
+                    break;
+                case Difficulty.StartUp:
+                    { laserHeight = 25; laserWidth = 10; }
+                    break;
+                case Difficulty.Easy:
+                    { laserHeight = 30; laserWidth = 15; }
+                    break;
+                case Difficulty.Medium:
+                    { laserHeight = 35; laserWidth = 20; }
+                    break;
+                case Difficulty.Hard:
+                    { laserHeight = 40; laserWidth = 25; }
+                    break;
+                case Difficulty.VeryHard:
+                    { laserHeight = 45; laserWidth = 30; }
+                    break;
+                case Difficulty.Extreme:
+                    { laserHeight = 50; laserWidth = 35; }
+                    break;
+                case Difficulty.Pro:
+                    { laserHeight = 55; laserWidth = 40; }
+                    break;
+                default:
+                    break;
+            }
+
+            var newLaser = new Laser(laserHeight, laserWidth);
+
+            Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
+            Canvas.SetTop(newLaser, Canvas.GetTop(player) - laserSpeed);
+
+            GameCanvas.Children.Add(newLaser);
+        }
+
+        /// <summary>
         /// Sets the y axis position of the player on game canvas.
         /// </summary>
         private void SetPlayerCanvasTop()
@@ -489,77 +535,118 @@ namespace AstroOdyssey
         }
 
         /// <summary>
+        /// Sets the difficulty of the game according to score; 
+        /// </summary>
+        private void SetDifficulty()
+        {
+            if (score > 0)
+                difficulty = Difficulty.Noob;
+            if (score > 25)
+                difficulty = Difficulty.StartUp;
+            if (score > 50)
+                difficulty = Difficulty.Easy;
+            if (score > 100)
+                difficulty = Difficulty.Medium;
+            if (score > 200)
+                difficulty = Difficulty.Hard;
+            if (score > 400)
+                difficulty = Difficulty.VeryHard;
+            if (score > 800)
+                difficulty = Difficulty.Extreme;
+            if (score > 1600)
+                difficulty = Difficulty.Pro;
+        }
+
+        /// <summary>
         /// Scales up difficulty according to player score.
         /// </summary>
         private void ScaleDifficulty()
         {
-            // startup
-            if (score > 10)
+            switch (difficulty)
             {
-                enemySpawnWait = 45;
-                enemySpeed = 5;
+                case Difficulty.Noob:
+                    {
+                        enemySpawnWait = 45;
+                        enemySpeed = 5;
+                        laserSpeed = 30;
+                    }
+                    break;
+                case Difficulty.StartUp:
+                    {
+                        enemySpawnWait = 45;
+                        enemySpeed = 5;
 
-                laserSpeed = 30;
-            }
+                        laserSpeed = 40;
+                    }
+                    break;
+                case Difficulty.Easy:
+                    {
+                        enemySpawnWait = 40;
+                        enemySpeed = 10;
 
-            // easy
-            if (score > 50)
-            {
-                enemySpawnWait = 40;
-                enemySpeed = 10;
+                        meteorSpawnWait = 40;
+                        meteorSpeed = 4;
 
-                meteorSpawnWait = 40;
-                meteorSpeed = 4;
+                        laserSpeed = 50;
+                    }
+                    break;
+                case Difficulty.Medium:
+                    {
+                        enemySpawnWait = 35;
+                        enemySpeed = 15;
 
-                laserSpeed = 40;
-            }
+                        meteorSpawnWait = 35;
+                        meteorSpeed = 6;
 
-            // medium
-            if (score > 100)
-            {
-                enemySpawnWait = 35;
-                enemySpeed = 15;
+                        laserSpeed = 60;
+                    }
+                    break;
+                case Difficulty.Hard:
+                    {
+                        enemySpawnWait = 30;
+                        enemySpeed = 20;
 
-                meteorSpawnWait = 35;
-                meteorSpeed = 6;
+                        meteorSpawnWait = 30;
+                        meteorSpeed = 8;
 
-                laserSpeed = 50;
-            }
+                        laserSpeed = 70;
+                    }
+                    break;
+                case Difficulty.VeryHard:
+                    {
+                        enemySpawnWait = 25;
+                        enemySpeed = 25;
 
-            // hard
-            if (score > 300)
-            {
-                enemySpawnWait = 30;
-                enemySpeed = 20;
+                        meteorSpawnWait = 25;
+                        meteorSpeed = 10;
 
-                meteorSpawnWait = 30;
-                meteorSpeed = 8;
+                        laserSpeed = 80;
+                    }
+                    break;
+                case Difficulty.Extreme:
+                    {
+                        enemySpawnWait = 20;
+                        enemySpeed = 30;
 
-                laserSpeed = 60;
-            }
+                        meteorSpawnWait = 20;
+                        meteorSpeed = 12;
 
-            // very hard
-            if (score > 500)
-            {
-                enemySpawnWait = 25;
-                enemySpeed = 25;
+                        laserSpeed = 90;
+                    }
+                    break;
+                case Difficulty.Pro:
+                    {
+                        enemySpawnWait = 15;
+                        enemySpeed = 35;
 
-                meteorSpawnWait = 25;
-                meteorSpeed = 10;
+                        meteorSpawnWait = 15;
+                        meteorSpeed = 14;
 
-                laserSpeed = 70;
-            }
-
-            // extreme hard
-            if (score > 700)
-            {
-                enemySpawnWait = 20;
-                enemySpeed = 30;
-
-                meteorSpawnWait = 20;
-                meteorSpeed = 12;
-
-                laserSpeed = 80;
+                        laserSpeed = 100;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -894,5 +981,17 @@ namespace AstroOdyssey
         #endregion
 
         #endregion
+    }
+
+    public enum Difficulty
+    {
+        Noob,
+        StartUp,
+        Easy,
+        Medium,
+        Hard,
+        VeryHard,
+        Extreme,
+        Pro,
     }
 }
