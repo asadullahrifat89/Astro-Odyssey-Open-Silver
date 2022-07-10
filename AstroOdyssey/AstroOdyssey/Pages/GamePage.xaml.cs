@@ -1209,7 +1209,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayBackgroundMusic()
         {
-            var musicTrack = rand.Next(1, 6);
+            var musicTrack = rand.Next(1, 7);
 
             string host = null;
 
@@ -1220,6 +1220,7 @@ namespace AstroOdyssey
                 case 3: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/cinematic-space-drone-10623.mp3"; } break;
                 case 4: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/slow-thoughtful-sad-piano-114586.mp3"; } break;
                 case 5: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/space-age-10714.mp3"; } break;
+                case 6: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/drone-space-main-9706.mp3"; } break;
                 default:
                     break;
             }
