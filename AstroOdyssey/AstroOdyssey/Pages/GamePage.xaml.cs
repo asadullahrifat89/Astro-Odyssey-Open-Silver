@@ -172,15 +172,6 @@ namespace AstroOdyssey
         {
             StopBackgroundMusic();
             gameIsRunning = false;
-
-            var contentDialogue = new MessageDialogueWindow(title: "Game Over!", message: "Would you like to play again?", result: (result) =>
-            {
-                if (result)
-                    App.NavigateToPage("/GamePage");
-                else
-                    App.NavigateToPage("/GameStartPage");
-            });
-            contentDialogue.Show();
         }
 
         /// <summary>
@@ -763,6 +754,15 @@ namespace AstroOdyssey
             {
                 HealthText.Text = "Game Over";
                 StopGame();
+
+                var contentDialogue = new MessageDialogueWindow(title: "Game Over!", message: "Would you like to play again?", result: (result) =>
+                {
+                    if (result)
+                        App.NavigateToPage("/GamePage");
+                    else
+                        App.NavigateToPage("/GameStartPage");
+                });
+                contentDialogue.Show();
             }
         }
 
@@ -1141,6 +1141,7 @@ namespace AstroOdyssey
         void Window_SizeChanged_Demo_Unloaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged -= Current_SizeChanged;
+            StopGame();
         }
 
         /// <summary>
