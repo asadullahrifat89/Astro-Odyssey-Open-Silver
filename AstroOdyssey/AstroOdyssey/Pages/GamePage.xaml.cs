@@ -279,7 +279,7 @@ namespace AstroOdyssey
             {
                 LevelUpText.Visibility = Visibility.Collapsed;
             }
-        }       
+        }
 
         /// <summary>
         /// Scales up difficulty according to player score.
@@ -1209,7 +1209,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayBackgroundMusic()
         {
-            var musicTrack = rand.Next(1, 9);
+            var musicTrack = rand.Next(1, 11);
 
             string host = null;
 
@@ -1223,6 +1223,8 @@ namespace AstroOdyssey
                 case 6: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/drone-space-main-9706.mp3"; } break;
                 case 7: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/cyberpunk-2099-10701.mp3"; } break;
                 case 8: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/insurrection-10941.mp3"; } break;
+                case 9: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/space-trip-114102.mp3"; } break;
+                case 10: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/dark-matter-10710.mp3"; } break;
                 default:
                     break;
             }
@@ -1230,11 +1232,12 @@ namespace AstroOdyssey
             //if (backgroundAudio is null)
             //{
             backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    var backgroundAudio = new Audio($0);
-                    backgroundAudio.loop = true;
-                    return backgroundAudio;
-                }())", host);
+            (function() {
+                var backgroundAudio = new Audio($0);
+                backgroundAudio.loop = true;
+                backgroundAudio.volume = 0.8;
+                return backgroundAudio;
+            }())", host);
             //}
             //else
             //{
@@ -1385,6 +1388,9 @@ namespace AstroOdyssey
             PlayAudio(playerHealthGainAudio);
         }
 
+        /// <summary>
+        /// Plays the level up audio.
+        /// </summary>
         private void PlayLevelUpSound()
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/8-bit-powerup-6768.mp3";
