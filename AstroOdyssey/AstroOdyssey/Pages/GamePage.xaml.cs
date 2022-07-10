@@ -71,8 +71,9 @@ namespace AstroOdyssey
         private Difficulty difficulty = Difficulty.StartUp;
 
         private readonly Random rand = new Random();
-        private readonly List<GameObject> destroyableGameObjects = new List<GameObject>();
-        private readonly List<GameObject> destroyableStars = new List<GameObject>();
+
+        private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
+        private readonly List<GameObject> destroyableStarCanvasObjects = new List<GameObject>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -139,7 +140,7 @@ namespace AstroOdyssey
                 UpdateStarElement(element);
             });
 
-            Parallel.ForEach(destroyableStars, (star) =>
+            Parallel.ForEach(destroyableStarCanvasObjects, (star) =>
             {
                 StarCanvas.Children.Remove(star);
             });
@@ -158,7 +159,7 @@ namespace AstroOdyssey
 
                 if (Canvas.GetTop(star) > windowHeight)
                 {
-                    destroyableStars.Add(star);
+                    destroyableStarCanvasObjects.Add(star);
                 }
             }
         }
@@ -279,7 +280,7 @@ namespace AstroOdyssey
         private void CheckPlayerDeath()
         {
             // game over
-            if (player.IsDestroyable)
+            if (player.HasNoHealth)
             {
                 HealthText.Text = "Game Over";
                 StopGame();
@@ -346,7 +347,7 @@ namespace AstroOdyssey
                 UpdateHealthElement(element);
             });
 
-            Parallel.ForEach(destroyableGameObjects, (removableItem) =>
+            Parallel.ForEach(destroyableGameCanvasObjects, (removableItem) =>
             {
                 GameCanvas.Children.Remove(removableItem);
 
@@ -393,6 +394,24 @@ namespace AstroOdyssey
         #endregion
 
         #region Laser Methods
+
+        /// <summary>
+        /// Runs the laser loop if game is running.
+        /// </summary>
+        private async void RunLaserLoop()
+        {
+            while (gameIsRunning)
+            {
+                // any object falls within player range
+                if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
+                {
+                    SpawnLaser();
+                    PlayLaserSound();
+                }
+
+                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
+            }
+        }
 
         /// <summary>
         /// Spawns a laser.
@@ -450,29 +469,12 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Runs the laser loop if game is running.
-        /// </summary>
-        private async void RunLaserLoop()
-        {
-            while (gameIsRunning)
-            {
-                // any object falls within player range
-                if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
-                {
-                    SpawnLaser();
-                    PlayLaserSound();
-                }
-
-                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
-            }
-        }
-
-        /// <summary>
         /// Update the laser element as per frame.
         /// </summary>
         /// <param name="element"></param>
         private void UpdateLaserElement(GameObject element)
         {
+            // TODO: performance lag
             if (element is Laser laser)
             {
                 // move laser up
@@ -481,67 +483,55 @@ namespace AstroOdyssey
                 // remove laser if outside game canvas
                 if (Canvas.GetTop(laser) < 10)
                 {
-                    destroyableGameObjects.Add(laser);
+                    destroyableGameCanvasObjects.Add(laser);
                 }
 
                 Rect laserBounds = laser.GetRect();
 
-                // get game objects which are not laser
-                var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x is Enemy || x is Meteor);
+                // get game objects which are enemy or meteor
+                var obstacles = GameCanvas.Children.OfType<GameObject>().Where(x => x.IsDestroyable && IntersectsWith(laserBounds, x.GetRect()));
 
                 Parallel.ForEach(obstacles, (obstacle) =>
                 {
-                    // check if enemy intersects the laser
                     if (obstacle is Enemy targetEnemy)
                     {
-                        Rect enemyBounds = targetEnemy.GetRect();
+                        destroyableGameCanvasObjects.Add(laser);
 
-                        if (IntersectsWith(laserBounds, enemyBounds))
+                        targetEnemy.LooseHealth();
+
+                        // move the enemy backwards a bit on laser hit
+                        Canvas.SetTop(targetEnemy, Canvas.GetTop(targetEnemy) - (enemySpeed * 3) / 2);
+
+                        PlayLaserHitObjectSound();
+
+                        if (targetEnemy.HasNoHealth)
                         {
-                            destroyableGameObjects.Add(laser);
+                            destroyableGameCanvasObjects.Add(targetEnemy);
 
-                            targetEnemy.LooseHealth();
+                            PlayerScoreByEnemyDestruction();
 
-                            // move the enemy backwards a bit on laser hit
-                            Canvas.SetTop(targetEnemy, Canvas.GetTop(targetEnemy) - (enemySpeed * 3) / 2);
-
-                            PlayLaserHitObjectSound();
-
-                            if (targetEnemy.IsDestroyable)
-                            {
-                                destroyableGameObjects.Add(targetEnemy);
-
-                                PlayerScoreByEnemyDestruction();
-
-                                PlayEnemyDestructionSound();
-                            }
+                            PlayEnemyDestructionSound();
                         }
                     }
 
-                    // check if meteor intersects the laser
                     if (obstacle is Meteor targetMeteor)
                     {
-                        Rect meteorBounds = targetMeteor.GetRect();
+                        destroyableGameCanvasObjects.Add(laser);
 
-                        if (IntersectsWith(laserBounds, meteorBounds))
+                        targetMeteor.LooseHealth();
+
+                        // move the meteor backwards a bit on laser hit
+                        Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - (meteorSpeed * 4) / 2);
+
+                        PlayLaserHitObjectSound();
+
+                        if (targetMeteor.HasNoHealth)
                         {
-                            destroyableGameObjects.Add(laser);
+                            destroyableGameCanvasObjects.Add(targetMeteor);
 
-                            targetMeteor.LooseHealth();
+                            PlayerScoreByMeteorDestruction();
 
-                            // move the meteor backwards a bit on laser hit
-                            Canvas.SetTop(targetMeteor, Canvas.GetTop(targetMeteor) - (meteorSpeed * 4) / 2);
-
-                            PlayLaserHitObjectSound();
-
-                            if (targetMeteor.IsDestroyable)
-                            {
-                                destroyableGameObjects.Add(targetMeteor);
-
-                                PlayerScoreByMeteorDestruction();
-
-                                PlayMeteorDestructionSound();
-                            }
+                            PlayMeteorDestructionSound();
                         }
                     }
                 });
@@ -569,6 +559,18 @@ namespace AstroOdyssey
         }
 
         /// <summary>
+        /// Generates a random enemy.
+        /// </summary>
+        private void GenerateEnemy()
+        {
+            var newEnemy = new Enemy();
+
+            Canvas.SetTop(newEnemy, -100);
+            Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
+            GameCanvas.Children.Add(newEnemy);
+        }
+
+        /// <summary>
         /// Update the enemey element as per frame.
         /// </summary>
         /// <param name="element"></param>
@@ -581,9 +583,11 @@ namespace AstroOdyssey
 
                 Rect enemyHitBox = enemy.GetRect();
 
+                //TODO: get lasers
+
                 if (IntersectsWith(playerBounds, enemyHitBox))
                 {
-                    destroyableGameObjects.Add(enemy);
+                    destroyableGameCanvasObjects.Add(enemy);
 
                     player.LooseHealth();
 
@@ -593,22 +597,10 @@ namespace AstroOdyssey
                 {
                     if (Canvas.GetTop(enemy) > windowHeight)
                     {
-                        destroyableGameObjects.Add(enemy);
+                        destroyableGameCanvasObjects.Add(enemy);
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Generates a random enemy.
-        /// </summary>
-        private void GenerateEnemy()
-        {
-            var newEnemy = new Enemy();
-
-            Canvas.SetTop(newEnemy, -100);
-            Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newEnemy);
         }
 
         #endregion
@@ -658,7 +650,7 @@ namespace AstroOdyssey
 
                 if (IntersectsWith(playerBounds, meteorHitBox))
                 {
-                    destroyableGameObjects.Add(meteor);
+                    destroyableGameCanvasObjects.Add(meteor);
 
                     player.LooseHealth();
 
@@ -668,7 +660,7 @@ namespace AstroOdyssey
                 {
                     if (Canvas.GetTop(meteor) > windowHeight)
                     {
-                        destroyableGameObjects.Add(meteor);
+                        destroyableGameCanvasObjects.Add(meteor);
                     }
                 }
             }
@@ -724,7 +716,7 @@ namespace AstroOdyssey
 
                 if (IntersectsWith(playerBounds, healthHitBox))
                 {
-                    destroyableGameObjects.Add(health);
+                    destroyableGameCanvasObjects.Add(health);
 
                     player.GainHealth(health.Health);
 
@@ -734,7 +726,7 @@ namespace AstroOdyssey
                 {
                     if (Canvas.GetTop(health) > windowHeight)
                     {
-                        destroyableGameObjects.Add(health);
+                        destroyableGameCanvasObjects.Add(health);
                     }
                 }
             }

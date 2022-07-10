@@ -14,7 +14,9 @@ namespace AstroOdyssey
 
         public int HealthSlot { get; set; } = 1;
 
-        public bool IsDestroyable => Health <= 0;
+        public bool IsDestroyable { get; set; }
+
+        public bool HasNoHealth => Health <= 0;
 
         public void LooseHealth()
         {

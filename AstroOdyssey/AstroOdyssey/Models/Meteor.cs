@@ -13,6 +13,8 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
 
+            IsDestroyable = true;
+
             Uri uri = null;
 
             var rand = new Random();

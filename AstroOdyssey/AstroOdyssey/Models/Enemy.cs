@@ -13,6 +13,8 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
 
+            IsDestroyable = true;
+
             Uri shipUri = null;
             var enemyShipType = new Random().Next(1, 6);
 
