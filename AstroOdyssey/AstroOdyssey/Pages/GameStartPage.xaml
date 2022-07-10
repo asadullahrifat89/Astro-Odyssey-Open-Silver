@@ -14,10 +14,10 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontFamily="Consolas"
-                FontSize="50"
+                FontSize="70"
                 FontWeight="Bold"
                 Foreground="White"
-                Text="Astro Odyssey" />
+                Text="ASTRO ODYSSEY" />
             <Button
                 x:Name="PlayButton"
                 Width="300"
@@ -28,7 +28,7 @@
                 BorderBrush="White"
                 BorderThickness="5"
                 Click="PlayButton_Click"
-                Content="Play"
+                Content="START GAME"
                 FontFamily="Consolas"
                 FontSize="30"
                 Style="{StaticResource MaterialDesign_RoundButton_Style}" />
