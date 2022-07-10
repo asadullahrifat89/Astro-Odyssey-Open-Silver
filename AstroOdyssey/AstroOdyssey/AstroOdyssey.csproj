@@ -89,6 +89,7 @@
 		<Compile Include="Models\Laser.cs" />
 		<Compile Include="Models\Meteor.cs" />
 		<Compile Include="Models\Player.cs" />
+		<Compile Include="Models\Star.cs" />
 		<Compile Include="Pages\GamePage.xaml.cs" />
 		<Compile Include="Pages\GameStartPage.xaml.cs" />
 	</ItemGroup>

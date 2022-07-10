@@ -9,7 +9,7 @@ namespace AstroOdyssey
     {
         public Health()
         {
-            Tag = "HealthPickup";
+            Tag = "health";
             Height = 100;
             Width = 100;
 
