@@ -73,6 +73,9 @@
 		<Page Include="Styles\Styles.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
+		<Page Include="Windows\MessageDialogueWindow.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -92,6 +95,7 @@
 		<Compile Include="Models\Star.cs" />
 		<Compile Include="Pages\GamePage.xaml.cs" />
 		<Compile Include="Pages\GameStartPage.xaml.cs" />
+		<Compile Include="Windows\MessageDialogueWindow.xaml.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

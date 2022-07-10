@@ -16,10 +16,13 @@
             KeyDown="FocusBox_KeyDown"
             KeyUp="FocusBox_KeyUp" />
 
+        <!--  This renders the stars  -->
+        <Canvas x:Name="StarCanvas" Background="Black" />
+
         <!--  This redenders game objects  -->
         <Canvas
             x:Name="GameCanvas"
-            Background="Black"
+            Background="Transparent"
             PointerPressed="GameCanvas_PointerPressed" />
 
         <!--  This shows current score  -->

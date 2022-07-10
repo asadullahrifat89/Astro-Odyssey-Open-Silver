@@ -7,7 +7,7 @@
     <local:DoubleToCornerRadiusConverter x:Key="DoubleToCornerRadiusConverter" />
     <local:TextToPlaceholderTextVisibilityConverter x:Key="TextToPlaceholderTextVisibilityConverter" />
 
-    <SolidColorBrush x:Key="MaterialDesign_DefaultAccentColor" Color="#FF0069EC" />
+    <SolidColorBrush x:Key="MaterialDesign_DefaultAccentColor" Color="Black" />
     <SolidColorBrush x:Key="DefaultBackgroundColor" Color="White" />
 
 </ResourceDictionary>

@@ -39,6 +39,10 @@ namespace AstroOdyssey
         private int healthSpawnLimit;
         private int healthSpeed;
 
+        private int starCounter;
+        private int starSpawnLimit;
+        private double starSpeed;
+
         private int playerSpeed;
 
         private double score;
@@ -68,6 +72,7 @@ namespace AstroOdyssey
 
         private readonly Random rand = new Random();
         private readonly List<GameObject> destroyableGameObjects = new List<GameObject>();
+        private readonly List<GameObject> destroyableStars = new List<GameObject>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -85,12 +90,80 @@ namespace AstroOdyssey
             Loaded += Window_SizeChanged_Demo_Loaded;
             Unloaded += Window_SizeChanged_Demo_Unloaded;
 
-            SetWindowSizeAtStartup();
+            SetWindowSize();
         }
 
         #endregion
 
         #region Methods
+
+        #region Star Methods
+
+        /// <summary>
+        /// Spawns random stars in the star canvas.
+        /// </summary>
+        private void SpawnStar()
+        {
+            // each frame progress decreases this counter
+            starCounter -= 1;
+
+            // when counter reaches zero, create an star
+            if (starCounter < 0)
+            {
+                GenerateStar();
+                starCounter = starSpawnLimit;
+            }
+        }
+
+        /// <summary>
+        /// Generates a random star.
+        /// </summary>
+        private void GenerateStar()
+        {
+            var newStar = new Star();
+
+            Canvas.SetTop(newStar, -100);
+            Canvas.SetLeft(newStar, rand.Next(10, (int)windowWidth - 10));
+            StarCanvas.Children.Add(newStar);
+        }
+
+        /// <summary>
+        /// Updates stars on the star canvas.
+        /// </summary>
+        private void UpdateStars()
+        {
+            var gameObjects = StarCanvas.Children.OfType<GameObject>();
+
+            Parallel.ForEach(gameObjects, (element) =>
+            {
+                UpdateStarElement(element);
+            });
+
+            Parallel.ForEach(destroyableStars, (star) =>
+            {
+                StarCanvas.Children.Remove(star);
+            });
+        }
+
+        /// <summary>
+        /// Updates the star element.
+        /// </summary>
+        /// <param name="element"></param>
+        private void UpdateStarElement(GameObject element)
+        {
+            if (element is Star star)
+            {
+                // move star down
+                Canvas.SetTop(star, Canvas.GetTop(star) + starSpeed);
+
+                if (Canvas.GetTop(star) > windowHeight)
+                {
+                    destroyableStars.Add(star);
+                }
+            }
+        }
+
+        #endregion
 
         #region Player Methods
 
@@ -275,8 +348,9 @@ namespace AstroOdyssey
 
             Parallel.ForEach(destroyableGameObjects, (removableItem) =>
             {
-                // TODO: add storyboard animation for destruction
                 GameCanvas.Children.Remove(removableItem);
+
+                // TODO: add storyboard animation for destruction
             });
         }
 
@@ -357,6 +431,16 @@ namespace AstroOdyssey
                     break;
             }
 
+            GenerateLaser(laserHeight, laserWidth);
+        }
+
+        /// <summary>
+        /// Generates a laser.
+        /// </summary>
+        /// <param name="laserHeight"></param>
+        /// <param name="laserWidth"></param>
+        private void GenerateLaser(double laserHeight, double laserWidth)
+        {
             var newLaser = new Laser(laserHeight, laserWidth);
 
             Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
@@ -376,7 +460,6 @@ namespace AstroOdyssey
                 if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
                 {
                     SpawnLaser();
-
                     PlayLaserSound();
                 }
 
@@ -669,6 +752,7 @@ namespace AstroOdyssey
             PlayBackgroundMusic();
             SetDefaultGameEnvironment();
             SpawnPlayer();
+            SpawnStar();
 
             gameIsRunning = true;
 
@@ -692,6 +776,10 @@ namespace AstroOdyssey
             healthCounter = 1000;
             healthSpawnLimit = 1000;
             healthSpeed = 3;
+
+            starCounter = 100;
+            starSpawnLimit = 100;
+            starSpeed = 0.1d;
 
             playerSpeed = 15;
 
@@ -718,14 +806,14 @@ namespace AstroOdyssey
             StopBackgroundMusic();
             gameIsRunning = false;
 
-
-            //App.NavigateToPage("/GamePage");
-
-
-            //TODO: show score  
-            //TODO: ask if want to play again
-            //App.NavigateToPage("/GameStartPage");
-
+            var contentDialogue = new MessageDialogueWindow(title: "Game Over!", message: "Would you like to play again?", result: (result) =>
+            {
+                if (result)
+                    App.NavigateToPage("/GamePage");
+                else
+                    App.NavigateToPage("/GameStartPage");
+            });
+            contentDialogue.Show();
         }
 
         /// <summary>
@@ -751,9 +839,13 @@ namespace AstroOdyssey
 
                 SpawnHealth();
 
+                SpawnStar();
+
                 MovePlayer();
 
                 UpdateFrame();
+
+                UpdateStars();
 
                 SetDifficulty();
 
@@ -813,6 +905,8 @@ namespace AstroOdyssey
                         enemySpawnLimit = 45;
                         enemySpeed = 5;
                         laserSpeed = 30;
+
+                        starSpeed = 0.1d;
                     }
                     break;
                 case Difficulty.StartUp:
@@ -820,6 +914,8 @@ namespace AstroOdyssey
                         enemySpawnLimit = 45;
                         enemySpeed = 5;
                         laserSpeed = 40;
+
+                        starSpeed = 0.1d;
                     }
                     break;
                 case Difficulty.Easy:
@@ -833,6 +929,8 @@ namespace AstroOdyssey
                         laserSpeed = 50;
 
                         healthSpeed = 5;
+
+                        starSpeed = 0.2d;
                     }
                     break;
                 case Difficulty.Medium:
@@ -846,6 +944,8 @@ namespace AstroOdyssey
                         laserSpeed = 60;
 
                         healthSpeed = 8;
+
+                        starSpeed = 0.3d;
                     }
                     break;
                 case Difficulty.Hard:
@@ -859,6 +959,8 @@ namespace AstroOdyssey
                         laserSpeed = 70;
 
                         healthSpeed = 10;
+
+                        starSpeed = 0.4d;
                     }
                     break;
                 case Difficulty.VeryHard:
@@ -872,6 +974,8 @@ namespace AstroOdyssey
                         laserSpeed = 80;
 
                         healthSpeed = 12;
+
+                        starSpeed = 0.5d;
                     }
                     break;
                 case Difficulty.Extreme:
@@ -885,6 +989,8 @@ namespace AstroOdyssey
                         laserSpeed = 90;
 
                         healthSpeed = 14;
+
+                        starSpeed = 0.6d;
                     }
                     break;
                 case Difficulty.Pro:
@@ -898,6 +1004,8 @@ namespace AstroOdyssey
                         laserSpeed = 100;
 
                         healthSpeed = 16;
+
+                        starSpeed = 0.7d;
                     }
                     break;
                 default:
@@ -924,23 +1032,25 @@ namespace AstroOdyssey
         /// <summary>
         /// Sets the window and canvas size on startup.
         /// </summary>
-        private void SetWindowSizeAtStartup()
+        private void SetWindowSize()
         {
             windowWidth = Window.Current.Bounds.Width;
             windowHeight = Window.Current.Bounds.Height;
-
-            SetGameCanvasSize();
-
             pointerX = windowWidth / 2;
+
+            SetCanvasSize();
         }
 
         /// <summary>
         /// Sets the game canvas size according to current window size.
         /// </summary>
-        private void SetGameCanvasSize()
+        private void SetCanvasSize()
         {
             GameCanvas.Height = windowHeight;
             GameCanvas.Width = windowWidth;
+
+            StarCanvas.Height = windowHeight;
+            StarCanvas.Width = windowWidth;
         }
 
         #endregion
@@ -1020,13 +1130,13 @@ namespace AstroOdyssey
             windowWidth = Window.Current.Bounds.Width;
             windowHeight = Window.Current.Bounds.Height;
 
-            SetGameCanvasSize();
+            SetCanvasSize();
             SetPlayerCanvasTop();
         }
 
         #endregion
 
-        #region Sounds
+        #region Audio Methods
 
         /// <summary>
         /// Plays the background music.
