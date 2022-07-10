@@ -15,8 +15,6 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
             Child = content;
-
-            SetAttributes();
         }
 
         public void SetAttributes()

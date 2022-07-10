@@ -14,35 +14,39 @@ namespace AstroOdyssey
     {
         #region Fields
 
+        private string baseUrl;
+
         private const float FRAME_CAP_MS = 1000.0f / 60.0f;
+
         private int fpsCount;
         private int fpsCounter;
+        private int frameStatUpdateCounter;
+        private int frameStatUpdateLimit;
+
         private float lastFrameTime;
         private long frameStartTime;
         private int frameDuration = 10;
         private long frameTime;
-        private int frameStatUpdateCounter;
-        private int frameStatUpdateLimit;
 
         private bool gameIsRunning;
 
         private int enemyCounter;
         private int enemySpawnLimit;
-        private int enemySpeed;
+        private double enemySpeed;
 
         private int meteorCounter;
         private int meteorSpawnLimit;
-        private int meteorSpeed;
+        private double meteorSpeed;
 
         private int healthCounter;
         private int healthSpawnLimit;
-        private int healthSpeed;
+        private double healthSpeed;
 
         private int starCounter;
         private int starSpawnLimit;
         private double starSpeed;
 
-        private int playerSpeed;
+        private double playerSpeed;
 
         private double score;
 
@@ -53,8 +57,6 @@ namespace AstroOdyssey
 
         private double laserTime;
         private double laserSpeed;
-
-        private string baseUrl;
 
         private object backgroundAudio = null;
         private object laserAudio = null;
@@ -73,7 +75,12 @@ namespace AstroOdyssey
 
         private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
         private readonly List<GameObject> destroyableStarCanvasObjects = new List<GameObject>();
+
         private readonly Stack<Laser> laserStack = new Stack<Laser>();
+        private readonly Stack<Enemy> enemyStack = new Stack<Enemy>();
+        private readonly Stack<Meteor> meteorStack = new Stack<Meteor>();
+        private readonly Stack<Health> healthStack = new Stack<Health>();
+        private readonly Stack<Star> starStack = new Stack<Star>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -121,7 +128,9 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateStar()
         {
-            var newStar = new Star();
+            var newStar = starStack.Any() ? starStack.Pop() : new Star();
+
+            newStar.SetAttributes();
 
             Canvas.SetTop(newStar, -100);
             Canvas.SetLeft(newStar, rand.Next(10, (int)windowWidth - 10));
@@ -140,9 +149,12 @@ namespace AstroOdyssey
                 UpdateStarElement(star);
             }
 
-            foreach (var star in destroyableStarCanvasObjects)
+            foreach (var destroyable in destroyableStarCanvasObjects)
             {
-                StarCanvas.Children.Remove(star);
+                if (destroyable is Star star)
+                    starStack.Push(star);
+
+                StarCanvas.Children.Remove(destroyable);
             }
 
             destroyableStarCanvasObjects.Clear();
@@ -352,6 +364,12 @@ namespace AstroOdyssey
 
                 if (destroyable is Laser laser)
                     laserStack.Push(laser);
+                if (destroyable is Enemy enemy)
+                    enemyStack.Push(enemy);
+                if (destroyable is Meteor meteor)
+                    meteorStack.Push(meteor);
+                if (destroyable is Health health)
+                    healthStack.Push(health);
 
                 // TODO: add storyboard animation for destruction
             }
@@ -608,7 +626,9 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateEnemy()
         {
-            var newEnemy = new Enemy();
+            var newEnemy = enemyStack.Any() ? enemyStack.Pop() : new Enemy();
+
+            newEnemy.SetAttributes();
 
             Canvas.SetTop(newEnemy, -100);
             Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
@@ -640,7 +660,9 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateMeteor()
         {
-            var newMeteor = new Meteor();
+            var newMeteor = meteorStack.Any() ? meteorStack.Pop() : new Meteor();
+
+            newMeteor.SetAttributes();
 
             Canvas.SetTop(newMeteor, -100);
             Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));
@@ -675,7 +697,9 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateHealth()
         {
-            var newHealth = new Health();
+            var newHealth = healthStack.Any() ? healthStack.Pop() : new Health();
+
+            newHealth.SetAttributes();
 
             Canvas.SetTop(newHealth, -100);
             Canvas.SetLeft(newHealth, rand.Next(10, (int)windowWidth - 100));

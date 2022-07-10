@@ -17,8 +17,6 @@ namespace AstroOdyssey
 
             IsDestroyable = true;
             Child = content;
-
-            SetAttributes();
         }
 
         public void SetAttributes()

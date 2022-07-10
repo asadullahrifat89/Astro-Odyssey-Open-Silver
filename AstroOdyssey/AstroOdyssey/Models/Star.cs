@@ -13,8 +13,6 @@ namespace AstroOdyssey
         {
             Tag = "star";
             Child = content;
-
-            SetAttributes();
         }
 
         public void SetAttributes()

@@ -8,13 +8,33 @@ namespace AstroOdyssey
 {
     public class Player : GameObject
     {
+        private Grid content = new Grid();
+
+        private Image contentShip = new Image() { Stretch = Stretch.Uniform };
+
+        private Image contentTrail = new Image() { Stretch = Stretch.Uniform };
+
         public Player()
         {
-            Name = "Player";
             Background = new SolidColorBrush(Colors.Transparent);
             Height = 150;
             Width = 100;
 
+            Health = 100;
+            HealthSlot = 10;
+
+            // create ship and exhaust
+            content = new Grid();
+            content.Children.Add(contentTrail);
+            content.Children.Add(contentShip);
+
+            Child = content;
+
+            SetAttributes();
+        }
+
+        public void SetAttributes()
+        {
             Uri shipUri = null;
             var playerShipType = new Random().Next(1, 13);
 
@@ -71,33 +91,15 @@ namespace AstroOdyssey
                     exhaustHeight = 50;
                     break;
             }
-            
+
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
 
-            var imgShip = new Image()
-            {
-                Source = new BitmapImage(shipUri),
-                Stretch = Stretch.Uniform,
-            };            
+            contentShip.Source = new BitmapImage(shipUri);
 
-            var imgExhaust = new Image()
-            {
-                Source = new BitmapImage(exhaustUri),
-                Stretch = Stretch.Uniform,
-                Height = exhaustHeight,
-                Width = imgShip.Width
-            };
-
-            imgExhaust.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
-
-            // create ship and exhaust
-            var playerShip = new Grid();
-            playerShip.Children.Add(imgExhaust);
-            playerShip.Children.Add(imgShip);
-
-            Child = playerShip;
-            Health = 100;
-            HealthSlot = 10;
+            contentTrail.Source = new BitmapImage(exhaustUri);
+            contentTrail.Height = exhaustHeight;
+            contentTrail.Width = contentShip.Width;
+            contentTrail.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
         }
     }
 }
