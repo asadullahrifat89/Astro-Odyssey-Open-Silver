@@ -97,7 +97,7 @@ namespace AstroOdyssey
 
             Child = playerShip;
             Health = 100;
-            HealthSlot = 100;
+            HealthSlot = 10;
         }
     }
 }

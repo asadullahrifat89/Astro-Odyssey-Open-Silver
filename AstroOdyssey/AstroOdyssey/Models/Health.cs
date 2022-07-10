@@ -16,7 +16,7 @@ namespace AstroOdyssey
             Uri uri = null;
 
             uri = new Uri("ms-appx:///Assets/Images/icon_plusSmall.png", UriKind.RelativeOrAbsolute);
-            Health = 5;
+            Health = 10;
 
             var imgHealthPickup = new Image()
             {
