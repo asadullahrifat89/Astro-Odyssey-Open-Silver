@@ -403,7 +403,7 @@ namespace AstroOdyssey
             while (gameIsRunning)
             {
                 // any object falls within player range
-                if (GameCanvas.Children.OfType<GameObject>().Where(x => x is Meteor || x is Enemy).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
+                if (GameCanvas.Children.OfType<GameObject>().Where(x => x.IsDestroyable).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
                 {
                     SpawnLaser();
                     PlayLaserSound();
