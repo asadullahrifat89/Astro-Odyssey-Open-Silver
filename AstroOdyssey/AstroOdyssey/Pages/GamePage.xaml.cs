@@ -73,6 +73,7 @@ namespace AstroOdyssey
 
         private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
         private readonly List<GameObject> destroyableStarCanvasObjects = new List<GameObject>();
+        private readonly Stack<Laser> laserStack = new Stack<Laser>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -349,6 +350,9 @@ namespace AstroOdyssey
             {
                 GameCanvas.Children.Remove(destroyable);
 
+                if (destroyable is Laser laser)
+                    laserStack.Push(laser);
+
                 // TODO: add storyboard animation for destruction
             }
 
@@ -549,7 +553,9 @@ namespace AstroOdyssey
         /// <param name="laserWidth"></param>
         private void GenerateLaser(double laserHeight, double laserWidth)
         {
-            var newLaser = new Laser(laserHeight, laserWidth);
+            var newLaser = laserStack.Any() ? laserStack.Pop() : new Laser();
+
+            newLaser.SetAttributes(laserHeight, laserWidth);
 
             Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
             Canvas.SetTop(newLaser, Canvas.GetTop(player) - 20);
