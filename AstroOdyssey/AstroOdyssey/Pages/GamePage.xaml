@@ -72,7 +72,7 @@
 
         <!--  This shows current objects count in game canvas  -->
         <TextBlock
-            Name="ObjectsText"
+            Name="ObjectsCountText"
             Margin="5,100,5,5"
             HorizontalAlignment="Right"
             FontFamily="Consolas"

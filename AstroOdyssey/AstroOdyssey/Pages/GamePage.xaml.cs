@@ -366,7 +366,7 @@ namespace AstroOdyssey
             {
                 FPSText.Text = "FPS: " + fpsCount;
                 FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
-                ObjectsText.Text = "Objects: " + GameCanvas.Children.Count();
+                ObjectsCountText.Text = "Objects count: " + GameCanvas.Children.Count();
 
                 frameStatUpdateCounter = frameStatUpdateLimit;
             }
@@ -755,7 +755,7 @@ namespace AstroOdyssey
             fpsCount = 0;
             fpsCounter = 0;
             lastFrameTime = 0;
-            frameStatUpdateLimit = 10;
+            frameStatUpdateLimit = 5;
 
             laserTime = 235;
             laserSpeed = 20;
