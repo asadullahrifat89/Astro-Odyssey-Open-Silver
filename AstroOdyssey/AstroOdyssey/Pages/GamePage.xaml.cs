@@ -987,7 +987,6 @@ namespace AstroOdyssey
                         enemySpawnLimit = 45;
                         enemySpeed = 5;
 
-                        //laserSpeed = 30;
                         laserTime = 235;
 
                         starSpeed = 0.1d;
@@ -998,8 +997,7 @@ namespace AstroOdyssey
                         enemySpawnLimit = 45;
                         enemySpeed = 5;
 
-                        //laserSpeed = 40;
-                        laserTime = 235;
+                        laserTime = 230;
 
                         starSpeed = 0.1d;
                     }
@@ -1012,8 +1010,7 @@ namespace AstroOdyssey
                         meteorSpawnLimit = 40;
                         meteorSpeed = 4;
 
-                        //laserSpeed = 50;
-                        laserTime = 240;
+                        laserTime = 225;
 
                         healthSpeed = 5;
 
@@ -1028,8 +1025,7 @@ namespace AstroOdyssey
                         meteorSpawnLimit = 35;
                         meteorSpeed = 6;
 
-                        //laserSpeed = 60;
-                        laserTime = 245;
+                        laserTime = 220;
 
                         healthSpeed = 8;
 
@@ -1044,8 +1040,7 @@ namespace AstroOdyssey
                         meteorSpawnLimit = 30;
                         meteorSpeed = 8;
 
-                        //laserSpeed = 70;
-                        laserTime = 250;
+                        laserTime = 215;
 
                         healthSpeed = 10;
 
@@ -1060,8 +1055,7 @@ namespace AstroOdyssey
                         meteorSpawnLimit = 25;
                         meteorSpeed = 10;
 
-                        //laserSpeed = 80;
-                        laserTime = 255;
+                        laserTime = 210;
 
                         healthSpeed = 12;
 
@@ -1075,9 +1069,8 @@ namespace AstroOdyssey
 
                         meteorSpawnLimit = 20;
                         meteorSpeed = 12;
-
-                        //laserSpeed = 90;
-                        laserTime = 260;
+                        
+                        laserTime = 205;
 
                         healthSpeed = 14;
 
@@ -1091,9 +1084,8 @@ namespace AstroOdyssey
 
                         meteorSpawnLimit = 15;
                         meteorSpeed = 14;
-
-                        //laserSpeed = 100;
-                        laserTime = 265;
+                        
+                        laserTime = 200;
 
                         healthSpeed = 16;
 
