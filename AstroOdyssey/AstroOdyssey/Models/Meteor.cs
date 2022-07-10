@@ -7,6 +7,8 @@ namespace AstroOdyssey
 {
     public class Meteor : GameObject
     {
+        private Image content = new Image() { Stretch = Stretch.Uniform };
+
         public Meteor()
         {
             Tag = "meteor";
@@ -14,7 +16,13 @@ namespace AstroOdyssey
             Width = 100;
 
             IsDestroyable = true;
+            Child = content;
 
+            SetAttributes();
+        }
+
+        public void SetAttributes()
+        {
             Uri uri = null;
 
             var rand = new Random();
@@ -57,13 +65,7 @@ namespace AstroOdyssey
                     break;
             }
 
-            var imgMeteor = new Image()
-            {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-            };
-
-            Child = imgMeteor;
+            content.Source = new BitmapImage(uri);
         }
     }
 }

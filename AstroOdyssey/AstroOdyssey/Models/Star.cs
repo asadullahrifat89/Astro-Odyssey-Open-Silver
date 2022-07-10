@@ -7,10 +7,18 @@ namespace AstroOdyssey
 {
     public class Star : GameObject
     {
+        private Image content = new Image() { Stretch = Stretch.Uniform };
+
         public Star()
         {
             Tag = "star";
+            Child = content;
 
+            SetAttributes();
+        }
+
+        public void SetAttributes()
+        {
             Uri uri = null;
 
             var size = 0;
@@ -40,13 +48,7 @@ namespace AstroOdyssey
             Height = size;
             Width = size;
 
-            var imgStar = new Image()
-            {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-            };
-
-            Child = imgStar;
+            content.Source = new BitmapImage(uri);
         }
     }
 }

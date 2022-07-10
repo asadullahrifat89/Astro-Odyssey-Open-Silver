@@ -7,24 +7,24 @@ namespace AstroOdyssey
 {
     public class Health : GameObject
     {
+        private Image content = new Image() { Stretch = Stretch.Uniform };
+
         public Health()
         {
             Tag = "health";
             Height = 100;
             Width = 100;
+            Child = content;
 
-            Uri uri = null;
+            SetAttributes();
+        }
 
-            uri = new Uri("ms-appx:///Assets/Images/icon_plusSmall.png", UriKind.RelativeOrAbsolute);
+        public void SetAttributes()
+        {
+            var uri = new Uri("ms-appx:///Assets/Images/icon_plusSmall.png", UriKind.RelativeOrAbsolute);
             Health = 10;
 
-            var imgHealthPickup = new Image()
-            {
-                Source = new BitmapImage(uri),
-                Stretch = Stretch.Uniform,
-            };
-
-            Child = imgHealthPickup;
+            content.Source = new BitmapImage(uri);
         }
     }
 }

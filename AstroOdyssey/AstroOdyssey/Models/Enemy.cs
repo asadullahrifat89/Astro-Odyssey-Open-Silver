@@ -7,6 +7,8 @@ namespace AstroOdyssey
 {
     public class Enemy : GameObject
     {
+        private Image content = new Image() { Stretch = Stretch.Uniform };
+
         public Enemy()
         {
             Tag = "enemy";
@@ -14,41 +16,41 @@ namespace AstroOdyssey
             Width = 100;
 
             IsDestroyable = true;
+            Child = content;
 
-            Uri shipUri = null;
+            SetAttributes();
+        }
+
+        public void SetAttributes()
+        {
+            Uri uri = null;
             var enemyShipType = new Random().Next(1, 6);
 
             switch (enemyShipType)
             {
                 case 1:
-                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
+                    uri = new Uri("ms-appx:///Assets/Images/enemy_A.png", UriKind.RelativeOrAbsolute);
                     Health = 2;
                     break;
                 case 2:
-                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_B.png", UriKind.RelativeOrAbsolute);
+                    uri = new Uri("ms-appx:///Assets/Images/enemy_B.png", UriKind.RelativeOrAbsolute);
                     Health = 2;
                     break;
                 case 3:
-                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_C.png", UriKind.RelativeOrAbsolute);
+                    uri = new Uri("ms-appx:///Assets/Images/enemy_C.png", UriKind.RelativeOrAbsolute);
                     Health = 1;
                     break;
                 case 4:
-                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_D.png", UriKind.RelativeOrAbsolute);
+                    uri = new Uri("ms-appx:///Assets/Images/enemy_D.png", UriKind.RelativeOrAbsolute);
                     Health = 3;
                     break;
                 case 5:
-                    shipUri = new Uri("ms-appx:///Assets/Images/enemy_E.png", UriKind.RelativeOrAbsolute);
+                    uri = new Uri("ms-appx:///Assets/Images/enemy_E.png", UriKind.RelativeOrAbsolute);
                     Health = 3;
                     break;
             }
 
-            var imgShip = new Image()
-            {
-                Source = new BitmapImage(shipUri),
-                Stretch = Stretch.Uniform,
-            };
-
-            Child = imgShip;
+            content.Source = new BitmapImage(uri);
         }
     }
 }
