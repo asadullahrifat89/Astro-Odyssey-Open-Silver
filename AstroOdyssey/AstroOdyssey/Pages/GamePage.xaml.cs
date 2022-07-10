@@ -448,45 +448,6 @@ namespace AstroOdyssey
         #region Frame Methods
 
         /// <summary>
-        /// Elapses the frame duration.
-        /// </summary>
-        /// <param name="watch"></param>        
-        /// <returns></returns>
-        private async Task ElapseFrameDuration(Stopwatch watch)
-        {
-            //CalculateFrameDuration(watch);
-            await Task.Delay(frameDuration);
-        }
-
-        /// <summary>
-        /// Calculates the duration of a frame.
-        /// </summary>
-        /// <param name="watch"></param>
-        /// <returns></returns>
-        private void CalculateFrameDuration(Stopwatch watch)
-        {
-            frameTime = watch.ElapsedMilliseconds - frameStartTime;
-            frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
-        }
-
-        /// <summary>
-        /// Calculates frames per second.
-        /// </summary>
-        /// <param name="frameStartTime"></param>
-        private void CalculateFps()
-        {
-            // calculate FPS
-            if (lastFrameTime + 1000 < frameStartTime)
-            {
-                fpsCount = fpsCounter;
-                fpsCounter = 0;
-                lastFrameTime = frameStartTime;
-            }
-
-            fpsCounter++;
-        }
-
-        /// <summary>
         /// Updates a frame. Advances game objects in the frame.
         /// </summary>
         private void UpdateFrame()
@@ -624,6 +585,44 @@ namespace AstroOdyssey
             }
         }
 
+        /// <summary>
+        /// Elapses the frame duration.
+        /// </summary>
+        /// <param name="watch"></param>        
+        /// <returns></returns>
+        private async Task ElapseFrameDuration(Stopwatch watch)
+        {
+            //CalculateFrameDuration(watch);
+            await Task.Delay(frameDuration);
+        }
+
+        /// <summary>
+        /// Calculates the duration of a frame.
+        /// </summary>
+        /// <param name="watch"></param>
+        /// <returns></returns>
+        private void CalculateFrameDuration(Stopwatch watch)
+        {
+            frameTime = watch.ElapsedMilliseconds - frameStartTime;
+            frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
+        }
+
+        /// <summary>
+        /// Calculates frames per second.
+        /// </summary>
+        /// <param name="frameStartTime"></param>
+        private void CalculateFps()
+        {
+            // calculate FPS
+            if (lastFrameTime + 1000 < frameStartTime)
+            {
+                fpsCount = fpsCounter;
+                fpsCounter = 0;
+                lastFrameTime = frameStartTime;
+            }
+
+            fpsCounter++;
+        }
         #endregion
 
         #region Score Methods
