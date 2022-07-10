@@ -24,9 +24,9 @@ namespace AstroOdyssey
         private int frameStatUpdateLimit;
 
         private float lastFrameTime;
-        private long frameStartTime;
-        private int frameDuration = 10;
+        private long frameStartTime;        
         private long frameTime;
+        private int frameDuration = 10;
 
         private bool gameIsRunning;
 
