@@ -25,15 +25,15 @@ namespace AstroOdyssey
             {
                 case 1:
                     uri = new Uri("ms-appx:///Assets/Images/meteor_detailedLarge.png", UriKind.RelativeOrAbsolute);
-                    Health = 5;
+                    Health = 4;
                     break;
                 case 2:
                     uri = new Uri("ms-appx:///Assets/Images/meteor_detailedSmall.png", UriKind.RelativeOrAbsolute);
-                    Health = 3;
+                    Health = 2;
                     break;
                 case 3:
                     uri = new Uri("ms-appx:///Assets/Images/meteor_large.png", UriKind.RelativeOrAbsolute);
-                    Health = 4;
+                    Health = 3;
                     break;
                 case 4:
                     uri = new Uri("ms-appx:///Assets/Images/meteor_small.png", UriKind.RelativeOrAbsolute);

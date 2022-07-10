@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Browser;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -133,17 +132,19 @@ namespace AstroOdyssey
         /// </summary>
         private void UpdateStars()
         {
-            var gameObjects = StarCanvas.Children.OfType<GameObject>();
+            var starObjects = StarCanvas.Children.OfType<GameObject>();
 
-            Parallel.ForEach(gameObjects, (element) =>
+            foreach (var star in starObjects)
             {
-                UpdateStarElement(element);
-            });
+                UpdateStarElement(star);
+            }
 
-            Parallel.ForEach(destroyableStarCanvasObjects, (star) =>
+            foreach (var star in destroyableStarCanvasObjects)
             {
                 StarCanvas.Children.Remove(star);
-            });
+            }
+
+            destroyableStarCanvasObjects.Clear();
         }
 
         /// <summary>
@@ -337,19 +338,21 @@ namespace AstroOdyssey
         {
             var gameObjects = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Player);
 
-            Parallel.ForEach(gameObjects, (element) =>
+            foreach (var gameObject in gameObjects)
             {
-                UpdateLaserElement(element);
-                UpdateDestroyableElement(element);
-                UpdateHealthElement(element);
-            });
+                UpdateLaserElement(gameObject);
+                UpdateDestroyableElement(gameObject);
+                UpdateHealthElement(gameObject);
+            }
 
-            Parallel.ForEach(destroyableGameCanvasObjects, (removableItem) =>
+            foreach (var destroyable in destroyableGameCanvasObjects)
             {
-                GameCanvas.Children.Remove(removableItem);
+                GameCanvas.Children.Remove(destroyable);
 
                 // TODO: add storyboard animation for destruction
-            });
+            }
+
+            destroyableGameCanvasObjects.Clear();
         }
 
         /// <summary>
@@ -377,16 +380,16 @@ namespace AstroOdyssey
         {
             if (element.IsDestroyable)
             {
-                if (element is Enemy enemy)
+                if (element is Enemy enemyElement)
                 {
                     // move enemy down
-                    Canvas.SetTop(enemy, Canvas.GetTop(enemy) + enemySpeed);
+                    Canvas.SetTop(enemyElement, Canvas.GetTop(enemyElement) + enemySpeed);
                 }
 
-                if (element is Meteor meteor)
+                if (element is Meteor meteorElement)
                 {
                     // move meteor down
-                    Canvas.SetTop(meteor, Canvas.GetTop(meteor) + meteorSpeed);
+                    Canvas.SetTop(meteorElement, Canvas.GetTop(meteorElement) + meteorSpeed);
                 }
 
                 Rect elementBounds = element.GetRect();
@@ -411,7 +414,7 @@ namespace AstroOdyssey
 
                         if (lasers is not null && lasers.Any())
                         {
-                            Parallel.ForEach(lasers, (laser) =>
+                            foreach (var laser in lasers)
                             {
                                 destroyableGameCanvasObjects.Add(laser);
 
@@ -450,7 +453,7 @@ namespace AstroOdyssey
                                         PlayEnemyDestructionSound();
                                     }
                                 }
-                            });
+                            }
                         }
                     }
                 }
@@ -606,65 +609,6 @@ namespace AstroOdyssey
             GameCanvas.Children.Add(newEnemy);
         }
 
-        /// <summary>
-        /// Update the enemey element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateEnemyElement(GameObject element)
-        {
-            if (element is Enemy enemy)
-            {
-                // move enemy down
-                Canvas.SetTop(enemy, Canvas.GetTop(enemy) + enemySpeed);
-
-                Rect enemyBounds = enemy.GetRect();
-
-                if (IntersectsWith(playerBounds, enemyBounds))
-                {
-                    destroyableGameCanvasObjects.Add(enemy);
-
-                    player.LooseHealth();
-
-                    PlayPlayerHealthLossSound();
-                }
-                else
-                {
-                    if (Canvas.GetTop(enemy) > windowHeight)
-                    {
-                        destroyableGameCanvasObjects.Add(enemy);
-                    }
-                    else
-                    {
-                        var lasers = GameCanvas.Children.OfType<Laser>().Where(laser => IntersectsWith(laser.GetRect(), enemyBounds));
-
-                        if (lasers is not null && lasers.Any())
-                        {
-                            Parallel.ForEach(lasers, (laser) =>
-                            {
-                                destroyableGameCanvasObjects.Add(laser);
-
-                                enemy.LooseHealth();
-
-                                // move the enemy backwards a bit on laser hit
-                                Canvas.SetTop(enemy, Canvas.GetTop(enemy) - (enemySpeed * 3) / 2);
-
-                                PlayLaserHitObjectSound();
-
-                                if (enemy.HasNoHealth)
-                                {
-                                    destroyableGameCanvasObjects.Add(enemy);
-
-                                    PlayerScoreByEnemyDestruction();
-
-                                    PlayEnemyDestructionSound();
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
         #endregion
 
         #region Meteor Methods
@@ -695,65 +639,6 @@ namespace AstroOdyssey
             Canvas.SetTop(newMeteor, -100);
             Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));
             GameCanvas.Children.Add(newMeteor);
-        }
-
-        /// <summary>
-        /// Update the meteor element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateMeteorElement(GameObject element)
-        {
-            if (element is Meteor meteor)
-            {
-                // move meteor down
-                Canvas.SetTop(meteor, Canvas.GetTop(meteor) + meteorSpeed);
-
-                Rect meteorBounds = meteor.GetRect();
-
-                if (IntersectsWith(playerBounds, meteorBounds))
-                {
-                    destroyableGameCanvasObjects.Add(meteor);
-
-                    player.LooseHealth();
-
-                    PlayPlayerHealthLossSound();
-                }
-                else
-                {
-                    if (Canvas.GetTop(meteor) > windowHeight)
-                    {
-                        destroyableGameCanvasObjects.Add(meteor);
-                    }
-                    else
-                    {
-                        var lasers = GameCanvas.Children.OfType<Laser>().Where(laser => IntersectsWith(laser.GetRect(), meteorBounds));
-
-                        if (lasers is not null && lasers.Any())
-                        {
-                            Parallel.ForEach(lasers, (laser) =>
-                            {
-                                destroyableGameCanvasObjects.Add(laser);
-
-                                meteor.LooseHealth();
-
-                                // move the meteor backwards a bit on laser hit
-                                Canvas.SetTop(meteor, Canvas.GetTop(meteor) - (meteorSpeed * 3) / 2);
-
-                                PlayLaserHitObjectSound();
-
-                                if (meteor.HasNoHealth)
-                                {
-                                    destroyableGameCanvasObjects.Add(meteor);
-
-                                    PlayerScoreByMeteorDestruction();
-
-                                    PlayMeteorDestructionSound();
-                                }
-                            });
-                        }
-                    }
-                }
-            }
         }
 
         #endregion
@@ -1069,7 +954,7 @@ namespace AstroOdyssey
 
                         meteorSpawnLimit = 20;
                         meteorSpeed = 12;
-                        
+
                         laserTime = 205;
 
                         healthSpeed = 14;
@@ -1084,7 +969,7 @@ namespace AstroOdyssey
 
                         meteorSpawnLimit = 15;
                         meteorSpeed = 14;
-                        
+
                         laserTime = 200;
 
                         healthSpeed = 16;
