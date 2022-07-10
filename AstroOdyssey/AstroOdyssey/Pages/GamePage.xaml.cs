@@ -70,6 +70,9 @@ namespace AstroOdyssey
         private Player player;
         private Rect playerBounds;
 
+        private int playerDamagedOpacityCount;
+        private int playerDamagedOpacityLimit;
+
         private Difficulty difficulty = Difficulty.StartUp;
         private int showLevelUpCount;
         private int showLevelUpLimit;
@@ -148,6 +151,7 @@ namespace AstroOdyssey
             starSpeed = 0.1d;
 
             playerSpeed = 15;
+            playerDamagedOpacityLimit = 100;
 
             score = 0;
 
@@ -211,6 +215,8 @@ namespace AstroOdyssey
 
                 ScaleDifficulty();
 
+                PlayerOpacity();
+
                 CheckPlayerDeath();
 
                 CalculateFps();
@@ -262,6 +268,9 @@ namespace AstroOdyssey
             }
         }
 
+        /// <summary>
+        /// Hides the level up text after keeping it visible for 100 frames.
+        /// </summary>
         private void HideLevelUp()
         {
             showLevelUpCount -= 1;
@@ -270,7 +279,7 @@ namespace AstroOdyssey
             {
                 LevelUpText.Visibility = Visibility.Collapsed;
             }
-        }
+        }       
 
         /// <summary>
         /// Scales up difficulty according to player score.
@@ -514,9 +523,7 @@ namespace AstroOdyssey
                 {
                     destroyableGameCanvasObjects.Add(element);
 
-                    player.LooseHealth();
-
-                    PlayPlayerHealthLossSound();
+                    PlayerHealthLoss();
                 }
                 else
                 {
@@ -766,6 +773,44 @@ namespace AstroOdyssey
             }
         }
 
+        /// <summary>
+        /// Makes the player loose health.
+        /// </summary>
+        private void PlayerHealthLoss()
+        {
+            player.LooseHealth();
+
+            PlayPlayerHealthLossSound();
+
+            player.Opacity = 0.4d;
+
+            playerDamagedOpacityCount = playerDamagedOpacityLimit;
+        }
+
+        /// <summary>
+        /// Sets the player opacity.
+        /// </summary>
+        private void PlayerOpacity()
+        {
+            playerDamagedOpacityCount -= 1;
+
+            if (playerDamagedOpacityCount <= 0)
+            {
+                player.Opacity = 1;
+            }
+        }
+
+        /// <summary>
+        /// Makes the player gain health.
+        /// </summary>
+        /// <param name="health"></param>
+        private void PlayerHealthGain(Health health)
+        {
+            player.GainHealth(health.Health);
+
+            PlayPlayerHealthGainSound();
+        }
+
         #endregion
 
         #region Health Methods
@@ -820,9 +865,7 @@ namespace AstroOdyssey
                 {
                     destroyableGameCanvasObjects.Add(health);
 
-                    player.GainHealth(health.Health);
-
-                    PlayPlayerHealthGainSound();
+                    PlayerHealthGain(health);
                 }
                 else
                 {
@@ -919,7 +962,6 @@ namespace AstroOdyssey
         /// <param name="element"></param>
         private void UpdateLaserElement(GameObject element)
         {
-            // TODO: performance lag
             if (element is Laser laser)
             {
                 // move laser up
