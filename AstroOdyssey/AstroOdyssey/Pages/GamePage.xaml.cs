@@ -79,11 +79,11 @@ namespace AstroOdyssey
         private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
         private readonly List<GameObject> destroyableStarCanvasObjects = new List<GameObject>();
 
-        private readonly Stack<Laser> laserStack = new Stack<Laser>();
+        //private readonly Stack<Laser> laserStack = new Stack<Laser>();
         private readonly Stack<Enemy> enemyStack = new Stack<Enemy>();
         private readonly Stack<Meteor> meteorStack = new Stack<Meteor>();
         private readonly Stack<Health> healthStack = new Stack<Health>();
-        private readonly Stack<Star> starStack = new Stack<Star>();
+        //private readonly Stack<Star> starStack = new Stack<Star>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -278,7 +278,7 @@ namespace AstroOdyssey
             if (showLevelUpCount <= 0)
             {
                 LevelUpText.Visibility = Visibility.Collapsed;
-            }                
+            }
         }
 
         /// <summary>
@@ -465,8 +465,8 @@ namespace AstroOdyssey
             {
                 GameCanvas.Children.Remove(destroyable);
 
-                if (destroyable is Laser laser)
-                    laserStack.Push(laser);
+                //if (destroyable is Laser laser)
+                //    laserStack.Push(laser);
                 if (destroyable is Enemy enemy)
                     enemyStack.Push(enemy);
                 if (destroyable is Meteor meteor)
@@ -903,7 +903,7 @@ namespace AstroOdyssey
         /// <param name="laserWidth"></param>
         private void GenerateLaser(double laserHeight, double laserWidth)
         {
-            var newLaser = laserStack.Any() ? laserStack.Pop() : new Laser();
+            var newLaser = /*laserStack.Any() ? laserStack.Pop() :*/ new Laser();
 
             newLaser.SetAttributes(laserHeight, laserWidth);
 
@@ -1026,7 +1026,7 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateStar()
         {
-            var newStar = starStack.Any() ? starStack.Pop() : new Star();
+            var newStar = /*starStack.Any() ? starStack.Pop() :*/ new Star();
 
             newStar.SetAttributes();
 
@@ -1049,8 +1049,8 @@ namespace AstroOdyssey
 
             foreach (var destroyable in destroyableStarCanvasObjects)
             {
-                if (destroyable is Star star)
-                    starStack.Push(star);
+                //if (destroyable is Star star)
+                //    starStack.Push(star);
 
                 StarCanvas.Children.Remove(destroyable);
             }
