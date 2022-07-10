@@ -19,7 +19,9 @@
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 		<Content Include="Assets\Sounds\8-bit-powerup-6768.mp3" />
+		<Content Include="Assets\Sounds\cyberpunk-2099-10701.mp3" />
 		<Content Include="Assets\Sounds\drone-space-main-9706.mp3" />
+		<Content Include="Assets\Sounds\insurrection-10941.mp3" />
 		<Content Include="Assets\Sounds\scale-e6-14577.mp3" />
 		<Content Include="Assets\Sounds\slow-thoughtful-sad-piano-114586.mp3" />
 		<Content Include="Assets\Sounds\space-age-10714.mp3" />
