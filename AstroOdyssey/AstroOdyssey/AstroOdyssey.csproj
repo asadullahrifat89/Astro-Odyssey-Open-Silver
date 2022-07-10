@@ -18,6 +18,7 @@
 		<Page Include="MainPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
+		<Content Include="Assets\Sounds\8-bit-powerup-6768.mp3" />
 		<Content Include="Assets\Sounds\scale-e6-14577.mp3" />
 		<Content Include="Pages\GamePage.xaml">
 		  <Generator>MSBuild:Compile</Generator>

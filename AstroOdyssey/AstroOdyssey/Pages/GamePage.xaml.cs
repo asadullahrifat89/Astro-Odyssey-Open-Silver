@@ -24,7 +24,7 @@ namespace AstroOdyssey
         private int frameStatUpdateLimit;
 
         private float lastFrameTime;
-        private long frameStartTime;        
+        private long frameStartTime;
         private long frameTime;
         private int frameDuration = 10;
 
@@ -65,11 +65,14 @@ namespace AstroOdyssey
         private object laserHitObjectAudio = null;
         private object playerHealthLossAudio = null;
         private object playerHealthGainAudio = null;
+        private object levelUpAudio = null;
 
         private Player player;
         private Rect playerBounds;
 
         private Difficulty difficulty = Difficulty.StartUp;
+        private int showLevelUpCount;
+        private int showLevelUpLimit;
 
         private readonly Random rand = new Random();
 
@@ -105,200 +108,339 @@ namespace AstroOdyssey
 
         #region Methods
 
-        #region Star Methods
+        #region Game Methods
 
         /// <summary>
-        /// Spawns random stars in the star canvas.
+        /// Starts the game. Spawns the player and starts game and laser loops.
         /// </summary>
-        private void SpawnStar()
+        private void StartGame()
         {
-            // each frame progress decreases this counter
-            starCounter -= 1;
+            PlayBackgroundMusic();
+            SetDefaultGameEnvironment();
+            SpawnPlayer();
+            SpawnStar();
 
-            // when counter reaches zero, create an star
-            if (starCounter < 0)
+            gameIsRunning = true;
+
+            RunGameLoop();
+            RunLaserLoop();
+        }
+
+        /// <summary>
+        /// Sets the game environment to it's default state.
+        /// </summary>
+        private void SetDefaultGameEnvironment()
+        {
+            enemyCounter = 100;
+            enemySpawnLimit = 45;
+            enemySpeed = 5;
+
+            meteorCounter = 100;
+            meteorSpawnLimit = 50;
+            meteorSpeed = 2;
+
+            healthCounter = 1000;
+            healthSpawnLimit = 1000;
+            healthSpeed = 3;
+
+            starCounter = 100;
+            starSpawnLimit = 100;
+            starSpeed = 0.1d;
+
+            playerSpeed = 15;
+
+            score = 0;
+
+            fpsCount = 0;
+            fpsCounter = 0;
+            lastFrameTime = 0;
+            frameStatUpdateLimit = 5;
+
+            laserTime = 235;
+            laserSpeed = 20;
+
+            difficulty = Difficulty.Noob;
+            showLevelUpLimit = 100;
+
+            GameCanvas.Children.Clear();
+        }
+
+        /// <summary>
+        /// Stops the game.
+        /// </summary>
+        private void StopGame()
+        {
+            StopBackgroundMusic();
+            gameIsRunning = false;
+
+            var contentDialogue = new MessageDialogueWindow(title: "Game Over!", message: "Would you like to play again?", result: (result) =>
             {
-                GenerateStar();
-                starCounter = starSpawnLimit;
+                if (result)
+                    App.NavigateToPage("/GamePage");
+                else
+                    App.NavigateToPage("/GameStartPage");
+            });
+            contentDialogue.Show();
+        }
+
+        /// <summary>
+        /// Runs the game loop if game is running. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
+        /// </summary>
+        private async void RunGameLoop()
+        {
+            var watch = Stopwatch.StartNew();
+
+            while (gameIsRunning)
+            {
+                frameStartTime = watch.ElapsedMilliseconds;
+
+                UpdateGameStats();
+
+                UpdateFrameStats();
+
+                GetPlayerBounds();
+
+                SpawnEnemy();
+
+                SpawnMeteor();
+
+                SpawnHealth();
+
+                SpawnStar();
+
+                MovePlayer();
+
+                UpdateFrame();
+
+                UpdateStars();
+
+                SetDifficulty();
+
+                HideLevelUp();
+
+                ScaleDifficulty();
+
+                CheckPlayerDeath();
+
+                CalculateFps();
+
+                FocusBox.Focus();
+
+                await ElapseFrameDuration(watch);
             }
         }
 
         /// <summary>
-        /// Generates a random star.
+        /// Updates the game score, player health.
         /// </summary>
-        private void GenerateStar()
+        private void UpdateGameStats()
         {
-            var newStar = starStack.Any() ? starStack.Pop() : new Star();
-
-            newStar.SetAttributes();
-
-            Canvas.SetTop(newStar, -100);
-            Canvas.SetLeft(newStar, rand.Next(10, (int)windowWidth - 10));
-            StarCanvas.Children.Add(newStar);
+            ScoreText.Text = "Score: " + score;
+            HealthText.Text = GetPlayerHealthPoints();
         }
 
         /// <summary>
-        /// Updates stars on the star canvas.
+        /// Sets the difficulty of the game according to score; 
         /// </summary>
-        private void UpdateStars()
+        private void SetDifficulty()
         {
-            var starObjects = StarCanvas.Children.OfType<GameObject>();
+            var currentDifficulty = difficulty;
 
-            foreach (var star in starObjects)
+            if (score > 0)
+                difficulty = Difficulty.Noob;
+            if (score > 25)
+                difficulty = Difficulty.StartUp;
+            if (score > 50)
+                difficulty = Difficulty.Easy;
+            if (score > 100)
+                difficulty = Difficulty.Medium;
+            if (score > 200)
+                difficulty = Difficulty.Hard;
+            if (score > 400)
+                difficulty = Difficulty.VeryHard;
+            if (score > 800)
+                difficulty = Difficulty.Extreme;
+            if (score > 1600)
+                difficulty = Difficulty.Pro;
+
+            if (currentDifficulty != difficulty)
             {
-                UpdateStarElement(star);
-            }
-
-            foreach (var destroyable in destroyableStarCanvasObjects)
-            {
-                if (destroyable is Star star)
-                    starStack.Push(star);
-
-                StarCanvas.Children.Remove(destroyable);
-            }
-
-            destroyableStarCanvasObjects.Clear();
-        }
-
-        /// <summary>
-        /// Updates the star element.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateStarElement(GameObject element)
-        {
-            if (element is Star star)
-            {
-                // move star down
-                Canvas.SetTop(star, Canvas.GetTop(star) + starSpeed);
-
-                if (Canvas.GetTop(star) > windowHeight)
-                {
-                    destroyableStarCanvasObjects.Add(star);
-                }
+                LevelUpText.Visibility = Visibility.Visible;
+                showLevelUpCount = showLevelUpLimit;
+                PlayLevelUpSound();
             }
         }
 
-        #endregion
-
-        #region Player Methods
-
-        /// <summary>
-        /// Spawns the player.
-        /// </summary>
-        private void SpawnPlayer()
+        private void HideLevelUp()
         {
-            player = new Player();
+            showLevelUpCount -= 1;
 
-            Canvas.SetLeft(player, pointerX);
-            SetPlayerCanvasTop();
-
-            GameCanvas.Children.Add(player);
+            if (showLevelUpCount <= 0)
+            {
+                LevelUpText.Visibility = Visibility.Collapsed;
+            }                
         }
 
         /// <summary>
-        /// Gets the players x axis position and bounds.
+        /// Scales up difficulty according to player score.
         /// </summary>
-        private void GetPlayerBounds()
+        private void ScaleDifficulty()
         {
-            playerX = Canvas.GetLeft(player);
-            playerWidthHalf = player.Width / 2;
+            switch (difficulty)
+            {
+                case Difficulty.Noob:
+                    {
+                        enemySpawnLimit = 45;
+                        enemySpeed = 5;
 
-            playerBounds = player.GetRect();
+                        laserTime = 235;
+
+                        starSpeed = 0.1d;
+                    }
+                    break;
+                case Difficulty.StartUp:
+                    {
+                        enemySpawnLimit = 45;
+                        enemySpeed = 5;
+
+                        laserTime = 230;
+
+                        starSpeed = 0.1d;
+                    }
+                    break;
+                case Difficulty.Easy:
+                    {
+                        enemySpawnLimit = 40;
+                        enemySpeed = 7;
+
+                        meteorSpawnLimit = 40;
+                        meteorSpeed = 4;
+
+                        laserTime = 225;
+
+                        healthSpeed = 5;
+
+                        starSpeed = 0.2d;
+                    }
+                    break;
+                case Difficulty.Medium:
+                    {
+                        enemySpawnLimit = 35;
+                        enemySpeed = 9;
+
+                        meteorSpawnLimit = 35;
+                        meteorSpeed = 6;
+
+                        laserTime = 220;
+
+                        healthSpeed = 8;
+
+                        starSpeed = 0.3d;
+                    }
+                    break;
+                case Difficulty.Hard:
+                    {
+                        enemySpawnLimit = 30;
+                        enemySpeed = 11;
+
+                        meteorSpawnLimit = 30;
+                        meteorSpeed = 8;
+
+                        laserTime = 215;
+
+                        healthSpeed = 10;
+
+                        starSpeed = 0.4d;
+                    }
+                    break;
+                case Difficulty.VeryHard:
+                    {
+                        enemySpawnLimit = 25;
+                        enemySpeed = 13;
+
+                        meteorSpawnLimit = 25;
+                        meteorSpeed = 10;
+
+                        laserTime = 210;
+
+                        healthSpeed = 12;
+
+                        starSpeed = 0.5d;
+                    }
+                    break;
+                case Difficulty.Extreme:
+                    {
+                        enemySpawnLimit = 20;
+                        enemySpeed = 15;
+
+                        meteorSpawnLimit = 20;
+                        meteorSpeed = 12;
+
+                        laserTime = 205;
+
+                        healthSpeed = 14;
+
+                        starSpeed = 0.6d;
+                    }
+                    break;
+                case Difficulty.Pro:
+                    {
+                        enemySpawnLimit = 15;
+                        enemySpeed = 17;
+
+                        meteorSpawnLimit = 15;
+                        meteorSpeed = 14;
+
+                        laserTime = 200;
+
+                        healthSpeed = 16;
+
+                        starSpeed = 0.7d;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         /// <summary>
-        /// Sets the y axis position of the player on game canvas.
+        /// Checks if a two rects intersect.
         /// </summary>
-        private void SetPlayerCanvasTop()
-        {
-            Canvas.SetTop(player, windowHeight - player.Height - 20);
-        }
-
-        /// <summary>
-        /// Sets the x axis position of the player on game canvas.
-        /// </summary>
-        /// <param name="x"></param>
-        private void SetPlayerCanvasLeft(double x)
-        {
-            Canvas.SetLeft(player, x);
-        }
-
-        /// <summary>
-        /// Checks if there is any game object within the left side range of the player
-        /// </summary>
-        /// <param name="go"></param>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
         /// <returns></returns>
-        private bool IsAnyObjectWithinLeftSideRange(GameObject go)
+        private bool IntersectsWith(Rect source, Rect target)
         {
-            return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
+            if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
+            {
+                return target.Y + target.Height >= source.Y;
+            }
+
+            return false;
         }
 
         /// <summary>
-        /// Checks if there is any game object within the right side range of the player
+        /// Sets the window and canvas size on startup.
         /// </summary>
-        /// <param name="go"></param>
-        /// <returns></returns>
-        private bool IsAnyObjectWihinRightSideRange(GameObject go)
+        private void SetWindowSize()
         {
-            return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
+            windowWidth = Window.Current.Bounds.Width;
+            windowHeight = Window.Current.Bounds.Height;
+            pointerX = windowWidth / 2;
+
+            SetCanvasSize();
         }
 
         /// <summary>
-        /// Moves the player to last pointer pressed position by x axis.
+        /// Sets the game canvas size according to current window size.
         /// </summary>
-        private void MovePlayer()
+        private void SetCanvasSize()
         {
-            if (moveLeft && playerX > 0)
-                pointerX -= playerSpeed;
+            GameCanvas.Height = windowHeight;
+            GameCanvas.Width = windowWidth;
 
-            if (moveRight && playerX + player.Width < windowWidth)
-                pointerX += playerSpeed;
-
-            // move right
-            if (pointerX - playerWidthHalf > playerX + playerSpeed)
-            {
-                if (playerX + playerWidthHalf < windowWidth)
-                {
-                    SetPlayerCanvasLeft(playerX + playerSpeed);
-                }
-            }
-
-            // move left
-            if (pointerX - playerWidthHalf < playerX - playerSpeed)
-            {
-                SetPlayerCanvasLeft(playerX - playerSpeed);
-            }
-        }
-
-        /// <summary>
-        /// Gets the player health points.
-        /// </summary>
-        /// <returns></returns>
-        private string GetPlayerHealthPoints()
-        {
-            var healthPoints = player.Health / player.HealthSlot;
-            var healthIcon = "❤️";
-            var health = string.Empty;
-
-            for (int i = 0; i < healthPoints; i++)
-            {
-                health += healthIcon;
-            }
-
-            return health;
-        }
-
-        /// <summary>
-        /// Check if player is dead.
-        /// </summary>
-        private void CheckPlayerDeath()
-        {
-            // game over
-            if (player.HasNoHealth)
-            {
-                HealthText.Text = "Game Over";
-                StopGame();
-            }
+            StarCanvas.Height = windowHeight;
+            StarCanvas.Width = windowWidth;
         }
 
         #endregion
@@ -504,6 +646,197 @@ namespace AstroOdyssey
 
         #endregion
 
+        #region Player Methods
+
+        /// <summary>
+        /// Spawns the player.
+        /// </summary>
+        private void SpawnPlayer()
+        {
+            player = new Player();
+
+            Canvas.SetLeft(player, pointerX);
+            SetPlayerCanvasTop();
+
+            GameCanvas.Children.Add(player);
+        }
+
+        /// <summary>
+        /// Gets the players x axis position and bounds.
+        /// </summary>
+        private void GetPlayerBounds()
+        {
+            playerX = Canvas.GetLeft(player);
+            playerWidthHalf = player.Width / 2;
+
+            playerBounds = player.GetRect();
+        }
+
+        /// <summary>
+        /// Sets the y axis position of the player on game canvas.
+        /// </summary>
+        private void SetPlayerCanvasTop()
+        {
+            Canvas.SetTop(player, windowHeight - player.Height - 20);
+        }
+
+        /// <summary>
+        /// Sets the x axis position of the player on game canvas.
+        /// </summary>
+        /// <param name="x"></param>
+        private void SetPlayerCanvasLeft(double x)
+        {
+            Canvas.SetLeft(player, x);
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the left side range of the player
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private bool IsAnyObjectWithinLeftSideRange(GameObject go)
+        {
+            return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the right side range of the player
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private bool IsAnyObjectWihinRightSideRange(GameObject go)
+        {
+            return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
+        }
+
+        /// <summary>
+        /// Moves the player to last pointer pressed position by x axis.
+        /// </summary>
+        private void MovePlayer()
+        {
+            if (moveLeft && playerX > 0)
+                pointerX -= playerSpeed;
+
+            if (moveRight && playerX + player.Width < windowWidth)
+                pointerX += playerSpeed;
+
+            // move right
+            if (pointerX - playerWidthHalf > playerX + playerSpeed)
+            {
+                if (playerX + playerWidthHalf < windowWidth)
+                {
+                    SetPlayerCanvasLeft(playerX + playerSpeed);
+                }
+            }
+
+            // move left
+            if (pointerX - playerWidthHalf < playerX - playerSpeed)
+            {
+                SetPlayerCanvasLeft(playerX - playerSpeed);
+            }
+        }
+
+        /// <summary>
+        /// Gets the player health points.
+        /// </summary>
+        /// <returns></returns>
+        private string GetPlayerHealthPoints()
+        {
+            var healthPoints = player.Health / player.HealthSlot;
+            var healthIcon = "❤️";
+            var health = string.Empty;
+
+            for (int i = 0; i < healthPoints; i++)
+            {
+                health += healthIcon;
+            }
+
+            return health;
+        }
+
+        /// <summary>
+        /// Check if player is dead.
+        /// </summary>
+        private void CheckPlayerDeath()
+        {
+            // game over
+            if (player.HasNoHealth)
+            {
+                HealthText.Text = "Game Over";
+                StopGame();
+            }
+        }
+
+        #endregion
+
+        #region Health Methods
+
+        /// <summary>
+        /// Spawns a Health.
+        /// </summary>
+        private void SpawnHealth()
+        {
+            if (player.Health <= 60)
+            {
+                // each frame progress decreases this counter
+                healthCounter -= 1;
+
+                // when counter reaches zero, create a Health
+                if (healthCounter < 0)
+                {
+                    GenerateHealth();
+                    healthCounter = healthSpawnLimit;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates a random Health.
+        /// </summary>
+        private void GenerateHealth()
+        {
+            var newHealth = healthStack.Any() ? healthStack.Pop() : new Health();
+
+            newHealth.SetAttributes();
+
+            Canvas.SetTop(newHealth, -100);
+            Canvas.SetLeft(newHealth, rand.Next(10, (int)windowWidth - 100));
+            GameCanvas.Children.Add(newHealth);
+        }
+
+        /// <summary>
+        /// Update the health element as per frame.
+        /// </summary>
+        /// <param name="element"></param>
+        private void UpdateHealthElement(GameObject element)
+        {
+            if (element is Health health)
+            {
+                // move Health down
+                Canvas.SetTop(health, Canvas.GetTop(health) + healthSpeed);
+
+                Rect healthHitBox = health.GetRect();
+
+                if (IntersectsWith(playerBounds, healthHitBox))
+                {
+                    destroyableGameCanvasObjects.Add(health);
+
+                    player.GainHealth(health.Health);
+
+                    PlayPlayerHealthGainSound();
+                }
+                else
+                {
+                    if (Canvas.GetTop(health) > windowHeight)
+                    {
+                        destroyableGameCanvasObjects.Add(health);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Laser Methods
 
         /// <summary>
@@ -671,388 +1004,80 @@ namespace AstroOdyssey
 
         #endregion
 
-        #region Health Methods
+        #region Star Methods
 
         /// <summary>
-        /// Spawns a Health.
+        /// Spawns random stars in the star canvas.
         /// </summary>
-        private void SpawnHealth()
+        private void SpawnStar()
         {
-            if (player.Health <= 60)
-            {
-                // each frame progress decreases this counter
-                healthCounter -= 1;
+            // each frame progress decreases this counter
+            starCounter -= 1;
 
-                // when counter reaches zero, create a Health
-                if (healthCounter < 0)
-                {
-                    GenerateHealth();
-                    healthCounter = healthSpawnLimit;
-                }
+            // when counter reaches zero, create an star
+            if (starCounter < 0)
+            {
+                GenerateStar();
+                starCounter = starSpawnLimit;
             }
         }
 
         /// <summary>
-        /// Generates a random Health.
+        /// Generates a random star.
         /// </summary>
-        private void GenerateHealth()
+        private void GenerateStar()
         {
-            var newHealth = healthStack.Any() ? healthStack.Pop() : new Health();
+            var newStar = starStack.Any() ? starStack.Pop() : new Star();
 
-            newHealth.SetAttributes();
+            newStar.SetAttributes();
 
-            Canvas.SetTop(newHealth, -100);
-            Canvas.SetLeft(newHealth, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newHealth);
+            Canvas.SetTop(newStar, -100);
+            Canvas.SetLeft(newStar, rand.Next(10, (int)windowWidth - 10));
+            StarCanvas.Children.Add(newStar);
         }
 
         /// <summary>
-        /// Update the health element as per frame.
+        /// Updates stars on the star canvas.
+        /// </summary>
+        private void UpdateStars()
+        {
+            var starObjects = StarCanvas.Children.OfType<GameObject>();
+
+            foreach (var star in starObjects)
+            {
+                UpdateStarElement(star);
+            }
+
+            foreach (var destroyable in destroyableStarCanvasObjects)
+            {
+                if (destroyable is Star star)
+                    starStack.Push(star);
+
+                StarCanvas.Children.Remove(destroyable);
+            }
+
+            destroyableStarCanvasObjects.Clear();
+        }
+
+        /// <summary>
+        /// Updates the star element.
         /// </summary>
         /// <param name="element"></param>
-        private void UpdateHealthElement(GameObject element)
+        private void UpdateStarElement(GameObject element)
         {
-            if (element is Health health)
+            if (element is Star star)
             {
-                // move Health down
-                Canvas.SetTop(health, Canvas.GetTop(health) + healthSpeed);
+                // move star down
+                Canvas.SetTop(star, Canvas.GetTop(star) + starSpeed);
 
-                Rect healthHitBox = health.GetRect();
-
-                if (IntersectsWith(playerBounds, healthHitBox))
+                if (Canvas.GetTop(star) > windowHeight)
                 {
-                    destroyableGameCanvasObjects.Add(health);
-
-                    player.GainHealth(health.Health);
-
-                    PlayPlayerHealthGainSound();
-                }
-                else
-                {
-                    if (Canvas.GetTop(health) > windowHeight)
-                    {
-                        destroyableGameCanvasObjects.Add(health);
-                    }
+                    destroyableStarCanvasObjects.Add(star);
                 }
             }
         }
 
-        #endregion
-
-        #region Game Methods
-
-        /// <summary>
-        /// Starts the game. Spawns the player and starts game and laser loops.
-        /// </summary>
-        private void StartGame()
-        {
-            PlayBackgroundMusic();
-            SetDefaultGameEnvironment();
-            SpawnPlayer();
-            SpawnStar();
-
-            gameIsRunning = true;
-
-            RunGameLoop();
-            RunLaserLoop();
-        }
-
-        /// <summary>
-        /// Sets the game environment to it's default state.
-        /// </summary>
-        private void SetDefaultGameEnvironment()
-        {
-            enemyCounter = 100;
-            enemySpawnLimit = 45;
-            enemySpeed = 5;
-
-            meteorCounter = 100;
-            meteorSpawnLimit = 50;
-            meteorSpeed = 2;
-
-            healthCounter = 1000;
-            healthSpawnLimit = 1000;
-            healthSpeed = 3;
-
-            starCounter = 100;
-            starSpawnLimit = 100;
-            starSpeed = 0.1d;
-
-            playerSpeed = 15;
-
-            score = 0;
-
-            fpsCount = 0;
-            fpsCounter = 0;
-            lastFrameTime = 0;
-            frameStatUpdateLimit = 5;
-
-            laserTime = 235;
-            laserSpeed = 20;
-
-            difficulty = Difficulty.Noob;
-
-            GameCanvas.Children.Clear();
-        }
-
-        /// <summary>
-        /// Stops the game.
-        /// </summary>
-        private void StopGame()
-        {
-            StopBackgroundMusic();
-            gameIsRunning = false;
-
-            var contentDialogue = new MessageDialogueWindow(title: "Game Over!", message: "Would you like to play again?", result: (result) =>
-            {
-                if (result)
-                    App.NavigateToPage("/GamePage");
-                else
-                    App.NavigateToPage("/GameStartPage");
-            });
-            contentDialogue.Show();
-        }
-
-        /// <summary>
-        /// Runs the game loop if game is running. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
-        /// </summary>
-        private async void RunGameLoop()
-        {
-            var watch = Stopwatch.StartNew();
-
-            while (gameIsRunning)
-            {
-                frameStartTime = watch.ElapsedMilliseconds;
-
-                UpdateGameStats();
-
-                UpdateFrameStats();
-
-                GetPlayerBounds();
-
-                SpawnEnemy();
-
-                SpawnMeteor();
-
-                SpawnHealth();
-
-                SpawnStar();
-
-                MovePlayer();
-
-                UpdateFrame();
-
-                UpdateStars();
-
-                SetDifficulty();
-
-                ScaleDifficulty();
-
-                CheckPlayerDeath();
-
-                CalculateFps();
-
-                FocusBox.Focus();
-
-                await ElapseFrameDuration(watch);
-            }
-        }
-
-        /// <summary>
-        /// Updates the game score, player health.
-        /// </summary>
-        private void UpdateGameStats()
-        {
-            ScoreText.Text = "Score: " + score;
-            HealthText.Text = GetPlayerHealthPoints();
-        }
-
-        /// <summary>
-        /// Sets the difficulty of the game according to score; 
-        /// </summary>
-        private void SetDifficulty()
-        {
-            if (score > 0)
-                difficulty = Difficulty.Noob;
-            if (score > 25)
-                difficulty = Difficulty.StartUp;
-            if (score > 50)
-                difficulty = Difficulty.Easy;
-            if (score > 100)
-                difficulty = Difficulty.Medium;
-            if (score > 200)
-                difficulty = Difficulty.Hard;
-            if (score > 400)
-                difficulty = Difficulty.VeryHard;
-            if (score > 800)
-                difficulty = Difficulty.Extreme;
-            if (score > 1600)
-                difficulty = Difficulty.Pro;
-        }
-
-        /// <summary>
-        /// Scales up difficulty according to player score.
-        /// </summary>
-        private void ScaleDifficulty()
-        {
-            switch (difficulty)
-            {
-                case Difficulty.Noob:
-                    {
-                        enemySpawnLimit = 45;
-                        enemySpeed = 5;
-
-                        laserTime = 235;
-
-                        starSpeed = 0.1d;
-                    }
-                    break;
-                case Difficulty.StartUp:
-                    {
-                        enemySpawnLimit = 45;
-                        enemySpeed = 5;
-
-                        laserTime = 230;
-
-                        starSpeed = 0.1d;
-                    }
-                    break;
-                case Difficulty.Easy:
-                    {
-                        enemySpawnLimit = 40;
-                        enemySpeed = 7;
-
-                        meteorSpawnLimit = 40;
-                        meteorSpeed = 4;
-
-                        laserTime = 225;
-
-                        healthSpeed = 5;
-
-                        starSpeed = 0.2d;
-                    }
-                    break;
-                case Difficulty.Medium:
-                    {
-                        enemySpawnLimit = 35;
-                        enemySpeed = 9;
-
-                        meteorSpawnLimit = 35;
-                        meteorSpeed = 6;
-
-                        laserTime = 220;
-
-                        healthSpeed = 8;
-
-                        starSpeed = 0.3d;
-                    }
-                    break;
-                case Difficulty.Hard:
-                    {
-                        enemySpawnLimit = 30;
-                        enemySpeed = 11;
-
-                        meteorSpawnLimit = 30;
-                        meteorSpeed = 8;
-
-                        laserTime = 215;
-
-                        healthSpeed = 10;
-
-                        starSpeed = 0.4d;
-                    }
-                    break;
-                case Difficulty.VeryHard:
-                    {
-                        enemySpawnLimit = 25;
-                        enemySpeed = 13;
-
-                        meteorSpawnLimit = 25;
-                        meteorSpeed = 10;
-
-                        laserTime = 210;
-
-                        healthSpeed = 12;
-
-                        starSpeed = 0.5d;
-                    }
-                    break;
-                case Difficulty.Extreme:
-                    {
-                        enemySpawnLimit = 20;
-                        enemySpeed = 15;
-
-                        meteorSpawnLimit = 20;
-                        meteorSpeed = 12;
-
-                        laserTime = 205;
-
-                        healthSpeed = 14;
-
-                        starSpeed = 0.6d;
-                    }
-                    break;
-                case Difficulty.Pro:
-                    {
-                        enemySpawnLimit = 15;
-                        enemySpeed = 17;
-
-                        meteorSpawnLimit = 15;
-                        meteorSpeed = 14;
-
-                        laserTime = 200;
-
-                        healthSpeed = 16;
-
-                        starSpeed = 0.7d;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Checks if a two rects intersect.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        private bool IntersectsWith(Rect source, Rect target)
-        {
-            if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
-            {
-                return target.Y + target.Height >= source.Y;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Sets the window and canvas size on startup.
-        /// </summary>
-        private void SetWindowSize()
-        {
-            windowWidth = Window.Current.Bounds.Width;
-            windowHeight = Window.Current.Bounds.Height;
-            pointerX = windowWidth / 2;
-
-            SetCanvasSize();
-        }
-
-        /// <summary>
-        /// Sets the game canvas size according to current window size.
-        /// </summary>
-        private void SetCanvasSize()
-        {
-            GameCanvas.Height = windowHeight;
-            GameCanvas.Width = windowWidth;
-
-            StarCanvas.Height = windowHeight;
-            StarCanvas.Width = windowWidth;
-        }
-
-        #endregion
+        #endregion        
 
         #region Canvas Events
 
@@ -1311,6 +1336,24 @@ namespace AstroOdyssey
             }
 
             PlayAudio(playerHealthGainAudio);
+        }
+
+        private void PlayLevelUpSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/8-bit-powerup-6768.mp3";
+
+            if (levelUpAudio is null)
+            {
+                levelUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var levelUpAudio = new Audio($0);
+                    levelUpAudio.volume = 1.0;
+                   return levelUpAudio;
+                }())", host);
+            }
+
+            PlayAudio(levelUpAudio);
         }
 
         /// <summary>

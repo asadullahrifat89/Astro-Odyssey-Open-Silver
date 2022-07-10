@@ -81,5 +81,16 @@
             Foreground="White"
             Text="Objects:" />
 
+        <!--  This shows level up text when difficulty scales  -->
+        <TextBlock
+            x:Name="LevelUpText"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontFamily="Consolas"
+            FontSize="50"
+            FontWeight="Bold"
+            Foreground="White"
+            Text="LEVEL UP!" />
+
     </Grid>
 </Page>
