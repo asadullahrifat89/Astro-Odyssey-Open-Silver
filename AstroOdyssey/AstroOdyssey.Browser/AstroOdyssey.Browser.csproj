@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<NoXamlPreprocessor>True</NoXamlPreprocessor>
 		<OpenSilverType>4</OpenSilverType>
-		<OpenSilverVersion>1.0.0</OpenSilverVersion>
+		<!--<OpenSilverVersion>1.0.0</OpenSilverVersion>-->
 		<WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 		<!--Use .NET 6 to enable the commented options below-->
 		<PublishTrimmed>true</PublishTrimmed>
