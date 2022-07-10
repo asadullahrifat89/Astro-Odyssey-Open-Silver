@@ -61,14 +61,14 @@
 
         <!--  This shows frame time  -->
         <TextBlock
-            Name="FrameTimeText"
+            Name="FrameDurationText"
             Margin="5,50,5,5"
             HorizontalAlignment="Right"
             FontFamily="Consolas"
             FontSize="18"
             FontWeight="Bold"
             Foreground="White"
-            Text="Frame Time:" />
+            Text="Frame duration:" />
 
         <!--  This shows current objects count in game canvas  -->
         <TextBlock

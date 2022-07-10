@@ -19,14 +19,14 @@ namespace AstroOdyssey
             mainPage = new MainPage();
             Window.Current.Content = mainPage;
 
-            SetBaseUrl();            
+            SetBaseUrl();
 
             mainPage.NavigateToPage("/GameStartPage");
         }
 
         private void SetBaseUrl()
         {
-            baseUrl = HtmlPage.Document.DocumentUri.OriginalString;
+            baseUrl = HtmlPage.Document.DocumentUri.OriginalString.Split('#')[0];
         }
 
         public static string GetBaseUrl()
@@ -36,7 +36,7 @@ namespace AstroOdyssey
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
-           
+
             UnhandledException += App_UnhandledException;
         }
 
