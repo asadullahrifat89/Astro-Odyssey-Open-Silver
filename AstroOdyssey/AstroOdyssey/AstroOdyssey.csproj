@@ -20,6 +20,8 @@
 		</Page>
 		<Content Include="Assets\Sounds\8-bit-powerup-6768.mp3" />
 		<Content Include="Assets\Sounds\scale-e6-14577.mp3" />
+		<Content Include="Assets\Sounds\slow-thoughtful-sad-piano-114586.mp3" />
+		<Content Include="Assets\Sounds\space-age-10714.mp3" />
 		<Content Include="Pages\GamePage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Content>

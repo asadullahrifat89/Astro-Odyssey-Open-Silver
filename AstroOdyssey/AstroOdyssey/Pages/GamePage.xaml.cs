@@ -691,7 +691,7 @@ namespace AstroOdyssey
         /// </summary>
         /// <param name="go"></param>
         /// <returns></returns>
-        private bool IsAnyObjectWithinLeftSideRange(GameObject go)
+        private bool AnyObjectWithinPlayersLeftSideRange(GameObject go)
         {
             return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
         }
@@ -701,7 +701,7 @@ namespace AstroOdyssey
         /// </summary>
         /// <param name="go"></param>
         /// <returns></returns>
-        private bool IsAnyObjectWihinRightSideRange(GameObject go)
+        private bool AnyObjectWithinPlayersRightRange(GameObject go)
         {
             return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
         }
@@ -889,7 +889,7 @@ namespace AstroOdyssey
             while (gameIsRunning)
             {
                 // any object falls within player range
-                if (GameCanvas.Children.OfType<GameObject>().Where(x => x.IsDestroyable).Any(x => IsAnyObjectWihinRightSideRange(x) || IsAnyObjectWithinLeftSideRange(x)))
+                if (GameCanvas.Children.OfType<GameObject>().Where(x => x.IsDestroyable).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
                 {
                     SpawnLaser();
                     PlayLaserSound();
@@ -1209,7 +1209,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayBackgroundMusic()
         {
-            var musicTrack = rand.Next(1, 4);
+            var musicTrack = rand.Next(1, 6);
 
             string host = null;
 
@@ -1218,6 +1218,8 @@ namespace AstroOdyssey
                 case 1: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/slow-trap-18565.mp3"; } break;
                 case 2: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/space-chillout-14194.mp3"; } break;
                 case 3: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/cinematic-space-drone-10623.mp3"; } break;
+                case 4: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/slow-thoughtful-sad-piano-114586.mp3"; } break;
+                case 5: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/space-age-10714.mp3"; } break;
                 default:
                     break;
             }
