@@ -1084,7 +1084,7 @@ namespace AstroOdyssey
             powerUpTriggered = true;
             powerUpTriggerCounter = powerUpTriggerLimit;
 
-            laserTime -= 10;
+            laserTime -= 50;
             ShowInGameText("POWER UP!");
             PlayPowerUpSound();
             player.SetPowerUp();
@@ -1102,7 +1102,7 @@ namespace AstroOdyssey
                 if (powerUpTriggerCounter <= 0)
                 {
                     powerUpTriggered = false;
-                    laserTime += 10;
+                    laserTime += 50;
                     PlayPowerDownSound();
                     player.SetPowerDown();
                 }
