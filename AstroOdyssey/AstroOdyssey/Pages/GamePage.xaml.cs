@@ -504,7 +504,7 @@ namespace AstroOdyssey
                                 if (gameObject is Meteor meteor)
                                 {
                                     // move the meteor backwards a bit on laser hit
-                                    meteor.MoveY(meteorSpeed * 3 / 2, YDirection.UP);
+                                    meteor.MoveY(meteor.Speed * 3 / 2, YDirection.UP);
 
                                     PlayLaserImpactSound();
 
@@ -517,7 +517,7 @@ namespace AstroOdyssey
                                 if (gameObject is Enemy enemy)
                                 {
                                     // move the enemy backwards a bit on laser hit
-                                    enemy.MoveY(enemySpeed * 3 / 2, YDirection.UP);
+                                    enemy.MoveY(enemy.Speed * 3 / 2, YDirection.UP);
 
                                     PlayLaserImpactSound();
 
@@ -840,40 +840,6 @@ namespace AstroOdyssey
 
         #endregion
 
-        #region Health Methods
-
-        /// <summary>
-        /// Spawns a Health.
-        /// </summary>
-        private void SpawnHealth()
-        {
-            if (player.Health <= 60)
-            {
-                // each frame progress decreases this counter
-                healthCounter -= 1;
-
-                // when counter reaches zero, create a Health
-                if (healthCounter < 0)
-                {
-                    GenerateHealth();
-                    healthCounter = healthSpawnLimit;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Generates a random Health.
-        /// </summary>
-        private void GenerateHealth()
-        {
-            var newHealth = healthStack.Any() ? healthStack.Pop() as Health : new Health();
-
-            newHealth.SetAttributes(healthSpeed);
-            newHealth.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
-        }
-
-        #endregion
-
         #region Laser Methods
 
         /// <summary>
@@ -975,7 +941,7 @@ namespace AstroOdyssey
         {
             var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
 
-            newEnemy.SetAttributes(enemySpeed);
+            newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));
             newEnemy.AddToGameEnvironment(-100, rand.Next(10, (int)windowWidth - 100), GameView);
         }
 
@@ -1019,7 +985,7 @@ namespace AstroOdyssey
         {
             var newMeteor = meteorStack.Any() ? meteorStack.Pop() as Meteor : new Meteor();
 
-            newMeteor.SetAttributes(meteorSpeed);
+            newMeteor.SetAttributes(meteorSpeed + rand.NextDouble());
             newMeteor.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
@@ -1034,6 +1000,40 @@ namespace AstroOdyssey
             PlayerScoreByMeteorDestruction();
 
             PlayMeteorDestructionSound();
+        }
+
+        #endregion
+
+        #region Health Methods
+
+        /// <summary>
+        /// Spawns a Health.
+        /// </summary>
+        private void SpawnHealth()
+        {
+            if (player.Health <= 60)
+            {
+                // each frame progress decreases this counter
+                healthCounter -= 1;
+
+                // when counter reaches zero, create a Health
+                if (healthCounter < 0)
+                {
+                    GenerateHealth();
+                    healthCounter = healthSpawnLimit;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates a random Health.
+        /// </summary>
+        private void GenerateHealth()
+        {
+            var newHealth = healthStack.Any() ? healthStack.Pop() as Health : new Health();
+
+            newHealth.SetAttributes(healthSpeed + rand.NextDouble());
+            newHealth.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         #endregion
