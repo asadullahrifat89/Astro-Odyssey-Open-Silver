@@ -17,10 +17,13 @@ namespace AstroOdyssey
 
             IsDestroyable = true;
             Child = content;
+            YDirection = YDirection.DOWN;
         }
 
-        public void SetAttributes()
+        public void SetAttributes(double speed)
         {
+            Speed = speed;
+
             Uri uri = null;
 
             var rand = new Random();

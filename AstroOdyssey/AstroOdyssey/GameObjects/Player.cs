@@ -34,7 +34,7 @@ namespace AstroOdyssey
         }
 
         public void SetAttributes()
-        {
+        {            
             Uri shipUri = null;
             var playerShipType = new Random().Next(1, 13);
 

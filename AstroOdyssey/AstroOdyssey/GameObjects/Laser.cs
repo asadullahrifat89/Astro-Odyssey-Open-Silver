@@ -13,10 +13,12 @@ namespace AstroOdyssey
             Width = 5;
             Background = new SolidColorBrush(Colors.White);
             CornerRadius = new CornerRadius(50);
+            YDirection = YDirection.UP;
         }
 
-        public void SetAttributes(double height = 20, double width = 5)
+        public void SetAttributes(double speed, double height = 20, double width = 5)
         {
+            Speed = speed;
             Height = height;
             Width = width;
         }

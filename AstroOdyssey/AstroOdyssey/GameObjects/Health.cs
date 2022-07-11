@@ -15,10 +15,13 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
             Child = content;
+            YDirection = YDirection.DOWN;
         }
 
-        public void SetAttributes()
+        public void SetAttributes(double speed)
         {
+            Speed = speed;
+
             var uri = new Uri("ms-appx:///Assets/Images/icon_plusSmall.png", UriKind.RelativeOrAbsolute);
             Health = 10;
 

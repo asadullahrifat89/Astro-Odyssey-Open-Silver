@@ -15,8 +15,10 @@ namespace AstroOdyssey
             Child = content;
         }
 
-        public void SetAttributes()
+        public void SetAttributes(double speed)
         {
+            Speed = speed;
+
             Uri uri = null;
 
             var size = 0;

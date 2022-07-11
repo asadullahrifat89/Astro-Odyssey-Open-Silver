@@ -16,6 +16,12 @@ namespace AstroOdyssey
 
         public bool IsDestroyable { get; set; }
 
+        public double Speed { get; set; } = 1;
+
+        public YDirection YDirection { get; set; } = YDirection.DOWN;
+
+        public XDirection XDirection { get; set; } = XDirection.RIGHT;
+
         public bool HasNoHealth => Health <= 0;
 
         public void GainHealth()
@@ -58,14 +64,24 @@ namespace AstroOdyssey
             Canvas.SetLeft(this, left);
         }
 
-        public void MoveX(double left, int direction)
+        public void MoveX(double left)
         {
-            Canvas.SetLeft(this, GetX() + (left * direction));
+            Canvas.SetLeft(this, GetX() + (left * (XDirection == XDirection.LEFT ? -1 : 1)));
         }
 
-        public void MoveY(double top, int direction)
+        public void MoveY()
         {
-            Canvas.SetTop(this, GetY() + (top * direction));
+            Canvas.SetTop(this, GetY() + (this.Speed * (YDirection == YDirection.UP ? -1 : 1)));
+        }
+
+        public void MoveY(double top)
+        {
+            Canvas.SetTop(this, GetY() + (top * (YDirection == YDirection.UP ? -1 : 1)));
+        }
+
+        public void MoveY(double top, YDirection yDirection)
+        {
+            Canvas.SetTop(this, GetY() + (top * (yDirection == YDirection.UP ? -1 : 1)));
         }
 
         public void SetPosition(double top, double left)
@@ -80,5 +96,17 @@ namespace AstroOdyssey
 
             gameEnvironment.AddGameObject(this);
         }
+    }
+
+    public enum YDirection
+    {
+        UP,
+        DOWN,
+    }
+
+    public enum XDirection
+    {
+        LEFT,
+        RIGHT,
     }
 }
