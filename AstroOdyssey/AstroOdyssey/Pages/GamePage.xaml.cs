@@ -82,11 +82,9 @@ namespace AstroOdyssey
         private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
         private readonly List<GameObject> destroyableStarCanvasObjects = new List<GameObject>();
 
-        //private readonly Stack<Laser> laserStack = new Stack<Laser>();
         private readonly Stack<Enemy> enemyStack = new Stack<Enemy>();
         private readonly Stack<Meteor> meteorStack = new Stack<Meteor>();
         private readonly Stack<Health> healthStack = new Stack<Health>();
-        //private readonly Stack<Star> starStack = new Stack<Star>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -1209,7 +1207,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayBackgroundMusic()
         {
-            var musicTrack = rand.Next(1, 11);
+            var musicTrack = rand.Next(1, 12);
 
             string host = null;
 
@@ -1225,28 +1223,29 @@ namespace AstroOdyssey
                 case 8: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/insurrection-10941.mp3"; } break;
                 case 9: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/space-trip-114102.mp3"; } break;
                 case 10: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/dark-matter-10710.mp3"; } break;
+                case 11: { host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/music-807dfe09ce23793891674eb022b38c1b.mp3"; } break;
                 default:
                     break;
             }
 
-            //if (backgroundAudio is null)
-            //{
-            backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() {
-                var backgroundAudio = new Audio($0);
-                backgroundAudio.loop = true;
-                backgroundAudio.volume = 0.8;
-                return backgroundAudio;
-            }())", host);
-            //}
-            //else
-            //{
-            //    backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-            //    (function() {
-            //        $0.src = $1;
-            //        return $0;
-            //    }())", backgroundAudio, host);
-            //}
+            if (backgroundAudio is null)
+            {
+                backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    var backgroundAudio = new Audio($0);
+                    backgroundAudio.loop = true;
+                    backgroundAudio.volume = 0.8;
+                    return backgroundAudio;
+                }())", host);
+            }
+            else
+            {
+                backgroundAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    $0.src = $1;
+                    return $0;
+                }())", backgroundAudio, host);
+            }
 
             PlayAudio(backgroundAudio);
         }
