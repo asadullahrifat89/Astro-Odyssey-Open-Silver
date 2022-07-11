@@ -18,11 +18,6 @@ namespace AstroOdyssey
 
         public bool HasNoHealth => Health <= 0;
 
-        public void LooseHealth()
-        {
-            Health -= HealthSlot;
-        }
-
         public void GainHealth()
         {
             Health += HealthSlot;
@@ -33,34 +28,44 @@ namespace AstroOdyssey
             Health += health;
         }
 
+        public void LooseHealth()
+        {
+            Health -= HealthSlot;
+        }
+
         public Rect GetRect()
         {
             return new Rect(Canvas.GetLeft(this), Canvas.GetTop(this), Width, Height);
         }
 
-        public double GetTop()
+        public double GetY()
         {
             return Canvas.GetTop(this);
         }
 
-        public double GetLeft()
+        public double GetX()
         {
             return Canvas.GetLeft(this);
         }
 
-        public void MoveY(double top, int direction)
-        {
-            Canvas.SetTop(this, GetTop() + (top * direction));
-        }
-
-        public void SetTop(double top)
+        public void SetY(double top)
         {
             Canvas.SetTop(this, top);
         }
 
-        public void SetLeft(double left)
+        public void SetX(double left)
         {
             Canvas.SetLeft(this, left);
+        }
+
+        public void MoveX(double left, int direction)
+        {
+            Canvas.SetLeft(this, GetX() + (left * direction));
+        }
+
+        public void MoveY(double top, int direction)
+        {
+            Canvas.SetTop(this, GetY() + (top * direction));
         }
 
         public void SetPosition(double top, double left)

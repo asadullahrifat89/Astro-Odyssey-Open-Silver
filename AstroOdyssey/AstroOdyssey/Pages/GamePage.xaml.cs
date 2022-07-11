@@ -500,7 +500,7 @@ namespace AstroOdyssey
                 laserElement.MoveY(laserSpeed, -1);
 
                 // remove laser if outside game canvas
-                if (laserElement.GetTop() < 10)
+                if (laserElement.GetY() < 10)
                 {
                     GameView.AddDestroyableGameObject(laserElement);
                 }
@@ -530,7 +530,7 @@ namespace AstroOdyssey
                 }
                 else
                 {
-                    if (element.GetTop() > windowHeight)
+                    if (element.GetY() > windowHeight)
                     {
                         GameView.AddDestroyableGameObject(element);
                     }
@@ -598,7 +598,7 @@ namespace AstroOdyssey
                 }
                 else
                 {
-                    if (health.GetTop() > windowHeight)
+                    if (health.GetY() > windowHeight)
                     {
                         GameView.AddDestroyableGameObject(health);
                     }
@@ -684,25 +684,25 @@ namespace AstroOdyssey
         {
             playerWidthHalf = player.Width / 2;
 
-            playerX = player.GetLeft();
+            playerX = player.GetX();
             playerBounds = player.GetRect();
         }
 
         /// <summary>
         /// Sets the y axis position of the player on game canvas.
         /// </summary>
-        private void SetPlayerCanvasTop()
+        private void SetPlayerY()
         {
-            player.SetTop(windowHeight - player.Height - 20);
+            player.SetY(windowHeight - player.Height - 20);
         }
 
         /// <summary>
         /// Sets the x axis position of the player on game canvas.
         /// </summary>
         /// <param name="x"></param>
-        private void SetPlayerLeft(double x)
+        private void SetPlayerX(double x)
         {
-            player.SetLeft(x);
+            player.SetX(x);
         }
 
         /// <summary>
@@ -712,7 +712,7 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool AnyObjectWithinPlayersLeftSideRange(GameObject go)
         {
-            var left = go.GetLeft();
+            var left = go.GetX();
 
             return left + go.Width / 2 < playerX && left + go.Width / 2 > playerX - 250;
         }
@@ -724,7 +724,7 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool AnyObjectWithinPlayersRightRange(GameObject go)
         {
-            var left = go.GetLeft();
+            var left = go.GetX();
 
             return left + go.Width / 2 > playerX && left + go.Width / 2 <= playerX + 250;
         }
@@ -745,14 +745,14 @@ namespace AstroOdyssey
             {
                 if (playerX + playerWidthHalf < windowWidth)
                 {
-                    SetPlayerLeft(playerX + playerSpeed);
+                    SetPlayerX(playerX + playerSpeed);
                 }
             }
 
             // move left
             if (pointerX - playerWidthHalf < playerX - playerSpeed)
             {
-                SetPlayerLeft(playerX - playerSpeed);
+                SetPlayerX(playerX - playerSpeed);
             }
         }
 
@@ -940,7 +940,7 @@ namespace AstroOdyssey
             var newLaser = /*laserStack.Any() ? laserStack.Pop() :*/ new Laser();
 
             newLaser.SetAttributes(laserHeight, laserWidth);
-            newLaser.AddToGameEnvironment(top: player.GetTop() - 20, left: player.GetLeft() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
+            newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
         }
 
         #endregion
@@ -1070,7 +1070,7 @@ namespace AstroOdyssey
                 // move star down
                 star.MoveY(starSpeed, 1);
 
-                if (star.GetTop() > windowHeight)
+                if (star.GetY() > windowHeight)
                 {
                     StarView.AddDestroyableGameObject(star);
                 }
@@ -1156,7 +1156,7 @@ namespace AstroOdyssey
             windowHeight = Window.Current.Bounds.Height;
 
             SetCanvasSize();
-            SetPlayerCanvasTop();
+            SetPlayerY();
         }
 
         #endregion
