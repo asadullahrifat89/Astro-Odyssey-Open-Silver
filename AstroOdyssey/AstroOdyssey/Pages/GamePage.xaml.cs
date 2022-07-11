@@ -83,7 +83,7 @@ namespace AstroOdyssey
         private readonly Stack<GameObject> enemyStack = new Stack<GameObject>();
         private readonly Stack<GameObject> meteorStack = new Stack<GameObject>();
         private readonly Stack<GameObject> healthStack = new Stack<GameObject>();
-        //private readonly Stack<GameObject> laserStack = new Stack<GameObject>();
+        private readonly Stack<GameObject> starStack = new Stack<GameObject>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -107,6 +107,106 @@ namespace AstroOdyssey
         #endregion
 
         #region Methods
+
+        #region Frame Methods
+
+        /// <summary>
+        /// Updates a frame of the game.
+        /// </summary>
+        private void UpdateFrame()
+        {
+            UpdateGameStats();
+
+            UpdateFrameStats();
+
+            GetPlayerBounds();
+
+            SpawnEnemy();
+
+            SpawnMeteor();
+
+            SpawnHealth();
+
+            SpawnStar();
+
+            MovePlayer();
+
+            UpdateGameView();
+
+            UpdateStarView();
+
+            SetDifficulty();
+
+            HideLevelUp();
+
+            ScaleDifficulty();
+
+            PlayerOpacity();
+
+            CheckPlayerDeath();
+
+            CalculateFps();
+
+            KeyboardFocus();
+        }
+
+        /// <summary>
+        /// Updates the fps, frame time and objects currently in view.
+        /// </summary>
+        private void UpdateFrameStats()
+        {
+            frameStatUpdateCounter -= 1;
+
+            if (frameStatUpdateCounter < 0)
+            {
+                FPSText.Text = "FPS: " + fpsCount;
+                FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
+                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
+
+                frameStatUpdateCounter = frameStatUpdateLimit;
+            }
+        }
+
+        /// <summary>
+        /// Elapses the frame duration.
+        /// </summary>
+        /// <param name="watch"></param>        
+        /// <returns></returns>
+        private async Task ElapseFrameDuration(Stopwatch watch)
+        {
+            //CalculateFrameDuration(watch);
+            await Task.Delay(frameDuration);
+        }
+
+        /// <summary>
+        /// Calculates the duration of a frame.
+        /// </summary>
+        /// <param name="watch"></param>
+        /// <returns></returns>
+        private void CalculateFrameDuration(Stopwatch watch)
+        {
+            frameTime = watch.ElapsedMilliseconds - frameStartTime;
+            frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
+        }
+
+        /// <summary>
+        /// Calculates frames per second.
+        /// </summary>
+        /// <param name="frameStartTime"></param>
+        private void CalculateFps()
+        {
+            // calculate FPS
+            if (lastFrameTime + 1000 < frameStartTime)
+            {
+                fpsCount = fpsCounter;
+                fpsCounter = 0;
+                lastFrameTime = frameStartTime;
+            }
+
+            fpsCounter++;
+        }
+
+        #endregion
 
         #region Game Methods
 
@@ -186,42 +286,18 @@ namespace AstroOdyssey
             {
                 frameStartTime = watch.ElapsedMilliseconds;
 
-                UpdateGameStats();
-
-                UpdateFrameStats();
-
-                GetPlayerBounds();
-
-                SpawnEnemy();
-
-                SpawnMeteor();
-
-                SpawnHealth();
-
-                SpawnStar();
-
-                MovePlayer();
-
                 UpdateFrame();
-
-                UpdateStars();
-
-                SetDifficulty();
-
-                HideLevelUp();
-
-                ScaleDifficulty();
-
-                PlayerOpacity();
-
-                CheckPlayerDeath();
-
-                CalculateFps();
-
-                FocusBox.Focus();
 
                 await ElapseFrameDuration(watch);
             }
+        }
+
+        /// <summary>
+        /// Brings focus on keyboard so that keyboard events work.
+        /// </summary>
+        private void KeyboardFocus()
+        {
+            FocusBox.Focus();
         }
 
         /// <summary>
@@ -438,30 +514,26 @@ namespace AstroOdyssey
             StarView.SetSize(windowHeight, windowWidth);
         }
 
-        #endregion
-
-        #region Frame Methods
-
         /// <summary>
-        /// Updates a frame. Advances game objects in the frame.
+        /// Updates a frame of game view. Advances game objects in the frame.
         /// </summary>
-        private void UpdateFrame()
+        private void UpdateGameView()
         {
             var gameObjects = GameView.GetGameObjects<GameObject>().Where(x => x is not Player);
 
             foreach (var gameObject in gameObjects)
             {
-                UpdateGameObjects(gameObject);
+                UpdateGameViewObjects(gameObject);
             }
 
-            RemoveDestroyables();
+            ClearGameView();
         }
 
         /// <summary>
-        /// Updates game objects. Finds intersecting objects performs game logic.
+        /// Updates game objects in game view. Moves the objects. Detects collision causes and applies effects.
         /// </summary>
         /// <param name="gameObject"></param>
-        private void UpdateGameObjects(GameObject gameObject)
+        private void UpdateGameViewObjects(GameObject gameObject)
         {
             if (gameObject.IsDestroyable)
             {
@@ -476,7 +548,7 @@ namespace AstroOdyssey
                     meteorElement.MoveY();
                 }
 
-                // if enemy or meteor object has gone below the game view
+                // if enemy or meteor object has gone below game view
                 if (gameObject.GetY() > GameView.Height)
                     GameView.AddDestroyableGameObject(gameObject);
 
@@ -547,7 +619,7 @@ namespace AstroOdyssey
                     // move Health down
                     health.MoveY();
 
-                    // if health object has gone below the game view
+                    // if health object has gone below game view
                     if (health.GetY() > GameView.Height)
                         GameView.AddDestroyableGameObject(health);
 
@@ -561,9 +633,9 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Removes destroyable objects from game environment.
+        /// Clears destroyable objects from game view.
         /// </summary>
-        private void RemoveDestroyables()
+        private void ClearGameView()
         {
             foreach (var destroyable in GameView.GetDestroyableGameObjects())
             {
@@ -587,61 +659,6 @@ namespace AstroOdyssey
             GameView.ClearDestroyableGameObjects();
         }
 
-        /// <summary>
-        /// Updates the fps, frame time and objects currently in view.
-        /// </summary>
-        private void UpdateFrameStats()
-        {
-            frameStatUpdateCounter -= 1;
-
-            if (frameStatUpdateCounter < 0)
-            {
-                FPSText.Text = "FPS: " + fpsCount;
-                FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
-                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
-
-                frameStatUpdateCounter = frameStatUpdateLimit;
-            }
-        }
-
-        /// <summary>
-        /// Elapses the frame duration.
-        /// </summary>
-        /// <param name="watch"></param>        
-        /// <returns></returns>
-        private async Task ElapseFrameDuration(Stopwatch watch)
-        {
-            //CalculateFrameDuration(watch);
-            await Task.Delay(frameDuration);
-        }
-
-        /// <summary>
-        /// Calculates the duration of a frame.
-        /// </summary>
-        /// <param name="watch"></param>
-        /// <returns></returns>
-        private void CalculateFrameDuration(Stopwatch watch)
-        {
-            frameTime = watch.ElapsedMilliseconds - frameStartTime;
-            frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
-        }
-
-        /// <summary>
-        /// Calculates frames per second.
-        /// </summary>
-        /// <param name="frameStartTime"></param>
-        private void CalculateFps()
-        {
-            // calculate FPS
-            if (lastFrameTime + 1000 < frameStartTime)
-            {
-                fpsCount = fpsCounter;
-                fpsCounter = 0;
-                lastFrameTime = frameStartTime;
-            }
-
-            fpsCounter++;
-        }
         #endregion
 
         #region Score Methods
@@ -1035,7 +1052,7 @@ namespace AstroOdyssey
         #region Star Methods
 
         /// <summary>
-        /// Spawns random stars in the star canvas.
+        /// Spawns random stars in the star view.
         /// </summary>
         private void SpawnStar()
         {
@@ -1055,51 +1072,55 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateStar()
         {
-            var newStar = /*starStack.Any() ? starStack.Pop() :*/ new Star();
+            var newStar = starStack.Any() ? starStack.Pop() as Star : new Star();
 
             newStar.SetAttributes(starSpeed);
-            newStar.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 10), gameEnvironment: StarView);
+            newStar.AddToGameEnvironment(top: 0 - newStar.Height, left: rand.Next(10, (int)windowWidth - 10), gameEnvironment: StarView);
         }
 
         /// <summary>
         /// Updates stars on the star canvas.
         /// </summary>
-        private void UpdateStars()
+        private void UpdateStarView()
         {
             var starObjects = StarView.GetGameObjects<GameObject>();
 
             foreach (var star in starObjects)
             {
-                UpdateStarElement(star);
+                UpdateStarViewObject(star);
             }
 
-            foreach (var destroyable in StarView.GetDestroyableGameObjects())
+            ClearStarView();
+        }
+
+        /// <summary>
+        /// Updates the star objects. Moves the stars.
+        /// </summary>
+        /// <param name="star"></param>
+        private void UpdateStarViewObject(GameObject star)
+        {
+            // move star down
+            star.MoveY(starSpeed);
+
+            if (star.GetY() > windowHeight)
+                StarView.AddDestroyableGameObject(star);
+        }
+
+        /// <summary>
+        /// Clears destroyable stars from the star view.
+        /// </summary>
+        private void ClearStarView()
+        {
+            foreach (var star in StarView.GetDestroyableGameObjects())
             {
-                StarView.RemoveGameObject(destroyable);
+                StarView.RemoveGameObject(star);
+                starStack.Push(star);
             }
 
             StarView.ClearDestroyableGameObjects();
         }
 
-        /// <summary>
-        /// Updates the star element.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateStarElement(GameObject element)
-        {
-            if (element is Star star)
-            {
-                // move star down
-                star.MoveY();
-
-                if (star.GetY() > windowHeight)
-                {
-                    StarView.AddDestroyableGameObject(star);
-                }
-            }
-        }
-
-        #endregion        
+        #endregion
 
         #region Canvas Events
 
