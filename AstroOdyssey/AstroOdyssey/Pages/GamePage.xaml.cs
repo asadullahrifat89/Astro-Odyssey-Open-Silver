@@ -43,6 +43,10 @@ namespace AstroOdyssey
         private int healthSpawnLimit;
         private double healthSpeed;
 
+        private int powerUpCounter;
+        private int powerUpSpawnLimit;
+        private double powerUpSpeed;
+
         private int starCounter;
         private int starSpawnLimit;
         private double starSpeed;
@@ -58,12 +62,15 @@ namespace AstroOdyssey
 
         private double laserTime;
         private double laserSpeed;
+        private bool powerUpTriggered;
+        private int powerUpTriggerCounter;
+        private int powerUpTriggerLimit;
 
         private object backgroundAudio = null;
         private object laserAudio = null;
         private object enemyDestructionAudio = null;
         private object meteorDestructionAudio = null;
-        private object laserHitObjectAudio = null;
+        private object laserImpactAudio = null;
         private object playerHealthLossAudio = null;
         private object playerHealthGainAudio = null;
         private object levelUpAudio = null;
@@ -75,14 +82,15 @@ namespace AstroOdyssey
         private int playerDamagedOpacityLimit;
 
         private Difficulty difficulty = Difficulty.StartUp;
-        private int showLevelUpCount;
-        private int showLevelUpLimit;
+        private int showInGameTextCount;
+        private int showInGameTextLimit;
 
         private readonly Random rand = new Random();
 
         private readonly Stack<GameObject> enemyStack = new Stack<GameObject>();
         private readonly Stack<GameObject> meteorStack = new Stack<GameObject>();
         private readonly Stack<GameObject> healthStack = new Stack<GameObject>();
+        private readonly Stack<GameObject> powerUpStack = new Stack<GameObject>();
         private readonly Stack<GameObject> starStack = new Stack<GameObject>();
 
         private bool moveLeft = false, moveRight = false;
@@ -127,6 +135,8 @@ namespace AstroOdyssey
 
             SpawnHealth();
 
+            SpawnPowerUp();
+
             SpawnStar();
 
             MovePlayer();
@@ -137,7 +147,9 @@ namespace AstroOdyssey
 
             SetDifficulty();
 
-            HideLevelUp();
+            HideInGameText();
+
+            StopPowerUp();
 
             ScaleDifficulty();
 
@@ -162,7 +174,7 @@ namespace AstroOdyssey
                 FPSText.Text = "FPS: " + fpsCount;
 #if DEBUG
                 FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
-                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count(); 
+                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
 #endif
 
                 frameStatUpdateCounter = frameStatUpdateLimit;
@@ -245,6 +257,10 @@ namespace AstroOdyssey
             healthSpawnLimit = 1000;
             healthSpeed = 3;
 
+            powerUpCounter = 1000;
+            powerUpSpawnLimit = 1000;
+            powerUpSpeed = 3;
+
             starCounter = 100;
             starSpawnLimit = 100;
             starSpeed = 0.1d;
@@ -261,9 +277,11 @@ namespace AstroOdyssey
 
             laserTime = 235;
             laserSpeed = 20;
+            powerUpTriggerLimit = 500;
 
             difficulty = Difficulty.Noob;
-            showLevelUpLimit = 100;
+
+            showInGameTextLimit = 100;
 
             GameView.Children.Clear();
         }
@@ -312,169 +330,37 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Sets the difficulty of the game according to score; 
+        /// Shows the level up text in game view.
         /// </summary>
-        private void SetDifficulty()
+        private void ShowLevelUp()
         {
-            var currentDifficulty = difficulty;
-
-            if (score > 0)
-                difficulty = Difficulty.Noob;
-            if (score > 25)
-                difficulty = Difficulty.StartUp;
-            if (score > 50)
-                difficulty = Difficulty.Easy;
-            if (score > 100)
-                difficulty = Difficulty.Medium;
-            if (score > 200)
-                difficulty = Difficulty.Hard;
-            if (score > 400)
-                difficulty = Difficulty.VeryHard;
-            if (score > 800)
-                difficulty = Difficulty.Extreme;
-            if (score > 1600)
-                difficulty = Difficulty.Pro;
-
-            if (currentDifficulty != difficulty)
-            {
-                LevelUpText.Visibility = Visibility.Visible;
-                showLevelUpCount = showLevelUpLimit;
-                PlayLevelUpSound();
-            }
+            ShowInGameText("LEVEL UP!");
+            PlayLevelUpSound();
         }
 
         /// <summary>
-        /// Hides the level up text after keeping it visible for 100 frames.
+        /// Shows the level up text in game view.
         /// </summary>
-        private void HideLevelUp()
+        private void ShowInGameText(string text)
         {
-            showLevelUpCount -= 1;
-
-            if (showLevelUpCount <= 0)
-            {
-                LevelUpText.Visibility = Visibility.Collapsed;
-            }
+            InGameText.Text = text;
+            InGameText.Visibility = Visibility.Visible;
+            showInGameTextCount = showInGameTextLimit;
         }
 
         /// <summary>
-        /// Scales up difficulty according to player score.
+        /// Hides the level up text after keeping it visible.
         /// </summary>
-        private void ScaleDifficulty()
+        private void HideInGameText()
         {
-            switch (difficulty)
+            if (InGameText.Visibility == Visibility.Visible)
             {
-                case Difficulty.Noob:
-                    {
-                        enemySpawnLimit = 45;
-                        enemySpeed = 5;
+                showInGameTextCount -= 1;
 
-                        laserTime = 235;
-
-                        starSpeed = 0.1d;
-                    }
-                    break;
-                case Difficulty.StartUp:
-                    {
-                        enemySpawnLimit = 45;
-                        enemySpeed = 5;
-
-                        laserTime = 230;
-
-                        starSpeed = 0.1d;
-                    }
-                    break;
-                case Difficulty.Easy:
-                    {
-                        enemySpawnLimit = 40;
-                        enemySpeed = 7;
-
-                        meteorSpawnLimit = 40;
-                        meteorSpeed = 4;
-
-                        laserTime = 225;
-
-                        healthSpeed = 5;
-
-                        starSpeed = 0.2d;
-                    }
-                    break;
-                case Difficulty.Medium:
-                    {
-                        enemySpawnLimit = 35;
-                        enemySpeed = 9;
-
-                        meteorSpawnLimit = 35;
-                        meteorSpeed = 6;
-
-                        laserTime = 220;
-
-                        healthSpeed = 8;
-
-                        starSpeed = 0.3d;
-                    }
-                    break;
-                case Difficulty.Hard:
-                    {
-                        enemySpawnLimit = 30;
-                        enemySpeed = 11;
-
-                        meteorSpawnLimit = 30;
-                        meteorSpeed = 8;
-
-                        laserTime = 215;
-
-                        healthSpeed = 10;
-
-                        starSpeed = 0.4d;
-                    }
-                    break;
-                case Difficulty.VeryHard:
-                    {
-                        enemySpawnLimit = 25;
-                        enemySpeed = 13;
-
-                        meteorSpawnLimit = 25;
-                        meteorSpeed = 10;
-
-                        laserTime = 210;
-
-                        healthSpeed = 12;
-
-                        starSpeed = 0.5d;
-                    }
-                    break;
-                case Difficulty.Extreme:
-                    {
-                        enemySpawnLimit = 20;
-                        enemySpeed = 15;
-
-                        meteorSpawnLimit = 20;
-                        meteorSpeed = 12;
-
-                        laserTime = 205;
-
-                        healthSpeed = 14;
-
-                        starSpeed = 0.6d;
-                    }
-                    break;
-                case Difficulty.Pro:
-                    {
-                        enemySpawnLimit = 15;
-                        enemySpeed = 17;
-
-                        meteorSpawnLimit = 15;
-                        meteorSpeed = 14;
-
-                        laserTime = 200;
-
-                        healthSpeed = 16;
-
-                        starSpeed = 0.7d;
-                    }
-                    break;
-                default:
-                    break;
+                if (showInGameTextCount <= 0)
+                {
+                    InGameText.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -571,7 +457,8 @@ namespace AstroOdyssey
                     {
                         foreach (var laser in lasers)
                         {
-                            GameView.AddDestroyableGameObject(laser);
+                            if (!powerUpTriggered)
+                                GameView.AddDestroyableGameObject(laser);
 
                             gameObject.LooseHealth();
 
@@ -631,6 +518,22 @@ namespace AstroOdyssey
                         PlayerHealthGain(health);
                     }
                 }
+
+                if (gameObject is PowerUp powerUp)
+                {
+                    // move PowerUp down
+                    powerUp.MoveY();
+
+                    // if PowerUp object has gone below game view
+                    if (powerUp.GetY() > GameView.Height)
+                        GameView.AddDestroyableGameObject(powerUp);
+
+                    if (IntersectsWith(playerBounds, powerUp.GetRect()))
+                    {
+                        GameView.AddDestroyableGameObject(powerUp);
+                        TriggerPowerUp();
+                    }
+                }
             }
         }
 
@@ -679,6 +582,167 @@ namespace AstroOdyssey
         private void PlayerScoreByMeteorDestruction()
         {
             score++;
+        }
+
+        #endregion
+
+        #region Difficulty Methods
+
+        /// <summary>
+        /// Sets the difficulty of the game according to score; 
+        /// </summary>
+        private void SetDifficulty()
+        {
+            var currentDifficulty = difficulty;
+
+            if (score > 0)
+                difficulty = Difficulty.Noob;
+            if (score > 25)
+                difficulty = Difficulty.StartUp;
+            if (score > 50)
+                difficulty = Difficulty.Easy;
+            if (score > 100)
+                difficulty = Difficulty.Medium;
+            if (score > 200)
+                difficulty = Difficulty.Hard;
+            if (score > 400)
+                difficulty = Difficulty.VeryHard;
+            if (score > 800)
+                difficulty = Difficulty.Extreme;
+            if (score > 1600)
+                difficulty = Difficulty.Pro;
+
+            // when difficulty changes show level up
+            if (currentDifficulty != difficulty)
+                ShowLevelUp();
+        }
+
+        /// <summary>
+        /// Scales up difficulty according to player score.
+        /// </summary>
+        private void ScaleDifficulty()
+        {
+            switch (difficulty)
+            {
+                case Difficulty.Noob:
+                    {
+                        enemySpawnLimit = 45;
+                        enemySpeed = 5;
+
+                        laserTime = 235;
+
+                        starSpeed = 0.1d;
+                    }
+                    break;
+                case Difficulty.StartUp:
+                    {
+                        enemySpawnLimit = 45;
+                        enemySpeed = 5;
+
+                        laserTime = 230;
+
+                        starSpeed = 0.1d;
+                    }
+                    break;
+                case Difficulty.Easy:
+                    {
+                        enemySpawnLimit = 40;
+                        enemySpeed = 7;
+
+                        meteorSpawnLimit = 40;
+                        meteorSpeed = 4;
+
+                        laserTime = 225;
+
+                        healthSpeed = 5;
+                        powerUpSpeed = 5;
+
+                        starSpeed = 0.2d;
+                    }
+                    break;
+                case Difficulty.Medium:
+                    {
+                        enemySpawnLimit = 35;
+                        enemySpeed = 9;
+
+                        meteorSpawnLimit = 35;
+                        meteorSpeed = 6;
+
+                        laserTime = 220;
+
+                        healthSpeed = 8;
+                        powerUpSpeed = 8;
+
+                        starSpeed = 0.3d;
+                    }
+                    break;
+                case Difficulty.Hard:
+                    {
+                        enemySpawnLimit = 30;
+                        enemySpeed = 11;
+
+                        meteorSpawnLimit = 30;
+                        meteorSpeed = 8;
+
+                        laserTime = 215;
+
+                        healthSpeed = 10;
+                        powerUpSpeed = 10;
+
+                        starSpeed = 0.4d;
+                    }
+                    break;
+                case Difficulty.VeryHard:
+                    {
+                        enemySpawnLimit = 25;
+                        enemySpeed = 13;
+
+                        meteorSpawnLimit = 25;
+                        meteorSpeed = 10;
+
+                        laserTime = 210;
+
+                        healthSpeed = 12;
+                        powerUpSpeed = 12;
+
+                        starSpeed = 0.5d;
+                    }
+                    break;
+                case Difficulty.Extreme:
+                    {
+                        enemySpawnLimit = 20;
+                        enemySpeed = 15;
+
+                        meteorSpawnLimit = 20;
+                        meteorSpeed = 12;
+
+                        laserTime = 205;
+
+                        healthSpeed = 14;
+                        powerUpSpeed = 14;
+
+                        starSpeed = 0.6d;
+                    }
+                    break;
+                case Difficulty.Pro:
+                    {
+                        enemySpawnLimit = 15;
+                        enemySpeed = 17;
+
+                        meteorSpawnLimit = 15;
+                        meteorSpeed = 14;
+
+                        laserTime = 200;
+
+                        healthSpeed = 16;
+                        powerUpSpeed = 16;
+
+                        starSpeed = 0.7d;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         #endregion
@@ -1051,6 +1115,65 @@ namespace AstroOdyssey
 
         #endregion
 
+        #region PowerUp Methods
+
+        /// <summary>
+        /// Spawns a PowerUp.
+        /// </summary>
+        private void SpawnPowerUp()
+        {
+            // each frame progress decreases this counter
+            powerUpCounter -= 1;
+
+            // when counter reaches zero, create a PowerUp
+            if (powerUpCounter < 0)
+            {
+                GeneratePowerUp();
+                powerUpCounter = powerUpSpawnLimit;
+            }
+
+        }
+
+        /// <summary>
+        /// Generates a random PowerUp.
+        /// </summary>
+        private void GeneratePowerUp()
+        {
+            var newPowerUp = powerUpStack.Any() ? powerUpStack.Pop() as PowerUp : new PowerUp();
+
+            newPowerUp.SetAttributes(powerUpSpeed + rand.NextDouble());
+            newPowerUp.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+        }
+
+        /// <summary>
+        /// Triggers the powered up state.
+        /// </summary>
+        private void TriggerPowerUp()
+        {
+            powerUpTriggered = true;
+            powerUpTriggerCounter = powerUpTriggerLimit;
+            ShowInGameText("POWER UP!");
+            PlayLevelUpSound();
+        }
+
+        /// <summary>
+        /// Stops the powered up state after keeping it active for 1000 frames.
+        /// </summary>
+        private void StopPowerUp()
+        {
+            if (powerUpTriggered)
+            {
+                powerUpTriggerCounter -= 1;
+
+                if (powerUpTriggerCounter <= 0)
+                {
+                    powerUpTriggered = false;
+                }
+            }
+        }
+
+        #endregion
+
         #region Star Methods
 
         /// <summary>
@@ -1316,18 +1439,18 @@ namespace AstroOdyssey
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-sfx-43814.mp3";
 
-            if (laserHitObjectAudio is null)
+            if (laserImpactAudio is null)
             {
-                laserHitObjectAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                laserImpactAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
-                    var laserHitObjectAudio = new Audio($0);
-                    laserHitObjectAudio.volume = 0.6;
-                    return laserHitObjectAudio;
+                    var laserImpactAudio = new Audio($0);
+                    laserImpactAudio.volume = 0.6;
+                    return laserImpactAudio;
                 }())", host);
             }
 
-            PlayAudio(laserHitObjectAudio);
+            PlayAudio(laserImpactAudio);
         }
 
         /// <summary>

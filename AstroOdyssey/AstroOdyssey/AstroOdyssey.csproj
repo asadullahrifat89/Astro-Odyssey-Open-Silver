@@ -95,6 +95,7 @@
 		<Compile Include="Converters\BooleanToVisibilityConverter.cs" />
 		<Compile Include="Converters\DoubleToCornerRadiusConverter.cs" />
 		<Compile Include="Converters\TextToPlaceholderTextVisibilityConverter.cs" />
+		<Compile Include="GameObjects\PowerUp.cs" />
 		<Compile Include="Internals\GameEnvironment.cs" />
 		<Compile Include="MainPage.xaml.cs" />
 		<Compile Include="GameObjects\Enemy.cs" />

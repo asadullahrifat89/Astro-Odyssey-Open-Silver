@@ -75,15 +75,14 @@
             FontWeight="Bold"
             Foreground="White" />
 
-        <!--  This shows level up text when difficulty scales  -->
+        <!--  This shows level up, power up text when difficulty scales  -->
         <TextBlock
-            x:Name="LevelUpText"
+            x:Name="InGameText"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontSize="50"
             FontWeight="Bold"
-            Foreground="White"
-            Text="LEVEL UP!" />
+            Foreground="White" />
 
     </Grid>
 </Page>
