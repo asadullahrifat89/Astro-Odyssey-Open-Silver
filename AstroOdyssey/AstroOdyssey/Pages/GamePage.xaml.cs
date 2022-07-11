@@ -160,8 +160,10 @@ namespace AstroOdyssey
             if (frameStatUpdateCounter < 0)
             {
                 FPSText.Text = "FPS: " + fpsCount;
+#if DEBUG
                 FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
-                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
+                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count(); 
+#endif
 
                 frameStatUpdateCounter = frameStatUpdateLimit;
             }
@@ -800,7 +802,7 @@ namespace AstroOdyssey
                 HealthText.Text = "Game Over";
                 StopGame();
 
-                var contentDialogue = new MessageDialogueWindow(title: "Game Over!", message: "Would you like to play again?", result: (result) =>
+                var contentDialogue = new MessageDialogueWindow(title: "GAME OVER", message: "Would you like to play again?", result: (result) =>
                 {
                     if (result)
                         App.NavigateToPage("/GamePage");

@@ -13,7 +13,6 @@
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                FontFamily="Consolas"
                 FontSize="70"
                 FontWeight="Bold"
                 Foreground="White"
@@ -29,7 +28,6 @@
                 BorderThickness="5"
                 Click="PlayButton_Click"
                 Content="START GAME"
-                FontFamily="Consolas"
                 FontSize="30"
                 Style="{StaticResource MaterialDesign_RoundButton_Style}" />
         </StackPanel>

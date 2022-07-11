@@ -2,7 +2,7 @@
     <Style x:Key="PageHeader_Style" TargetType="TextBlock">
         <Setter Property="FontSize" Value="36" />
         <Setter Property="TextWrapping" Value="Wrap" />
-        <Setter Property="FontFamily" Value="Segoe UI Light" />
+        <!--<Setter Property="FontFamily" Value="Consolas" />-->
         <Setter Property="Margin" Value="21,20,10,0" />
         <Setter Property="Foreground" Value="Gray" />
     </Style>
