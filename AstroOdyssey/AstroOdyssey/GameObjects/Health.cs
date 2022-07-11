@@ -7,7 +7,13 @@ namespace AstroOdyssey
 {
     public class Health : GameObject
     {
+        #region Fields
+        
         private Image content = new Image() { Stretch = Stretch.Uniform };
+
+        #endregion
+
+        #region Ctor
 
         public Health()
         {
@@ -16,7 +22,11 @@ namespace AstroOdyssey
             Width = 100;
             Child = content;
             YDirection = YDirection.DOWN;
-        }
+        } 
+
+        #endregion
+
+        #region Methods
 
         public void SetAttributes(double speed)
         {
@@ -26,6 +36,8 @@ namespace AstroOdyssey
             Health = 10;
 
             content.Source = new BitmapImage(uri);
-        }
+        } 
+
+        #endregion
     }
 }

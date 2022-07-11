@@ -8,12 +8,18 @@ namespace AstroOdyssey
 {
     public class Player : GameObject
     {
+        #region Fields
+
         private Grid content = new Grid();
 
         private Image contentShip = new Image() { Stretch = Stretch.Uniform };
 
         private Image contentShipBlaze = new Image() { Stretch = Stretch.Uniform };
 
+        #endregion
+
+        #region Ctor
+        
         public Player()
         {
             Background = new SolidColorBrush(Colors.Transparent);
@@ -28,8 +34,12 @@ namespace AstroOdyssey
             content.Children.Add(contentShipBlaze);
             content.Children.Add(contentShip);
 
-            Child = content;            
+            Child = content;
         }
+
+        #endregion
+
+        #region Methods
 
         public void SetAttributes(double speed)
         {
@@ -94,7 +104,7 @@ namespace AstroOdyssey
 
             contentShip.Source = new BitmapImage(shipUri);
 
-            var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);          
+            var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
 
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
             contentShipBlaze.Height = exhaustHeight;
@@ -114,6 +124,8 @@ namespace AstroOdyssey
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
             Speed -= 5;
-        }
+        } 
+
+        #endregion
     }
 }

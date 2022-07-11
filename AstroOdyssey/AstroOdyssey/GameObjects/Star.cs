@@ -7,13 +7,23 @@ namespace AstroOdyssey
 {
     public class Star : GameObject
     {
-        private Image content = new Image() { Stretch = Stretch.Uniform };
+        #region Fields
+        
+        private Image content = new Image() { Stretch = Stretch.Uniform }; 
+
+        #endregion
+
+        #region Ctor
 
         public Star()
         {
             Tag = "star";
             Child = content;
-        }
+        } 
+
+        #endregion
+
+        #region Methods
 
         public void SetAttributes(double speed)
         {
@@ -49,6 +59,8 @@ namespace AstroOdyssey
             Width = size;
 
             content.Source = new BitmapImage(uri);
-        }
+        } 
+
+        #endregion
     }
 }

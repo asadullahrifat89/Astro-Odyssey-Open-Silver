@@ -7,6 +7,8 @@ namespace AstroOdyssey
 {
     public class Meteor : GameObject
     {
+        #region Fields
+
         private Image content = new Image() { Stretch = Stretch.Uniform };
 
         private double rotation = 0;
@@ -16,6 +18,10 @@ namespace AstroOdyssey
             CenterX = 0.5,
             CenterY = 0.5,
         };
+
+        #endregion
+
+        #region Ctor
 
         public Meteor()
         {
@@ -32,7 +38,11 @@ namespace AstroOdyssey
             rotateTransform.Angle = rotation;
 
             RenderTransform = rotateTransform;
-        }
+        } 
+
+        #endregion
+
+        #region Methods
 
         public void Rotate()
         {
@@ -88,6 +98,8 @@ namespace AstroOdyssey
             }
 
             content.Source = new BitmapImage(uri);
-        }
+        } 
+
+        #endregion
     }
 }

@@ -7,8 +7,14 @@ namespace AstroOdyssey
 {
     public class Enemy : GameObject
     {
+        #region Fields
+        
         private Image content = new Image() { Stretch = Stretch.Uniform };
 
+        #endregion
+
+        #region Ctor
+        
         public Enemy()
         {
             Tag = "enemy";
@@ -18,7 +24,11 @@ namespace AstroOdyssey
             IsDestroyable = true;
             Child = content;
             YDirection = YDirection.DOWN;
-        }
+        } 
+
+        #endregion
+
+        #region Methods
 
         public void SetAttributes(double speed)
         {
@@ -54,6 +64,8 @@ namespace AstroOdyssey
             }
 
             content.Source = new BitmapImage(uri);
-        }
+        } 
+
+        #endregion
     }
 }

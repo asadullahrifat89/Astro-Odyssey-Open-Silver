@@ -6,6 +6,8 @@ namespace AstroOdyssey
 {
     public class Laser : GameObject
     {
+        #region Ctor
+
         public Laser()
         {
             Tag = "laser";
@@ -17,7 +19,15 @@ namespace AstroOdyssey
             YDirection = YDirection.UP;
         }
 
+        #endregion
+
+        #region Properties
+        
         public bool IsPoweredUp { get; set; }
+
+        #endregion
+
+        #region Methods
 
         public void SetAttributes(double speed, double height = 20, double width = 5, bool isPoweredUp = false)
         {
@@ -30,6 +40,8 @@ namespace AstroOdyssey
                 Background = new SolidColorBrush(Colors.Goldenrod);
             else
                 Background = new SolidColorBrush(Colors.White);
-        }
+        } 
+
+        #endregion
     }
 }
