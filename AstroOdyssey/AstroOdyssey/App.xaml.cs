@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Windows.Browser;
 using Windows.UI.Xaml;
 
@@ -10,9 +11,13 @@ namespace AstroOdyssey
 
         private static string baseUrl;
 
-        public App()
+        private IConfiguration configuration;
+
+        public App(IConfiguration configuration)
         {
             InitializeComponent();
+
+            this.configuration = configuration;
 
             Startup += App_Startup;
             Application.Current.UnhandledException += Current_UnhandledException;
@@ -43,7 +48,7 @@ namespace AstroOdyssey
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
-            
+
         }
 
         public static void NavigateToPage(string targetUri)

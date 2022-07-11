@@ -2,6 +2,7 @@
 using DotNetForHtml5;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 
 namespace AstroOdyssey.Browser.Pages
@@ -17,10 +18,13 @@ namespace AstroOdyssey.Browser.Pages
         {
             base.OnInitialized();
             Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
-            Program.RunApplication();
+            Program.RunApplication(Configuration);
         }
 
         [Inject]
         private IJSRuntime JSRuntime { get; set; }
+
+        [Inject]
+        private IConfiguration Configuration { get; set; }
     }
 }

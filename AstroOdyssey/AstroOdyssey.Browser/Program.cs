@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
@@ -20,11 +21,11 @@ namespace AstroOdyssey.Browser
             await host.RunAsync();
         }
 
-        public static void RunApplication()
+        public static void RunApplication(IConfiguration configuration)
         {
             Application.RunApplication(() =>
             {
-                var app = new AstroOdyssey.App();
+                var app = new AstroOdyssey.App(configuration);
             });
         }
     }
