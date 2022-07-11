@@ -476,6 +476,10 @@ namespace AstroOdyssey
                     meteorElement.MoveY();
                 }
 
+                // if enemy or meteor object has gone below the game view
+                if (gameObject.GetY() > GameView.Height)
+                    GameView.AddDestroyableGameObject(gameObject);
+
                 Rect elementBounds = gameObject.GetRect();
 
                 // if enemy or meteor collides with player
@@ -487,47 +491,39 @@ namespace AstroOdyssey
                 }
                 else
                 {
-                    // if enemy or meteor object has gone below the game view
-                    if (gameObject.GetY() > GameView.Height)
-                    {
-                        GameView.AddDestroyableGameObject(gameObject);
-                    }
-                    else
-                    {
-                        var lasers = GameView.GetGameObjects<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
+                    var lasers = GameView.GetGameObjects<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
 
-                        if (lasers is not null && lasers.Any())
+                    if (lasers is not null && lasers.Any())
+                    {
+                        foreach (var laser in lasers)
                         {
-                            foreach (var laser in lasers)
+                            GameView.AddDestroyableGameObject(laser);
+
+                            gameObject.LooseHealth();
+
+                            if (gameObject is Meteor meteor)
                             {
-                                GameView.AddDestroyableGameObject(laser);
+                                // move the meteor backwards a bit on laser hit
+                                meteor.MoveY(meteor.Speed * 3 / 2, YDirection.UP);
 
-                                gameObject.LooseHealth();
+                                PlayLaserImpactSound();
 
-                                if (gameObject is Meteor meteor)
+                                if (meteor.HasNoHealth)
                                 {
-                                    // move the meteor backwards a bit on laser hit
-                                    meteor.MoveY(meteor.Speed * 3 / 2, YDirection.UP);
-
-                                    PlayLaserImpactSound();
-
-                                    if (meteor.HasNoHealth)
-                                    {
-                                        DestroyMeteor(meteor);
-                                    }
+                                    DestroyMeteor(meteor);
                                 }
+                            }
 
-                                if (gameObject is Enemy enemy)
+                            if (gameObject is Enemy enemy)
+                            {
+                                // move the enemy backwards a bit on laser hit
+                                enemy.MoveY(enemy.Speed * 3 / 2, YDirection.UP);
+
+                                PlayLaserImpactSound();
+
+                                if (enemy.HasNoHealth)
                                 {
-                                    // move the enemy backwards a bit on laser hit
-                                    enemy.MoveY(enemy.Speed * 3 / 2, YDirection.UP);
-
-                                    PlayLaserImpactSound();
-
-                                    if (enemy.HasNoHealth)
-                                    {
-                                        DestroyEnemy(enemy);
-                                    }
+                                    DestroyEnemy(enemy);
                                 }
                             }
                         }
@@ -551,19 +547,14 @@ namespace AstroOdyssey
                     // move Health down
                     health.MoveY();
 
+                    // if health object has gone below the game view
+                    if (health.GetY() > GameView.Height)
+                        GameView.AddDestroyableGameObject(health);
+
                     if (IntersectsWith(playerBounds, health.GetRect()))
                     {
                         GameView.AddDestroyableGameObject(health);
-
                         PlayerHealthGain(health);
-                    }
-                    else
-                    {
-                        // if health object has gone below the game view
-                        if (health.GetY() > GameView.Height)
-                        {
-                            GameView.AddDestroyableGameObject(health);
-                        }
                     }
                 }
             }
