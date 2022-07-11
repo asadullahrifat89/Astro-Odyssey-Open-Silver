@@ -37,5 +37,33 @@ namespace AstroOdyssey
         {
             return new Rect(Canvas.GetLeft(this), Canvas.GetTop(this), Width, Height);
         }
+
+        public double GetTop()
+        {
+            return Canvas.GetTop(this);
+        }
+
+        public void SetTopNew(double top, int modifier)
+        {
+            Canvas.SetTop(this, GetTop() + (top * modifier));
+        }
+
+        public void SetTop(double top)
+        {
+            Canvas.SetTop(this, top);
+        }
+
+        public void SetPosition(double top, double left)
+        {
+            Canvas.SetTop(this, top);
+            Canvas.SetLeft(this, left);
+        }
+
+        public void AddToGameEnvironment(double top, double left, GameEnvironment gameEnvironment)
+        {
+            SetPosition(top, left);
+
+            gameEnvironment.AddGameObject(this);
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace AstroOdyssey
 {
     public class GameEnvironment : Canvas
     {
-        private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
+        private readonly List<GameObject> destroyableGameObjects = new List<GameObject>();
 
         public GameEnvironment()
         {
@@ -18,9 +18,29 @@ namespace AstroOdyssey
             Width = width;
         }
 
-        public void ClearDestroyableGameObjects() 
+        public List<GameObject> GetDestroyableGameObjects()
         {
-        
+            return destroyableGameObjects;
+        }
+
+        public void AddGameObject(GameObject gameObject) 
+        {
+            Children.Add(gameObject);
+        }
+
+        public void AddDestroyableGameObject(GameObject destroyable) 
+        {
+            destroyableGameObjects.Add(destroyable);
+        }
+
+        public void RemoveGameObject(GameObject destroyable)
+        {
+            Children.Remove(destroyable);
+        }
+
+        public void ClearDestroyableGameObjects()
+        {
+            destroyableGameObjects.Clear();
         }
     }
 }
