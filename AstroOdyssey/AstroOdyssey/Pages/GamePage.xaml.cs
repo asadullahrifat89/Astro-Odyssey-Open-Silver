@@ -497,7 +497,7 @@ namespace AstroOdyssey
             if (element is Laser laserElement)
             {
                 // move laser up                
-                laserElement.SetTopNew(laserSpeed, -1);
+                laserElement.MoveY(laserSpeed, -1);
 
                 // remove laser if outside game canvas
                 if (laserElement.GetTop() < 10)
@@ -511,13 +511,13 @@ namespace AstroOdyssey
                 if (element is Enemy enemyElement)
                 {
                     // move enemy down
-                    enemyElement.SetTopNew(enemySpeed, 1);
+                    enemyElement.MoveY(enemySpeed, 1);
                 }
 
                 if (element is Meteor meteorElement)
                 {
                     // move meteor down
-                    meteorElement.SetTopNew(meteorSpeed, 1);
+                    meteorElement.MoveY(meteorSpeed, 1);
                 }
 
                 Rect elementBounds = element.GetRect();
@@ -530,7 +530,7 @@ namespace AstroOdyssey
                 }
                 else
                 {
-                    if (Canvas.GetTop(element) > windowHeight)
+                    if (element.GetTop() > windowHeight)
                     {
                         GameView.AddDestroyableGameObject(element);
                     }
@@ -549,7 +549,7 @@ namespace AstroOdyssey
                                 if (element is Meteor meteor)
                                 {
                                     // move the meteor backwards a bit on laser hit
-                                    meteor.SetTopNew(meteorSpeed * 3 / 2, -1);
+                                    meteor.MoveY(meteorSpeed * 3 / 2, -1);
 
                                     PlayLaserHitObjectSound();
 
@@ -566,7 +566,7 @@ namespace AstroOdyssey
                                 if (element is Enemy enemy)
                                 {
                                     // move the enemy backwards a bit on laser hit
-                                    enemy.SetTopNew(enemySpeed * 3 / 2, -1);
+                                    enemy.MoveY(enemySpeed * 3 / 2, -1);
 
                                     PlayLaserHitObjectSound();
 
@@ -588,7 +588,7 @@ namespace AstroOdyssey
             if (element is Health health)
             {
                 // move Health down
-                health.SetTopNew(healthSpeed, 1);
+                health.MoveY(healthSpeed, 1);
 
                 if (IntersectsWith(playerBounds, health.GetRect()))
                 {
@@ -682,9 +682,9 @@ namespace AstroOdyssey
         /// </summary>
         private void GetPlayerBounds()
         {
-            playerX = Canvas.GetLeft(player);
             playerWidthHalf = player.Width / 2;
 
+            playerX = player.GetLeft();
             playerBounds = player.GetRect();
         }
 
@@ -693,16 +693,16 @@ namespace AstroOdyssey
         /// </summary>
         private void SetPlayerCanvasTop()
         {
-            Canvas.SetTop(player, windowHeight - player.Height - 20);
+            player.SetTop(windowHeight - player.Height - 20);
         }
 
         /// <summary>
         /// Sets the x axis position of the player on game canvas.
         /// </summary>
         /// <param name="x"></param>
-        private void SetPlayerCanvasLeft(double x)
+        private void SetPlayerLeft(double x)
         {
-            Canvas.SetLeft(player, x);
+            player.SetLeft(x);
         }
 
         /// <summary>
@@ -712,7 +712,9 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool AnyObjectWithinPlayersLeftSideRange(GameObject go)
         {
-            return (Canvas.GetLeft(go) + go.Width / 2 < playerX && Canvas.GetLeft(go) + go.Width / 2 > playerX - 250);
+            var left = go.GetLeft();
+
+            return left + go.Width / 2 < playerX && left + go.Width / 2 > playerX - 250;
         }
 
         /// <summary>
@@ -722,7 +724,9 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool AnyObjectWithinPlayersRightRange(GameObject go)
         {
-            return (Canvas.GetLeft(go) + go.Width / 2 > playerX && Canvas.GetLeft(go) + go.Width / 2 <= playerX + 250);
+            var left = go.GetLeft();
+
+            return left + go.Width / 2 > playerX && left + go.Width / 2 <= playerX + 250;
         }
 
         /// <summary>
@@ -741,14 +745,14 @@ namespace AstroOdyssey
             {
                 if (playerX + playerWidthHalf < windowWidth)
                 {
-                    SetPlayerCanvasLeft(playerX + playerSpeed);
+                    SetPlayerLeft(playerX + playerSpeed);
                 }
             }
 
             // move left
             if (pointerX - playerWidthHalf < playerX - playerSpeed)
             {
-                SetPlayerCanvasLeft(playerX - playerSpeed);
+                SetPlayerLeft(playerX - playerSpeed);
             }
         }
 
@@ -936,7 +940,7 @@ namespace AstroOdyssey
             var newLaser = /*laserStack.Any() ? laserStack.Pop() :*/ new Laser();
 
             newLaser.SetAttributes(laserHeight, laserWidth);
-            newLaser.AddToGameEnvironment(top: Canvas.GetTop(player) - 20, left: Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
+            newLaser.AddToGameEnvironment(top: player.GetTop() - 20, left: player.GetLeft() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
         }
 
         #endregion
@@ -1064,9 +1068,9 @@ namespace AstroOdyssey
             if (element is Star star)
             {
                 // move star down
-                Canvas.SetTop(star, Canvas.GetTop(star) + starSpeed);
+                star.MoveY(starSpeed, 1);
 
-                if (Canvas.GetTop(star) > windowHeight)
+                if (star.GetTop() > windowHeight)
                 {
                     StarView.AddDestroyableGameObject(star);
                 }

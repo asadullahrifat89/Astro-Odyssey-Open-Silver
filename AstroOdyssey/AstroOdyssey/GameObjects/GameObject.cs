@@ -43,14 +43,24 @@ namespace AstroOdyssey
             return Canvas.GetTop(this);
         }
 
-        public void SetTopNew(double top, int modifier)
+        public double GetLeft()
         {
-            Canvas.SetTop(this, GetTop() + (top * modifier));
+            return Canvas.GetLeft(this);
+        }
+
+        public void MoveY(double top, int direction)
+        {
+            Canvas.SetTop(this, GetTop() + (top * direction));
         }
 
         public void SetTop(double top)
         {
             Canvas.SetTop(this, top);
+        }
+
+        public void SetLeft(double left)
+        {
+            Canvas.SetLeft(this, left);
         }
 
         public void SetPosition(double top, double left)
