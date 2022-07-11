@@ -35,7 +35,7 @@ namespace AstroOdyssey
         private int enemySpawnLimit;
         private double enemySpeed;
 
-        private int sideWaysEnemySpawnCounter;
+        private int enemySpawnCounter;
 
         private int meteorCounter;
         private int meteorSpawnLimit;
@@ -906,7 +906,7 @@ namespace AstroOdyssey
 
             newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: powerUpTriggered);
 
-            newLaser.AddToGameEnvironment(top: player.GetY() - 5, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
+            newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
         }
 
         #endregion
@@ -926,7 +926,7 @@ namespace AstroOdyssey
             {
                 GenerateEnemy();
 
-                sideWaysEnemySpawnCounter++;
+                enemySpawnCounter++;
 
                 enemyCounter = enemySpawnLimit;
             }
@@ -940,10 +940,10 @@ namespace AstroOdyssey
             var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
 
             // when not noob anymore enemy moves sideways
-            if ((int)difficulty > 0 && sideWaysEnemySpawnCounter >= 70)
+            if ((int)difficulty > 0 && enemySpawnCounter >= 100)
             {
                 newEnemy.XDirection = (XDirection)rand.Next(0, 3);
-                sideWaysEnemySpawnCounter = 0;
+                enemySpawnCounter = 0;
             }
 
             newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));

@@ -44,7 +44,7 @@ namespace AstroOdyssey
             Health = 100;
             HealthSlot = 10;
 
-            // create ship and exhaust
+            // combine power gauge, ship, and blaze
             content = new Grid();
             content.Children.Add(contentShipPowerGauge);
             content.Children.Add(contentShipBlaze);
