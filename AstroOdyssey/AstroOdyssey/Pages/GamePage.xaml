@@ -2,6 +2,7 @@
     x:Class="AstroOdyssey.GamePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:astroodyssey="clr-namespace:AstroOdyssey"
     xmlns:local="using:AstroOdyssey">
 
     <Grid x:Name="RootGrid">
@@ -17,11 +18,11 @@
             KeyUp="FocusBox_KeyUp" />
 
         <!--  This renders the stars  -->
-        <Canvas x:Name="StarCanvas" Background="Black" />
+        <astroodyssey:GameEnvironment x:Name="StarView" Background="Black" />
 
-        <!--  This redenders game objects  -->
-        <Canvas
-            x:Name="GameCanvas"
+        <!--  This redenders player, enemies, meteors, healths, and lasers  -->
+        <astroodyssey:GameEnvironment
+            x:Name="GameView"
             Background="Transparent"
             PointerPressed="GameCanvas_PointerPressed" />
 

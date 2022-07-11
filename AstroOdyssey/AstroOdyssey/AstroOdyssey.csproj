@@ -95,14 +95,15 @@
 		<Compile Include="Converters\BooleanToVisibilityConverter.cs" />
 		<Compile Include="Converters\DoubleToCornerRadiusConverter.cs" />
 		<Compile Include="Converters\TextToPlaceholderTextVisibilityConverter.cs" />
+		<Compile Include="GameObjects\GameEnvironment.cs" />
 		<Compile Include="MainPage.xaml.cs" />
-		<Compile Include="Models\Enemy.cs" />
-		<Compile Include="Models\GameObject.cs" />
-		<Compile Include="Models\Health.cs" />
-		<Compile Include="Models\Laser.cs" />
-		<Compile Include="Models\Meteor.cs" />
-		<Compile Include="Models\Player.cs" />
-		<Compile Include="Models\Star.cs" />
+		<Compile Include="GameObjects\Enemy.cs" />
+		<Compile Include="GameObjects\GameObject.cs" />
+		<Compile Include="GameObjects\Health.cs" />
+		<Compile Include="GameObjects\Laser.cs" />
+		<Compile Include="GameObjects\Meteor.cs" />
+		<Compile Include="GameObjects\Player.cs" />
+		<Compile Include="GameObjects\Star.cs" />
 		<Compile Include="Pages\GamePage.xaml.cs" />
 		<Compile Include="Pages\GameStartPage.xaml.cs" />
 		<Compile Include="Windows\MessageDialogueWindow.xaml.cs" />
@@ -164,10 +165,6 @@
 		<Content Include="Assets\Sounds\explosion-sfx-43814.mp3" />
 		<Content Include="Assets\Sounds\slow-trap-18565.mp3" />
 		<Content Include="Assets\Sounds\space-chillout-14194.mp3" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Assets\Icons\" />
 	</ItemGroup>
 
 </Project>

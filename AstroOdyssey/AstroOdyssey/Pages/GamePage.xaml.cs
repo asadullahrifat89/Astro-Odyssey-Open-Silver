@@ -79,12 +79,14 @@ namespace AstroOdyssey
 
         private readonly Random rand = new Random();
 
-        private readonly List<GameObject> destroyableGameCanvasObjects = new List<GameObject>();
-        private readonly List<GameObject> destroyableStarCanvasObjects = new List<GameObject>();
+        private readonly List<GameObject> destroyableGameObjects = new List<GameObject>();
+        private readonly List<GameObject> destroyableStarObjects = new List<GameObject>();
 
-        private readonly Stack<Enemy> enemyStack = new Stack<Enemy>();
-        private readonly Stack<Meteor> meteorStack = new Stack<Meteor>();
-        private readonly Stack<Health> healthStack = new Stack<Health>();
+        
+
+        private readonly Stack<GameObject> enemyStack = new Stack<GameObject>();
+        private readonly Stack<GameObject> meteorStack = new Stack<GameObject>();
+        private readonly Stack<GameObject> healthStack = new Stack<GameObject>();
 
         private bool moveLeft = false, moveRight = false;
 
@@ -164,7 +166,7 @@ namespace AstroOdyssey
             difficulty = Difficulty.Noob;
             showLevelUpLimit = 100;
 
-            GameCanvas.Children.Clear();
+            GameView.Children.Clear();
         }
 
         /// <summary>
@@ -424,6 +426,7 @@ namespace AstroOdyssey
         {
             windowWidth = Window.Current.Bounds.Width;
             windowHeight = Window.Current.Bounds.Height;
+
             pointerX = windowWidth / 2;
 
             SetCanvasSize();
@@ -434,11 +437,8 @@ namespace AstroOdyssey
         /// </summary>
         private void SetCanvasSize()
         {
-            GameCanvas.Height = windowHeight;
-            GameCanvas.Width = windowWidth;
-
-            StarCanvas.Height = windowHeight;
-            StarCanvas.Width = windowWidth;
+            GameView.SetSize(windowHeight, windowWidth);
+            StarView.SetSize(windowHeight, windowWidth);
         }
 
         #endregion
@@ -450,32 +450,30 @@ namespace AstroOdyssey
         /// </summary>
         private void UpdateFrame()
         {
-            var gameObjects = GameCanvas.Children.OfType<GameObject>().Where(x => x is not Player);
+            var gameObjects = GameView.Children.OfType<GameObject>().Where(x => x is not Player);
 
             foreach (var gameObject in gameObjects)
             {
-                UpdateLaserElement(gameObject);
-                UpdateDestroyableElement(gameObject);
-                UpdateHealthElement(gameObject);
+                UpdateGameObjects(gameObject);
             }
 
-            foreach (var destroyable in destroyableGameCanvasObjects)
+            foreach (var destroyable in destroyableGameObjects)
             {
-                GameCanvas.Children.Remove(destroyable);
+                GameView.Children.Remove(destroyable);
 
-                //if (destroyable is Laser laser)
-                //    laserStack.Push(laser);
                 if (destroyable is Enemy enemy)
                     enemyStack.Push(enemy);
+
                 if (destroyable is Meteor meteor)
                     meteorStack.Push(meteor);
+
                 if (destroyable is Health health)
                     healthStack.Push(health);
 
                 // TODO: add storyboard animation for destruction
             }
 
-            destroyableGameCanvasObjects.Clear();
+            destroyableGameObjects.Clear();
         }
 
         /// <summary>
@@ -489,18 +487,30 @@ namespace AstroOdyssey
             {
                 FPSText.Text = "FPS: " + fpsCount;
                 FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
-                ObjectsCountText.Text = "Objects count: " + GameCanvas.Children.Count();
+                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
 
                 frameStatUpdateCounter = frameStatUpdateLimit;
             }
         }
 
         /// <summary>
-        /// Update a destroyable element. Finds intersecting lasers and performs destruction.
+        /// Updates game objects. Finds intersecting objects performs game logic.
         /// </summary>
         /// <param name="element"></param>
-        private void UpdateDestroyableElement(GameObject element)
+        private void UpdateGameObjects(GameObject element)
         {
+            if (element is Laser laserElement)
+            {
+                // move laser up
+                Canvas.SetTop(laserElement, Canvas.GetTop(laserElement) - laserSpeed);
+
+                // remove laser if outside game canvas
+                if (Canvas.GetTop(laserElement) < 10)
+                {
+                    destroyableGameObjects.Add(laserElement);
+                }
+            }
+
             if (element.IsDestroyable)
             {
                 if (element is Enemy enemyElement)
@@ -519,7 +529,7 @@ namespace AstroOdyssey
 
                 if (IntersectsWith(playerBounds, elementBounds))
                 {
-                    destroyableGameCanvasObjects.Add(element);
+                    destroyableGameObjects.Add(element);
 
                     PlayerHealthLoss();
                 }
@@ -527,17 +537,17 @@ namespace AstroOdyssey
                 {
                     if (Canvas.GetTop(element) > windowHeight)
                     {
-                        destroyableGameCanvasObjects.Add(element);
+                        destroyableGameObjects.Add(element);
                     }
                     else
                     {
-                        var lasers = GameCanvas.Children.OfType<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
+                        var lasers = GameView.Children.OfType<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
 
                         if (lasers is not null && lasers.Any())
                         {
                             foreach (var laser in lasers)
                             {
-                                destroyableGameCanvasObjects.Add(laser);
+                                destroyableGameObjects.Add(laser);
 
                                 element.LooseHealth();
 
@@ -550,7 +560,7 @@ namespace AstroOdyssey
 
                                     if (meteor.HasNoHealth)
                                     {
-                                        destroyableGameCanvasObjects.Add(meteor);
+                                        destroyableGameObjects.Add(meteor);
 
                                         PlayerScoreByMeteorDestruction();
 
@@ -567,7 +577,7 @@ namespace AstroOdyssey
 
                                     if (enemy.HasNoHealth)
                                     {
-                                        destroyableGameCanvasObjects.Add(enemy);
+                                        destroyableGameObjects.Add(enemy);
 
                                         PlayerScoreByEnemyDestruction();
 
@@ -576,6 +586,28 @@ namespace AstroOdyssey
                                 }
                             }
                         }
+                    }
+                }
+            }
+
+            if (element is Health health)
+            {
+                // move Health down
+                Canvas.SetTop(health, Canvas.GetTop(health) + healthSpeed);
+
+                Rect healthHitBox = health.GetRect();
+
+                if (IntersectsWith(playerBounds, healthHitBox))
+                {
+                    destroyableGameObjects.Add(health);
+
+                    PlayerHealthGain(health);
+                }
+                else
+                {
+                    if (Canvas.GetTop(health) > windowHeight)
+                    {
+                        destroyableGameObjects.Add(health);
                     }
                 }
             }
@@ -653,7 +685,7 @@ namespace AstroOdyssey
             Canvas.SetLeft(player, pointerX);
             SetPlayerCanvasTop();
 
-            GameCanvas.Children.Add(player);
+            GameView.Children.Add(player);
         }
 
         /// <summary>
@@ -837,42 +869,13 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateHealth()
         {
-            var newHealth = healthStack.Any() ? healthStack.Pop() : new Health();
+            var newHealth = healthStack.Any() ? healthStack.Pop() as Health : new Health();
 
             newHealth.SetAttributes();
 
             Canvas.SetTop(newHealth, -100);
             Canvas.SetLeft(newHealth, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newHealth);
-        }
-
-        /// <summary>
-        /// Update the health element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateHealthElement(GameObject element)
-        {
-            if (element is Health health)
-            {
-                // move Health down
-                Canvas.SetTop(health, Canvas.GetTop(health) + healthSpeed);
-
-                Rect healthHitBox = health.GetRect();
-
-                if (IntersectsWith(playerBounds, healthHitBox))
-                {
-                    destroyableGameCanvasObjects.Add(health);
-
-                    PlayerHealthGain(health);
-                }
-                else
-                {
-                    if (Canvas.GetTop(health) > windowHeight)
-                    {
-                        destroyableGameCanvasObjects.Add(health);
-                    }
-                }
-            }
+            GameView.Children.Add(newHealth);
         }
 
         #endregion
@@ -887,7 +890,7 @@ namespace AstroOdyssey
             while (gameIsRunning)
             {
                 // any object falls within player range
-                if (GameCanvas.Children.OfType<GameObject>().Where(x => x.IsDestroyable).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
+                if (GameView.Children.OfType<GameObject>().Where(x => x.IsDestroyable).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
                 {
                     SpawnLaser();
                     PlayLaserSound();
@@ -951,26 +954,7 @@ namespace AstroOdyssey
             Canvas.SetLeft(newLaser, Canvas.GetLeft(player) + player.Width / 2 - newLaser.Width / 2);
             Canvas.SetTop(newLaser, Canvas.GetTop(player) - 20);
 
-            GameCanvas.Children.Add(newLaser);
-        }
-
-        /// <summary>
-        /// Update the laser element as per frame.
-        /// </summary>
-        /// <param name="element"></param>
-        private void UpdateLaserElement(GameObject element)
-        {
-            if (element is Laser laser)
-            {
-                // move laser up
-                Canvas.SetTop(laser, Canvas.GetTop(laser) - laserSpeed);
-
-                // remove laser if outside game canvas
-                if (Canvas.GetTop(laser) < 10)
-                {
-                    destroyableGameCanvasObjects.Add(laser);
-                }
-            }
+            GameView.Children.Add(newLaser);
         }
 
         #endregion
@@ -998,13 +982,13 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateEnemy()
         {
-            var newEnemy = enemyStack.Any() ? enemyStack.Pop() : new Enemy();
+            var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
 
             newEnemy.SetAttributes();
 
             Canvas.SetTop(newEnemy, -100);
             Canvas.SetLeft(newEnemy, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newEnemy);
+            GameView.Children.Add(newEnemy);
         }
 
         #endregion
@@ -1032,13 +1016,13 @@ namespace AstroOdyssey
         /// </summary>
         private void GenerateMeteor()
         {
-            var newMeteor = meteorStack.Any() ? meteorStack.Pop() : new Meteor();
+            var newMeteor = meteorStack.Any() ? meteorStack.Pop() as Meteor : new Meteor();
 
             newMeteor.SetAttributes();
 
             Canvas.SetTop(newMeteor, -100);
             Canvas.SetLeft(newMeteor, rand.Next(10, (int)windowWidth - 100));
-            GameCanvas.Children.Add(newMeteor);
+            GameView.Children.Add(newMeteor);
         }
 
         #endregion
@@ -1072,7 +1056,7 @@ namespace AstroOdyssey
 
             Canvas.SetTop(newStar, -100);
             Canvas.SetLeft(newStar, rand.Next(10, (int)windowWidth - 10));
-            StarCanvas.Children.Add(newStar);
+            StarView.Children.Add(newStar);
         }
 
         /// <summary>
@@ -1080,22 +1064,22 @@ namespace AstroOdyssey
         /// </summary>
         private void UpdateStars()
         {
-            var starObjects = StarCanvas.Children.OfType<GameObject>();
+            var starObjects = StarView.Children.OfType<GameObject>();
 
             foreach (var star in starObjects)
             {
                 UpdateStarElement(star);
             }
 
-            foreach (var destroyable in destroyableStarCanvasObjects)
+            foreach (var destroyable in destroyableStarObjects)
             {
                 //if (destroyable is Star star)
                 //    starStack.Push(star);
 
-                StarCanvas.Children.Remove(destroyable);
+                StarView.Children.Remove(destroyable);
             }
 
-            destroyableStarCanvasObjects.Clear();
+            destroyableStarObjects.Clear();
         }
 
         /// <summary>
@@ -1111,7 +1095,7 @@ namespace AstroOdyssey
 
                 if (Canvas.GetTop(star) > windowHeight)
                 {
-                    destroyableStarCanvasObjects.Add(star);
+                    destroyableStarObjects.Add(star);
                 }
             }
         }
@@ -1122,7 +1106,7 @@ namespace AstroOdyssey
 
         private void GameCanvas_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            var currentPoint = e.GetCurrentPoint(GameCanvas);
+            var currentPoint = e.GetCurrentPoint(GameView);
 
             pointerX = currentPoint.Position.X;
         }
