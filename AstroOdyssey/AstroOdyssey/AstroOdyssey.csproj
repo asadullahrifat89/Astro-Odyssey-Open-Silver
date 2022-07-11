@@ -95,10 +95,10 @@
 		<Compile Include="Converters\BooleanToVisibilityConverter.cs" />
 		<Compile Include="Converters\DoubleToCornerRadiusConverter.cs" />
 		<Compile Include="Converters\TextToPlaceholderTextVisibilityConverter.cs" />
-		<Compile Include="GameObjects\GameEnvironment.cs" />
+		<Compile Include="Internals\GameEnvironment.cs" />
 		<Compile Include="MainPage.xaml.cs" />
 		<Compile Include="GameObjects\Enemy.cs" />
-		<Compile Include="GameObjects\GameObject.cs" />
+		<Compile Include="Internals\GameObject.cs" />
 		<Compile Include="GameObjects\Health.cs" />
 		<Compile Include="GameObjects\Laser.cs" />
 		<Compile Include="GameObjects\Meteor.cs" />
