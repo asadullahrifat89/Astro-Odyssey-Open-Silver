@@ -102,16 +102,13 @@ namespace AstroOdyssey
         #endregion
 
         #region Ctor
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+                
         public GamePage()
         {
             InitializeComponent();
 
-            Loaded += Window_SizeChanged_Demo_Loaded;
-            Unloaded += Window_SizeChanged_Demo_Unloaded;
+            Loaded += GamePage_Loaded;
+            Unloaded += GamePage_Unloaded;
 
             SetWindowSize();
         }
@@ -1232,7 +1229,7 @@ namespace AstroOdyssey
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Window_SizeChanged_Demo_Loaded(object sender, RoutedEventArgs e)
+        void GamePage_Loaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged += Current_SizeChanged;
             baseUrl = App.GetBaseUrl();
@@ -1244,7 +1241,7 @@ namespace AstroOdyssey
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Window_SizeChanged_Demo_Unloaded(object sender, RoutedEventArgs e)
+        void GamePage_Unloaded(object sender, RoutedEventArgs e)
         {
             Window.Current.SizeChanged -= Current_SizeChanged;
             StopGame();
