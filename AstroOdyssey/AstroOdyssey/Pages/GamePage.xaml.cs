@@ -471,7 +471,10 @@ namespace AstroOdyssey
 
                 // move meteor down
                 if (gameObject is Meteor meteorElement)
+                {
+                    meteorElement.Rotate();
                     meteorElement.MoveY();
+                }
 
                 Rect elementBounds = gameObject.GetRect();
 

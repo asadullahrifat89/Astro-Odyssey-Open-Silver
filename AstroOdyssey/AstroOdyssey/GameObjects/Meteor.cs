@@ -9,6 +9,14 @@ namespace AstroOdyssey
     {
         private Image content = new Image() { Stretch = Stretch.Uniform };
 
+        private double rotation = 0;
+
+        private RotateTransform rotateTransform = new RotateTransform()
+        {
+            CenterX = 0.5,
+            CenterY = 0.5,
+        };
+
         public Meteor()
         {
             Tag = "meteor";
@@ -18,11 +26,24 @@ namespace AstroOdyssey
             IsDestroyable = true;
             Child = content;
             YDirection = YDirection.DOWN;
+
+            RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);
+
+            rotateTransform.Angle = rotation;
+
+            RenderTransform = rotateTransform;
+        }
+
+        public void Rotate()
+        {
+            rotateTransform.Angle += rotation;
         }
 
         public void SetAttributes(double speed)
         {
             Speed = speed;
+
+            rotation = new Random().NextDouble();
 
             Uri uri = null;
 
