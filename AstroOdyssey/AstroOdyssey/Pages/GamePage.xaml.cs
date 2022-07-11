@@ -75,6 +75,7 @@ namespace AstroOdyssey
         private object playerHealthGainAudio = null;
         private object levelUpAudio = null;
         private object powerUpAudio = null;
+        private object powerDownAudio = null;
 
         private Player player;
         private Rect playerBounds;
@@ -150,7 +151,7 @@ namespace AstroOdyssey
 
             HideInGameText();
 
-            StopPowerUp();
+            UnsetPowerUp();
 
             ScaleDifficulty();
 
@@ -458,10 +459,13 @@ namespace AstroOdyssey
                     {
                         foreach (var laser in lasers)
                         {
-                            if (!powerUpTriggered)
-                                GameView.AddDestroyableGameObject(laser);
+                            GameView.AddDestroyableGameObject(laser);
 
-                            gameObject.LooseHealth();
+                            // if power up is triggered then execute one shot kill
+                            if (powerUpTriggered)
+                                gameObject.LooseHealth(gameObject.Health);
+                            else
+                                gameObject.LooseHealth();
 
                             if (gameObject is Meteor meteor)
                             {
@@ -987,7 +991,7 @@ namespace AstroOdyssey
         {
             var newLaser = /*laserStack.Count() > 10 ? laserStack.Pop() as Laser :*/ new Laser();
 
-            newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth);
+            newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: powerUpTriggered);
 
             newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
         }
@@ -1155,12 +1159,13 @@ namespace AstroOdyssey
             powerUpTriggerCounter = powerUpTriggerLimit;
             ShowInGameText("POWER UP!");
             PlayPowerUpSound();
+            player.SetPowerUp();
         }
 
         /// <summary>
-        /// Stops the powered up state after keeping it active for 1000 frames.
+        /// Unsets the power up trigger after keeping it active for 500 frames.
         /// </summary>
-        private void StopPowerUp()
+        private void UnsetPowerUp()
         {
             if (powerUpTriggered)
             {
@@ -1169,6 +1174,8 @@ namespace AstroOdyssey
                 if (powerUpTriggerCounter <= 0)
                 {
                     powerUpTriggered = false;
+                    PlayPowerDownSound();
+                    player.SetPowerDown();
                 }
             }
         }
@@ -1538,6 +1545,9 @@ namespace AstroOdyssey
             PlayAudio(levelUpAudio);
         }
 
+        /// <summary>
+        /// Plays the power up audio.
+        /// </summary>
         private void PlayPowerUpSound()
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/spellcast-46164.mp3";
@@ -1553,6 +1563,26 @@ namespace AstroOdyssey
             }
 
             PlayAudio(powerUpAudio);
+        }
+
+        /// <summary>
+        /// Plays the power down audio.
+        /// </summary>
+        private void PlayPowerDownSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/power-down-7103.mp3";
+
+            if (powerDownAudio is null)
+            {
+                powerDownAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {                 
+                    var powerDownAudio = new Audio($0);
+                    powerDownAudio.volume = 1.0;
+                   return powerDownAudio;
+                }())", host);
+            }
+
+            PlayAudio(powerDownAudio);
         }
 
         /// <summary>

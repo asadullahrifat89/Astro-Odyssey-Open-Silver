@@ -39,6 +39,11 @@ namespace AstroOdyssey
             Health -= HealthSlot;
         }
 
+        public void LooseHealth(int health)
+        {
+            Health -= health;
+        }
+
         public Rect GetRect()
         {
             return new Rect(Canvas.GetLeft(this), Canvas.GetTop(this), Width, Height);

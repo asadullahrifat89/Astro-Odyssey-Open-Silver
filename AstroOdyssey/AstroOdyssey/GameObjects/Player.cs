@@ -12,7 +12,7 @@ namespace AstroOdyssey
 
         private Image contentShip = new Image() { Stretch = Stretch.Uniform };
 
-        private Image contentTrail = new Image() { Stretch = Stretch.Uniform };
+        private Image contentShipBlaze = new Image() { Stretch = Stretch.Uniform };
 
         public Player()
         {
@@ -25,7 +25,7 @@ namespace AstroOdyssey
 
             // create ship and exhaust
             content = new Grid();
-            content.Children.Add(contentTrail);
+            content.Children.Add(contentShipBlaze);
             content.Children.Add(contentShip);
 
             Child = content;
@@ -34,7 +34,7 @@ namespace AstroOdyssey
         }
 
         public void SetAttributes()
-        {            
+        {
             Uri shipUri = null;
             var playerShipType = new Random().Next(1, 13);
 
@@ -92,14 +92,26 @@ namespace AstroOdyssey
                     break;
             }
 
-            var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
-
             contentShip.Source = new BitmapImage(shipUri);
 
-            contentTrail.Source = new BitmapImage(exhaustUri);
-            contentTrail.Height = exhaustHeight;
-            contentTrail.Width = contentShip.Width;
-            contentTrail.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
+            var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);          
+
+            contentShipBlaze.Source = new BitmapImage(exhaustUri);
+            contentShipBlaze.Height = exhaustHeight;
+            contentShipBlaze.Width = contentShip.Width;
+            contentShipBlaze.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
+        }
+
+        public void SetPowerUp()
+        {
+            var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_yellow.png", UriKind.RelativeOrAbsolute);
+            contentShipBlaze.Source = new BitmapImage(exhaustUri);
+        }
+
+        public void SetPowerDown()
+        {
+            var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
+            contentShipBlaze.Source = new BitmapImage(exhaustUri);
         }
     }
 }
