@@ -153,7 +153,7 @@ namespace AstroOdyssey
 
             HideInGameText();
 
-            UnsetPowerUp();
+            TriggerPowerDown();
 
             PlayerOpacity();
 
@@ -625,7 +625,7 @@ namespace AstroOdyssey
             {
                 ShowLevelUp();
                 ScaleDifficulty();
-            }                
+            }
         }
 
         /// <summary>
@@ -634,110 +634,33 @@ namespace AstroOdyssey
         private void ScaleDifficulty()
         {
             switch (difficulty)
-            {                
+            {
+                case Difficulty.Noob:
+                    {
+                        // Do nothing.
+                    }
+                    break;
                 case Difficulty.StartUp:
                     {
                         meteorSpawnLimit -= 5;
                         laserTime -= 5;
                     }
                     break;
-                case Difficulty.Easy:
-                    {
-                        enemySpawnLimit -= 5;
-                        enemySpeed += 2;
-
-                        meteorSpawnLimit -= 5;
-                        meteorSpeed += 2;
-
-                        laserTime -= 5;
-
-                        healthSpeed += 2;
-                        powerUpSpeed += 2;
-
-                        starSpeed += 0.1d;
-                    }
-                    break;
-                case Difficulty.Medium:
-                    {
-                        enemySpawnLimit -= 5;
-                        enemySpeed += 2;
-
-                        meteorSpawnLimit -= 5;
-                        meteorSpeed += 2;
-
-                        laserTime -= 5;
-
-                        healthSpeed += 2;
-                        powerUpSpeed += 2;
-
-                        starSpeed += 0.1d;
-                    }
-                    break;
-                case Difficulty.Hard:
-                    {
-                        enemySpawnLimit -= 5;
-                        enemySpeed += 2;
-
-                        meteorSpawnLimit -= 5;
-                        meteorSpeed += 2;
-
-                        laserTime -= 5;
-
-                        healthSpeed += 2;
-                        powerUpSpeed += 2;
-
-                        starSpeed += 0.1d;
-                    }
-                    break;
-                case Difficulty.VeryHard:
-                    {
-                        enemySpawnLimit -= 5;
-                        enemySpeed += 2;
-
-                        meteorSpawnLimit -= 5;
-                        meteorSpeed += 2;
-
-                        laserTime -= 5;
-
-                        healthSpeed += 2;
-                        powerUpSpeed += 2;
-
-                        starSpeed += 0.1d;
-                    }
-                    break;
-                case Difficulty.Extreme:
-                    {
-                        enemySpawnLimit -= 5;
-                        enemySpeed += 2;
-
-                        meteorSpawnLimit -= 5;
-                        meteorSpeed += 2;
-
-                        laserTime -= 5;
-
-                        healthSpeed += 2;
-                        powerUpSpeed += 2;
-
-                        starSpeed += 0.1d;
-                    }
-                    break;
-                case Difficulty.Pro:
-                    {
-                        enemySpawnLimit -= 5;
-                        enemySpeed += 2;
-
-                        meteorSpawnLimit -= 5;
-                        meteorSpeed += 2;
-
-                        laserTime -= 5;
-
-                        healthSpeed += 2;
-                        powerUpSpeed += 2;
-
-                        starSpeed += 0.1d;
-                    }
-                    break;
                 default:
+                    {
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
+
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
+
+                        laserTime -= 5;
+
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
+
+                        starSpeed += 0.1d;
+                    }
                     break;
             }
         }
@@ -1160,15 +1083,17 @@ namespace AstroOdyssey
         {
             powerUpTriggered = true;
             powerUpTriggerCounter = powerUpTriggerLimit;
+
+            laserTime -= 10;
             ShowInGameText("POWER UP!");
             PlayPowerUpSound();
             player.SetPowerUp();
         }
 
         /// <summary>
-        /// Unsets the power up trigger after keeping it active for 500 frames.
+        /// Triggers the powered up state down.
         /// </summary>
-        private void UnsetPowerUp()
+        private void TriggerPowerDown()
         {
             if (powerUpTriggered)
             {
@@ -1177,6 +1102,7 @@ namespace AstroOdyssey
                 if (powerUpTriggerCounter <= 0)
                 {
                     powerUpTriggered = false;
+                    laserTime += 10;
                     PlayPowerDownSound();
                     player.SetPowerDown();
                 }
