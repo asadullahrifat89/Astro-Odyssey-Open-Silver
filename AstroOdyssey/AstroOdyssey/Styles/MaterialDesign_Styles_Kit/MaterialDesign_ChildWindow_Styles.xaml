@@ -69,6 +69,7 @@
                                                 <ColumnDefinition Width="30" />
                                             </Grid.ColumnDefinitions>
                                             <ContentControl
+                                                Grid.ColumnSpan="2"
                                                 Margin="6,0,6,0"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
