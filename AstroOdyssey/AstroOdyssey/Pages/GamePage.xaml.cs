@@ -445,7 +445,7 @@ namespace AstroOdyssey
         /// </summary>
         private void UpdateFrame()
         {
-            var gameObjects = GameView.Children.OfType<GameObject>().Where(x => x is not Player);
+            var gameObjects = GameView.GetGameObjects<GameObject>().Where(x => x is not Player);
 
             foreach (var gameObject in gameObjects)
             {
@@ -536,7 +536,7 @@ namespace AstroOdyssey
                     }
                     else
                     {
-                        var lasers = GameView.Children.OfType<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
+                        var lasers = GameView.GetGameObjects<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
 
                         if (lasers is not null && lasers.Any())
                         {
@@ -880,7 +880,7 @@ namespace AstroOdyssey
             while (gameIsRunning)
             {
                 // any object falls within player range
-                if (GameView.Children.OfType<GameObject>().Where(x => x.IsDestroyable).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
+                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestroyable).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
                 {
                     SpawnLaser();
                     PlayLaserSound();
@@ -1041,7 +1041,7 @@ namespace AstroOdyssey
         /// </summary>
         private void UpdateStars()
         {
-            var starObjects = StarView.Children.OfType<GameObject>();
+            var starObjects = StarView.GetGameObjects<GameObject>();
 
             foreach (var star in starObjects)
             {

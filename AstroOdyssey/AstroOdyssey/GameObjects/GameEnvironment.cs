@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Windows.UI.Xaml.Controls;
 
 namespace AstroOdyssey
@@ -16,6 +17,11 @@ namespace AstroOdyssey
         {
             Height = height;
             Width = width;
+        }
+
+        public IEnumerable<T> GetGameObjects<T>()
+        {
+            return Children.OfType<T>();
         }
 
         public List<GameObject> GetDestroyableGameObjects()
