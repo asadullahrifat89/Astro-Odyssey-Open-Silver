@@ -35,7 +35,7 @@ namespace AstroOdyssey
         private int enemySpawnLimit;
         private double enemySpeed;
 
-        private int sideWaysEnemyLimit;
+        private int sideWaysEnemySpawnCounter;
 
         private int meteorCounter;
         private int meteorSpawnLimit;
@@ -85,7 +85,7 @@ namespace AstroOdyssey
         private int playerDamagedOpacityCount;
         private int playerDamagedOpacityLimit;
 
-        private Difficulty difficulty = Difficulty.StartUp;
+        private Difficulty difficulty;
         private int showInGameTextCount;
         private int showInGameTextLimit;
 
@@ -149,13 +149,11 @@ namespace AstroOdyssey
 
             UpdateStarView();
 
-            SetDifficulty();
+            ShiftDifficulty();
 
             HideInGameText();
 
             UnsetPowerUp();
-
-            ScaleDifficulty();
 
             PlayerOpacity();
 
@@ -466,8 +464,8 @@ namespace AstroOdyssey
                         {
                             GameView.AddDestroyableGameObject(laser);
 
-                            // if power up is triggered then execute one shot kill
-                            if (powerUpTriggered)
+                            // if laser is powered up then execute one shot kill
+                            if (laser.IsPoweredUp)
                                 gameObject.LooseHealth(gameObject.Health);
                             else
                                 gameObject.LooseHealth();
@@ -599,9 +597,9 @@ namespace AstroOdyssey
         #region Difficulty Methods
 
         /// <summary>
-        /// Sets the difficulty of the game according to score; 
+        /// Shifts the difficulty of the game according to score; 
         /// </summary>
-        private void SetDifficulty()
+        private void ShiftDifficulty()
         {
             var currentDifficulty = difficulty;
 
@@ -624,7 +622,10 @@ namespace AstroOdyssey
 
             // when difficulty changes show level up
             if (currentDifficulty != difficulty)
+            {
                 ShowLevelUp();
+                ScaleDifficulty();
+            }                
         }
 
         /// <summary>
@@ -633,121 +634,107 @@ namespace AstroOdyssey
         private void ScaleDifficulty()
         {
             switch (difficulty)
-            {
-                case Difficulty.Noob:
-                    {
-                        enemySpawnLimit = 45;
-                        enemySpeed = 5;
-
-                        laserTime = 235;
-
-                        starSpeed = 0.1d;
-                    }
-                    break;
+            {                
                 case Difficulty.StartUp:
                     {
-                        enemySpawnLimit = 45;
-                        enemySpeed = 5;
-
-                        laserTime = 230;
-
-                        starSpeed = 0.1d;
+                        meteorSpawnLimit -= 5;
+                        laserTime -= 5;
                     }
                     break;
                 case Difficulty.Easy:
                     {
-                        enemySpawnLimit = 40;
-                        enemySpeed = 7;
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
 
-                        meteorSpawnLimit = 40;
-                        meteorSpeed = 4;
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
 
-                        laserTime = 225;
+                        laserTime -= 5;
 
-                        healthSpeed = 5;
-                        powerUpSpeed = 5;
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
 
-                        starSpeed = 0.2d;
+                        starSpeed += 0.1d;
                     }
                     break;
                 case Difficulty.Medium:
                     {
-                        enemySpawnLimit = 35;
-                        enemySpeed = 9;
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
 
-                        meteorSpawnLimit = 35;
-                        meteorSpeed = 6;
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
 
-                        laserTime = 220;
+                        laserTime -= 5;
 
-                        healthSpeed = 8;
-                        powerUpSpeed = 8;
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
 
-                        starSpeed = 0.3d;
+                        starSpeed += 0.1d;
                     }
                     break;
                 case Difficulty.Hard:
                     {
-                        enemySpawnLimit = 30;
-                        enemySpeed = 11;
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
 
-                        meteorSpawnLimit = 30;
-                        meteorSpeed = 8;
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
 
-                        laserTime = 215;
+                        laserTime -= 5;
 
-                        healthSpeed = 10;
-                        powerUpSpeed = 10;
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
 
-                        starSpeed = 0.4d;
+                        starSpeed += 0.1d;
                     }
                     break;
                 case Difficulty.VeryHard:
                     {
-                        enemySpawnLimit = 25;
-                        enemySpeed = 13;
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
 
-                        meteorSpawnLimit = 25;
-                        meteorSpeed = 10;
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
 
-                        laserTime = 210;
+                        laserTime -= 5;
 
-                        healthSpeed = 12;
-                        powerUpSpeed = 12;
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
 
-                        starSpeed = 0.5d;
+                        starSpeed += 0.1d;
                     }
                     break;
                 case Difficulty.Extreme:
                     {
-                        enemySpawnLimit = 20;
-                        enemySpeed = 15;
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
 
-                        meteorSpawnLimit = 20;
-                        meteorSpeed = 12;
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
 
-                        laserTime = 205;
+                        laserTime -= 5;
 
-                        healthSpeed = 14;
-                        powerUpSpeed = 14;
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
 
-                        starSpeed = 0.6d;
+                        starSpeed += 0.1d;
                     }
                     break;
                 case Difficulty.Pro:
                     {
-                        enemySpawnLimit = 15;
-                        enemySpeed = 17;
+                        enemySpawnLimit -= 5;
+                        enemySpeed += 2;
 
-                        meteorSpawnLimit = 15;
-                        meteorSpeed = 14;
+                        meteorSpawnLimit -= 5;
+                        meteorSpeed += 2;
 
-                        laserTime = 200;
+                        laserTime -= 5;
 
-                        healthSpeed = 16;
-                        powerUpSpeed = 16;
+                        healthSpeed += 2;
+                        powerUpSpeed += 2;
 
-                        starSpeed = 0.7d;
+                        starSpeed += 0.1d;
                     }
                     break;
                 default:
@@ -765,7 +752,8 @@ namespace AstroOdyssey
         private void SpawnPlayer()
         {
             player = new Player();
-            player.AddToGameEnvironment(windowHeight - player.Height - 20, pointerX, GameView);
+            player.SetAttributes(playerSpeed);
+            player.AddToGameEnvironment(top: windowHeight - player.Height - 20, left: pointerX, gameEnvironment: GameView);
         }
 
         /// <summary>
@@ -826,24 +814,24 @@ namespace AstroOdyssey
         private void MovePlayer()
         {
             if (moveLeft && playerX > 0)
-                pointerX -= playerSpeed;
+                pointerX -= player.Speed;
 
             if (moveRight && playerX + player.Width < windowWidth)
-                pointerX += playerSpeed;
+                pointerX += player.Speed;
 
             // move right
-            if (pointerX - playerWidthHalf > playerX + playerSpeed)
+            if (pointerX - playerWidthHalf > playerX + player.Speed)
             {
                 if (playerX + playerWidthHalf < windowWidth)
                 {
-                    SetPlayerX(playerX + playerSpeed);
+                    SetPlayerX(playerX + player.Speed);
                 }
             }
 
             // move left
-            if (pointerX - playerWidthHalf < playerX - playerSpeed)
+            if (pointerX - playerWidthHalf < playerX - player.Speed)
             {
-                SetPlayerX(playerX - playerSpeed);
+                SetPlayerX(playerX - player.Speed);
             }
         }
 
@@ -998,7 +986,7 @@ namespace AstroOdyssey
 
             newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: powerUpTriggered);
 
-            newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
+            newLaser.AddToGameEnvironment(top: player.GetY() - 5, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
         }
 
         #endregion
@@ -1018,7 +1006,7 @@ namespace AstroOdyssey
             {
                 GenerateEnemy();
 
-                sideWaysEnemyLimit++;
+                sideWaysEnemySpawnCounter++;
 
                 enemyCounter = enemySpawnLimit;
             }
@@ -1031,15 +1019,15 @@ namespace AstroOdyssey
         {
             var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
 
-            // when difficulty is above medium every 5th enemy moves sideways
-            if ((int)difficulty > 3 && sideWaysEnemyLimit >= 5)
+            // when not noob anymore enemy moves sideways
+            if ((int)difficulty > 0 && sideWaysEnemySpawnCounter >= 70)
             {
                 newEnemy.XDirection = (XDirection)rand.Next(0, 3);
-                sideWaysEnemyLimit = 0;
+                sideWaysEnemySpawnCounter = 0;
             }
 
             newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));
-            newEnemy.AddToGameEnvironment(-100, rand.Next(10, (int)windowWidth - 100), GameView);
+            newEnemy.AddToGameEnvironment(top: 0 - newEnemy.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         /// <summary>
@@ -1083,7 +1071,7 @@ namespace AstroOdyssey
             var newMeteor = meteorStack.Any() ? meteorStack.Pop() as Meteor : new Meteor();
 
             newMeteor.SetAttributes(meteorSpeed + rand.NextDouble());
-            newMeteor.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newMeteor.AddToGameEnvironment(top: 0 - newMeteor.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         /// <summary>
@@ -1130,7 +1118,7 @@ namespace AstroOdyssey
             var newHealth = healthStack.Any() ? healthStack.Pop() as Health : new Health();
 
             newHealth.SetAttributes(healthSpeed + rand.NextDouble());
-            newHealth.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newHealth.AddToGameEnvironment(top: 0 - newHealth.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         #endregion
@@ -1162,7 +1150,7 @@ namespace AstroOdyssey
             var newPowerUp = powerUpStack.Any() ? powerUpStack.Pop() as PowerUp : new PowerUp();
 
             newPowerUp.SetAttributes(powerUpSpeed + rand.NextDouble());
-            newPowerUp.AddToGameEnvironment(top: -100, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newPowerUp.AddToGameEnvironment(top: 0 - newPowerUp.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         /// <summary>

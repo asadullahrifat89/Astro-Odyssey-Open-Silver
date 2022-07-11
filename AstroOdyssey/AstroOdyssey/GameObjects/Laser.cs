@@ -17,13 +17,16 @@ namespace AstroOdyssey
             YDirection = YDirection.UP;
         }
 
+        public bool IsPoweredUp { get; set; }
+
         public void SetAttributes(double speed, double height = 20, double width = 5, bool isPoweredUp = false)
         {
             Speed = speed;
             Height = height;
             Width = width;
+            IsPoweredUp = isPoweredUp;
 
-            if (isPoweredUp)
+            if (IsPoweredUp)
                 Background = new SolidColorBrush(Colors.Goldenrod);
             else
                 Background = new SolidColorBrush(Colors.White);

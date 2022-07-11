@@ -28,13 +28,13 @@ namespace AstroOdyssey
             content.Children.Add(contentShipBlaze);
             content.Children.Add(contentShip);
 
-            Child = content;
-
-            SetAttributes();
+            Child = content;            
         }
 
-        public void SetAttributes()
+        public void SetAttributes(double speed)
         {
+            Speed = speed;
+
             Uri shipUri = null;
             var playerShipType = new Random().Next(1, 13);
 
@@ -106,12 +106,14 @@ namespace AstroOdyssey
         {
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_yellow.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
+            Speed += 5;
         }
 
         public void SetPowerDown()
         {
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
+            Speed -= 5;
         }
     }
 }
