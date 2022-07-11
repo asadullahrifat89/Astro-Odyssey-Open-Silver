@@ -102,7 +102,7 @@ namespace AstroOdyssey
         #endregion
 
         #region Ctor
-                
+
         public GamePage()
         {
             InitializeComponent();
@@ -1084,7 +1084,7 @@ namespace AstroOdyssey
             laserTime -= 50;
             ShowInGameText("POWER UP!");
             PlayPowerUpSound();
-            player.SetPowerUp();
+            player.TriggerPowerUp();
         }
 
         /// <summary>
@@ -1096,12 +1096,16 @@ namespace AstroOdyssey
             {
                 powerUpTriggerCounter -= 1;
 
+                var powerGauge = (double)(powerUpTriggerCounter / 100) + 1;
+
+                player.SetPowerGauge(powerGauge);
+
                 if (powerUpTriggerCounter <= 0)
                 {
                     powerUpTriggered = false;
                     laserTime += 50;
                     PlayPowerDownSound();
-                    player.SetPowerDown();
+                    player.TriggerPowerDown();
                 }
             }
         }

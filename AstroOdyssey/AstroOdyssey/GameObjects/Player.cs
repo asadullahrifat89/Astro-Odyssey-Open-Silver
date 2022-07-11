@@ -14,12 +14,27 @@ namespace AstroOdyssey
 
         private Image contentShip = new Image() { Stretch = Stretch.Uniform };
 
-        private Image contentShipBlaze = new Image() { Stretch = Stretch.Uniform };
+        private Image contentShipBlaze = new Image()
+        {
+            Stretch = Stretch.Uniform,
+            Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0)
+        };
+
+        private Border contentShipPowerGauge = new Border()
+        {
+            Background = new SolidColorBrush(Colors.Goldenrod),
+            Height = 5,
+            Width = 0,
+            CornerRadius = new Windows.UI.Xaml.CornerRadius(50),
+            VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Top,
+            HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
+            Margin = new Windows.UI.Xaml.Thickness(0, 20, 0, 0),
+        };
 
         #endregion
 
         #region Ctor
-        
+
         public Player()
         {
             Background = new SolidColorBrush(Colors.Transparent);
@@ -31,6 +46,7 @@ namespace AstroOdyssey
 
             // create ship and exhaust
             content = new Grid();
+            content.Children.Add(contentShipPowerGauge);
             content.Children.Add(contentShipBlaze);
             content.Children.Add(contentShip);
 
@@ -109,22 +125,28 @@ namespace AstroOdyssey
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
             contentShipBlaze.Height = exhaustHeight;
             contentShipBlaze.Width = contentShip.Width;
-            contentShipBlaze.Margin = new Windows.UI.Xaml.Thickness(0, 80, 0, 0);
         }
 
-        public void SetPowerUp()
+        public void SetPowerGauge(double powerGauge)
+        {
+            contentShipPowerGauge.Width = powerGauge * 10;
+        }
+
+        public void TriggerPowerUp()
         {
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_yellow.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
             Speed += 5;
+            contentShipPowerGauge.Width = Width / 2;
         }
 
-        public void SetPowerDown()
+        public void TriggerPowerDown()
         {
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
             Speed -= 5;
-        } 
+            contentShipPowerGauge.Width = 0;
+        }
 
         #endregion
     }
