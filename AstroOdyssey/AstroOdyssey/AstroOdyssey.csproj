@@ -29,6 +29,7 @@
 		<Content Include="Assets\Sounds\slow-thoughtful-sad-piano-114586.mp3" />
 		<Content Include="Assets\Sounds\space-age-10714.mp3" />
 		<Content Include="Assets\Sounds\space-trip-114102.mp3" />
+		<Content Include="Assets\Sounds\spellcast-46164.mp3" />
 		<Content Include="Pages\GamePage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Content>

@@ -74,6 +74,7 @@ namespace AstroOdyssey
         private object playerHealthLossAudio = null;
         private object playerHealthGainAudio = null;
         private object levelUpAudio = null;
+        private object powerUpAudio = null;
 
         private Player player;
         private Rect playerBounds;
@@ -1153,7 +1154,7 @@ namespace AstroOdyssey
             powerUpTriggered = true;
             powerUpTriggerCounter = powerUpTriggerLimit;
             ShowInGameText("POWER UP!");
-            PlayLevelUpSound();
+            PlayPowerUpSound();
         }
 
         /// <summary>
@@ -1535,6 +1536,23 @@ namespace AstroOdyssey
             }
 
             PlayAudio(levelUpAudio);
+        }
+
+        private void PlayPowerUpSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/spellcast-46164.mp3";
+
+            if (powerUpAudio is null)
+            {
+                powerUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {                 
+                    var powerUpAudio = new Audio($0);
+                    powerUpAudio.volume = 1.0;
+                   return powerUpAudio;
+                }())", host);
+            }
+
+            PlayAudio(powerUpAudio);
         }
 
         /// <summary>
