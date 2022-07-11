@@ -35,6 +35,8 @@ namespace AstroOdyssey
         private int enemySpawnLimit;
         private double enemySpeed;
 
+        private int sideWaysEnemyLimit;
+
         private int meteorCounter;
         private int meteorSpawnLimit;
         private double meteorSpeed;
@@ -429,7 +431,10 @@ namespace AstroOdyssey
             {
                 // move enemy down
                 if (gameObject is Enemy enemyElement)
+                {
                     enemyElement.MoveY();
+                    enemyElement.MoveX();
+                }
 
                 // move meteor down
                 if (gameObject is Meteor meteorElement)
@@ -1012,6 +1017,9 @@ namespace AstroOdyssey
             if (enemyCounter < 0)
             {
                 GenerateEnemy();
+
+                sideWaysEnemyLimit++;
+
                 enemyCounter = enemySpawnLimit;
             }
         }
@@ -1022,6 +1030,13 @@ namespace AstroOdyssey
         private void GenerateEnemy()
         {
             var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
+
+            // when difficulty is above medium every 5th enemy moves sideways
+            if ((int)difficulty > 3 && sideWaysEnemyLimit >= 5)
+            {
+                newEnemy.XDirection = (XDirection)rand.Next(0, 3);
+                sideWaysEnemyLimit = 0;
+            }
 
             newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));
             newEnemy.AddToGameEnvironment(-100, rand.Next(10, (int)windowWidth - 100), GameView);

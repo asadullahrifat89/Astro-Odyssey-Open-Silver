@@ -20,7 +20,7 @@ namespace AstroOdyssey
 
         public YDirection YDirection { get; set; } = YDirection.DOWN;
 
-        public XDirection XDirection { get; set; } = XDirection.RIGHT;
+        public XDirection XDirection { get; set; } = XDirection.NONE;
 
         public bool HasNoHealth => Health <= 0;
 
@@ -69,24 +69,34 @@ namespace AstroOdyssey
             Canvas.SetLeft(this, left);
         }
 
+        public void MoveX()
+        {
+            Canvas.SetLeft(this, GetX() + (Speed * GetXDirectionModifier()));
+        }
+
         public void MoveX(double left)
         {
-            Canvas.SetLeft(this, GetX() + (left * (XDirection == XDirection.LEFT ? -1 : 1)));
+            Canvas.SetLeft(this, GetX() + (left * GetXDirectionModifier()));
+        }
+
+        public void MoveX(double left, XDirection xDirection)
+        {
+            Canvas.SetLeft(this, GetX() + (left * GetXDirectionModifier(xDirection)));
         }
 
         public void MoveY()
         {
-            Canvas.SetTop(this, GetY() + (this.Speed * (YDirection == YDirection.UP ? -1 : 1)));
+            Canvas.SetTop(this, GetY() + (this.Speed * GetYDirectionModifier()));
         }
 
         public void MoveY(double top)
         {
-            Canvas.SetTop(this, GetY() + (top * (YDirection == YDirection.UP ? -1 : 1)));
+            Canvas.SetTop(this, GetY() + (top * GetYDirectionModifier()));
         }
 
         public void MoveY(double top, YDirection yDirection)
         {
-            Canvas.SetTop(this, GetY() + (top * (yDirection == YDirection.UP ? -1 : 1)));
+            Canvas.SetTop(this, GetY() + (top * GetYDirectionModifier(yDirection)));
         }
 
         public void SetPosition(double top, double left)
@@ -95,10 +105,52 @@ namespace AstroOdyssey
             Canvas.SetLeft(this, left);
         }
 
+        private int GetXDirectionModifier(XDirection? xDirection = null)
+        {
+            var modifier = 0;
+            var xDirectionConsider = xDirection ?? XDirection;
+
+            switch (xDirectionConsider)
+            {
+                case XDirection.NONE:
+                    modifier = 0;
+                    break;
+                case XDirection.LEFT:
+                    modifier = -1;
+                    break;
+                case XDirection.RIGHT:
+                    modifier = 1;
+                    break;
+                default:
+                    break;
+            }
+
+            return modifier;
+        }
+
+        private int GetYDirectionModifier(YDirection? yDirection = null)
+        {
+            var modifier = 0;
+            var yDirectionConsider = yDirection ?? YDirection;
+
+            switch (yDirectionConsider)
+            {
+                case YDirection.UP:
+                    modifier = -1;
+                    break;
+                case YDirection.DOWN:
+                    modifier = 1;
+                    break;
+                default:
+                    break;
+            }
+
+            return modifier;
+        }
+
         public void AddToGameEnvironment(double top, double left, GameEnvironment gameEnvironment)
         {
             SetPosition(top, left);
-
             gameEnvironment.AddGameObject(this);
         }
     }
@@ -111,6 +163,7 @@ namespace AstroOdyssey
 
     public enum XDirection
     {
+        NONE,
         LEFT,
         RIGHT,
     }

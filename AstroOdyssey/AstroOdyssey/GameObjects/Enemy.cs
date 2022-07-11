@@ -24,8 +24,10 @@ namespace AstroOdyssey
         {
             Speed = speed;
 
+            var rand = new Random();
+
             Uri uri = null;
-            var enemyShipType = new Random().Next(1, 6);
+            var enemyShipType = rand.Next(1, 6);
 
             switch (enemyShipType)
             {
