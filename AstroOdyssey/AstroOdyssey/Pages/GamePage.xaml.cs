@@ -371,13 +371,24 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool RectsIntersect(Rect source, Rect target)
         {
+            var targetX = target.X;
+            var targetY = target.Y;
+            var sourceX = source.X;
+            var sourceY = source.Y;
+
+            var sourceWidth = source.Width - 5;
+            var sourceHeight = source.Height - 5;
+
+            var targetWidth = target.Width - 5;
+            var targetHeight = target.Height - 5;
+
             if (source.Width >= 0.0
                 && target.Width >= 0.0
-                && target.X <= source.X + source.Width
-                && target.X + target.Width >= source.X
-                && target.Y <= source.Y + source.Height)
+                && targetX <= sourceX + sourceWidth
+                && targetX + targetWidth >= sourceX
+                && targetY <= sourceY + sourceHeight)
             {
-                return target.Y + target.Height >= source.Y;
+                return targetY + targetHeight >= sourceY;
             }
 
             return false;
