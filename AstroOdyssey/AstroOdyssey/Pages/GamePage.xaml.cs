@@ -83,24 +83,25 @@ namespace AstroOdyssey
 
         private object laserImpactAudio = null;
         private object laserAudio = null;
-        private object laserPoweredUpAudio = null;
-
-        private Player player;
-
-        private int playerDamagedOpacityCount;
-        private int playerDamagedOpacityLimit;
+        private object laserPoweredUpModeAudio = null;
 
         private Difficulty difficulty;
+
         private int showInGameTextCount;
         private int showInGameTextLimit;
 
-        private readonly Random rand = new Random();
+        private readonly Random random = new Random();
 
         private readonly Stack<GameObject> enemyStack = new Stack<GameObject>();
         private readonly Stack<GameObject> meteorStack = new Stack<GameObject>();
         private readonly Stack<GameObject> healthStack = new Stack<GameObject>();
         private readonly Stack<GameObject> powerUpStack = new Stack<GameObject>();
         private readonly Stack<GameObject> starStack = new Stack<GameObject>();
+
+        private Player player;
+
+        private int playerDamagedOpacityCount;
+        private int playerDamagedOpacityLimit;
 
         private bool moveLeft = false, moveRight = false;
 
@@ -978,7 +979,7 @@ namespace AstroOdyssey
             newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
 
             if (newLaser.IsPoweredUp)
-                PlayLaserPoweredUpSound();
+                PlayLaserPoweredUpModeSound();
             else
                 PlayLaserSound();
         }
@@ -1073,12 +1074,12 @@ namespace AstroOdyssey
         /// <summary>
         /// Plays the laser power up sound effect.
         /// </summary>
-        private void PlayLaserPoweredUpSound()
+        private void PlayLaserPoweredUpModeSound()
         {
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/plasmablaster-37114.mp3";
 
-            if (laserPoweredUpAudio is null)
-                laserPoweredUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+            if (laserPoweredUpModeAudio is null)
+                laserPoweredUpModeAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
                     var laserPoweredUpAudio = new Audio($0);
@@ -1086,7 +1087,7 @@ namespace AstroOdyssey
                     return laserPoweredUpAudio;
                 }())", host);
 
-            AudioService.PlayAudio(laserPoweredUpAudio);
+            AudioService.PlayAudio(laserPoweredUpModeAudio);
         }
 
         #endregion
@@ -1119,15 +1120,15 @@ namespace AstroOdyssey
         {
             var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
 
-            newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));
+            newEnemy.SetAttributes(enemySpeed + random.Next(0, 4));
 
-            var left = rand.Next(10, (int)windowWidth - 100);
+            var left = random.Next(10, (int)windowWidth - 100);
             var top = 0 - newEnemy.Height;
 
             // when not noob anymore enemy moves sideways
             if ((int)difficulty > 0 && enemySpawnCounter >= 10)
             {
-                newEnemy.XDirection = (XDirection)rand.Next(1, 3);
+                newEnemy.XDirection = (XDirection)random.Next(1, 3);
                 enemySpawnCounter = 0;
             }
 
@@ -1196,8 +1197,8 @@ namespace AstroOdyssey
         {
             var newMeteor = meteorStack.Any() ? meteorStack.Pop() as Meteor : new Meteor();
 
-            newMeteor.SetAttributes(meteorSpeed + rand.NextDouble());
-            newMeteor.AddToGameEnvironment(top: 0 - newMeteor.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newMeteor.SetAttributes(meteorSpeed + random.NextDouble());
+            newMeteor.AddToGameEnvironment(top: 0 - newMeteor.Height, left: random.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         /// <summary>
@@ -1262,8 +1263,8 @@ namespace AstroOdyssey
         {
             var newHealth = healthStack.Any() ? healthStack.Pop() as Health : new Health();
 
-            newHealth.SetAttributes(healthSpeed + rand.NextDouble());
-            newHealth.AddToGameEnvironment(top: 0 - newHealth.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newHealth.SetAttributes(healthSpeed + random.NextDouble());
+            newHealth.AddToGameEnvironment(top: 0 - newHealth.Height, left: random.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         #endregion
@@ -1294,8 +1295,8 @@ namespace AstroOdyssey
         {
             var newPowerUp = powerUpStack.Any() ? powerUpStack.Pop() as PowerUp : new PowerUp();
 
-            newPowerUp.SetAttributes(powerUpSpeed + rand.NextDouble());
-            newPowerUp.AddToGameEnvironment(top: 0 - newPowerUp.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newPowerUp.SetAttributes(powerUpSpeed + random.NextDouble());
+            newPowerUp.AddToGameEnvironment(top: 0 - newPowerUp.Height, left: random.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
         }
 
         /// <summary>
@@ -1365,7 +1366,7 @@ namespace AstroOdyssey
             var newStar = starStack.Any() ? starStack.Pop() as Star : new Star();
 
             newStar.SetAttributes(starSpeed);
-            newStar.AddToGameEnvironment(top: 0 - newStar.Height, left: rand.Next(10, (int)windowWidth - 10), gameEnvironment: StarView);
+            newStar.AddToGameEnvironment(top: 0 - newStar.Height, left: random.Next(10, (int)windowWidth - 10), gameEnvironment: StarView);
         }
 
         /// <summary>
@@ -1501,7 +1502,7 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayBackgroundMusic()
         {
-            var musicTrack = rand.Next(1, 12);
+            var musicTrack = random.Next(1, 12);
 
             string host = null;
 
