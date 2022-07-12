@@ -369,9 +369,13 @@ namespace AstroOdyssey
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        private bool IntersectsWith(Rect source, Rect target)
+        private bool RectsIntersect(Rect source, Rect target)
         {
-            if (source.Width >= 0.0 && target.Width >= 0.0 && target.X <= source.X + source.Width && target.X + target.Width >= source.X && target.Y <= source.Y + source.Height)
+            if (source.Width >= 0.0
+                && target.Width >= 0.0
+                && target.X <= source.X + source.Width
+                && target.X + target.Width >= source.X
+                && target.Y <= source.Y + source.Height)
             {
                 return target.Y + target.Height >= source.Y;
             }
@@ -424,11 +428,11 @@ namespace AstroOdyssey
         {
             //TODO: fade away MarkedToDestroy object
 
-            if (gameObject.MarkedForLazyDestruction)
+            if (gameObject.MarkedForFadedRemoval)
             {
-                gameObject.Opacity -= 0.1d;
+                gameObject.FadeAway();
 
-                if (gameObject.Opacity <= 0)
+                if (gameObject.HasFadedAway)
                     GameView.AddDestroyableGameObject(gameObject);
             }
 
@@ -445,7 +449,7 @@ namespace AstroOdyssey
                         enemy.MoveX();
 
                         // if the object is marked for lazy destruction then no need to perform collisions
-                        if (enemy.MarkedForLazyDestruction)
+                        if (enemy.MarkedForFadedRemoval)
                             return;
 
                         // if enemy or meteor object has gone beyond game view
@@ -471,7 +475,7 @@ namespace AstroOdyssey
                         meteor.MoveY();
 
                         // if the object is marked for lazy destruction then no need to perform collisions
-                        if (meteor.MarkedForLazyDestruction)
+                        if (meteor.MarkedForFadedRemoval)
                             return;
 
                         // if enemy or meteor object has gone beyond game view
@@ -511,7 +515,7 @@ namespace AstroOdyssey
                         if (health.GetY() > GameView.Height)
                             GameView.AddDestroyableGameObject(health);
 
-                        if (IntersectsWith(playerBounds, health.GetRect()))
+                        if (RectsIntersect(playerBounds, health.GetRect()))
                         {
                             GameView.AddDestroyableGameObject(health);
                             PlayerHealthGain(health);
@@ -529,7 +533,7 @@ namespace AstroOdyssey
                         if (powerUp.GetY() > GameView.Height)
                             GameView.AddDestroyableGameObject(powerUp);
 
-                        if (IntersectsWith(playerBounds, powerUp.GetRect()))
+                        if (RectsIntersect(playerBounds, powerUp.GetRect()))
                         {
                             GameView.AddDestroyableGameObject(powerUp);
                             TriggerPowerUp();
@@ -853,7 +857,7 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool PlayerCollision(GameObject gameObject, Rect gameObjectBounds)
         {
-            if (IntersectsWith(playerBounds, gameObjectBounds))
+            if (RectsIntersect(playerBounds, gameObjectBounds))
             {
                 GameView.AddDestroyableGameObject(gameObject);
                 PlayerHealthLoss();
@@ -947,7 +951,7 @@ namespace AstroOdyssey
         /// <param name="gameObjectBounds"></param>
         private void LaserCollision(GameObject gameObject, Rect gameObjectBounds)
         {
-            var lasers = GameView.GetGameObjects<Laser>().Where(laser => IntersectsWith(laser.GetRect(), gameObjectBounds));
+            var lasers = GameView.GetGameObjects<Laser>().Where(laser => RectsIntersect(laser.GetRect(), gameObjectBounds));
 
             if (lasers is not null && lasers.Any())
             {
@@ -1038,7 +1042,7 @@ namespace AstroOdyssey
         /// <param name="meteor"></param>
         private void DestroyEnemy(Enemy enemy)
         {
-            enemy.MarkedForLazyDestruction = true;
+            enemy.MarkedForFadedRemoval = true;
 
             PlayerScoreByEnemyDestruction();
 
@@ -1085,7 +1089,7 @@ namespace AstroOdyssey
         /// <param name="meteor"></param>
         private void DestroyMeteor(Meteor meteor)
         {
-            meteor.MarkedForLazyDestruction = true;
+            meteor.MarkedForFadedRemoval = true;
 
             PlayerScoreByMeteorDestruction();
 

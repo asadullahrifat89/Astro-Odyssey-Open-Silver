@@ -49,7 +49,7 @@ namespace AstroOdyssey
         public void SetAttributes(double speed)
         {
             Speed = speed;
-            MarkedForLazyDestruction = false;
+            MarkedForFadedRemoval = false;
             Opacity = 1;
 
             rotation = new Random().NextDouble();

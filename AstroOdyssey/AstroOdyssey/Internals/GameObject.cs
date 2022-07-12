@@ -6,7 +6,7 @@ namespace AstroOdyssey
     public class GameObject : Border
     {
         #region Ctor
-        
+
         public GameObject()
         {
 
@@ -22,7 +22,7 @@ namespace AstroOdyssey
 
         public bool IsDestructible { get; set; }
 
-        public bool MarkedForLazyDestruction { get; set; }
+        public bool MarkedForFadedRemoval { get; set; }
 
         public double Speed { get; set; } = 1;
 
@@ -31,6 +31,8 @@ namespace AstroOdyssey
         public XDirection XDirection { get; set; } = XDirection.NONE;
 
         public bool HasNoHealth => Health <= 0;
+
+        public bool HasFadedAway => Opacity <= 0;
 
         #endregion
 
@@ -164,7 +166,12 @@ namespace AstroOdyssey
         {
             SetPosition(top, left);
             gameEnvironment.AddGameObject(this);
-        } 
+        }
+
+        public void FadeAway()
+        {
+            Opacity -= 0.1d;
+        }
 
         #endregion
     }

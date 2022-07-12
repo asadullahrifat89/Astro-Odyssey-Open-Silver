@@ -34,7 +34,7 @@ namespace AstroOdyssey
         {
             Speed = speed;
             XDirection = XDirection.NONE;
-            MarkedForLazyDestruction = false;
+            MarkedForFadedRemoval = false;
             Opacity = 1;
 
             var rand = new Random();
