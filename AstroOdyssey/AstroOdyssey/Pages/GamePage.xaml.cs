@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Xaml;
@@ -24,8 +25,6 @@ namespace AstroOdyssey
 
         private float lastFrameTime;
         private long frameStartTime;
-
-        private int frameDuration = 13;
 
         private int enemyCounter;
         private int enemySpawnLimit;
@@ -101,7 +100,11 @@ namespace AstroOdyssey
 
         private bool moveLeft = false, moveRight = false;
 
-        private DispatcherTimer frameGenerationTimer;
+        private System.Timers.Timer frameGenerationTimer;
+
+        private bool isGameRunning;
+
+        private int frameDuration = 14;
 
         #endregion
 
@@ -121,94 +124,6 @@ namespace AstroOdyssey
 
         #region Methods
 
-        #region Frame Methods
-
-        /// <summary>
-        /// Generates a frame for the game view.
-        /// </summary>
-        private void GenerateFrame()
-        {
-            UpdateGameStats();            
-
-            SpawnEnemy();
-
-            SpawnMeteor();
-
-            SpawnHealth();
-
-            SpawnPowerUp();
-
-            SpawnStar();
-
-            SpawnLaser(powerUpTriggered);
-
-            MovePlayer();
-
-            UpdateGameView();
-
-            UpdateStarView();
-
-            ShiftDifficulty();
-
-            HideInGameText();
-
-            TriggerPowerDown();
-
-            PlayerOpacity();
-
-            CheckPlayerDeath();          
-
-            KeyboardFocus();
-        }
-
-        /// <summary>
-        /// Sets analytics of fps, frame time and objects currently in view.
-        /// </summary>
-        private void SetFrameAnalytics()
-        {
-            frameStatUpdateCounter -= 1;
-
-            if (frameStatUpdateCounter < 0)
-            {
-                FPSText.Text = "FPS: " + fpsCount;
-#if DEBUG
-                FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
-                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
-#endif
-
-                frameStatUpdateCounter = frameStatUpdateLimit;
-            }
-        }
-
-        /// <summary>
-        /// Elapses the frame duration.
-        /// </summary>
-        /// <param name="watch"></param>        
-        /// <returns></returns>
-        private async Task ElapseFrameDuration(Stopwatch watch)
-        {
-            await Task.Delay(frameDuration);
-        }
-
-        /// <summary>
-        /// Calculates frames per second.
-        /// </summary>
-        /// <param name="frameStartTime"></param>
-        private void CalculateFps()
-        {
-            // calculate FPS
-            if (lastFrameTime + 1000 < frameStartTime)
-            {
-                fpsCount = fpsCounter;
-                fpsCounter = 0;
-                lastFrameTime = frameStartTime;
-            }
-
-            fpsCounter++;
-        }
-
-        #endregion
-
         #region Game Methods
 
         /// <summary>
@@ -220,7 +135,8 @@ namespace AstroOdyssey
             SetDefaultGameEnvironment();
             SpawnPlayer();
             SpawnStar();
-            RunGameFrames();
+            isGameRunning = true;
+            RunGame();
         }
 
         /// <summary>
@@ -275,26 +191,101 @@ namespace AstroOdyssey
         private void StopGame()
         {
             StopBackgroundMusic();
+            isGameRunning = false;
+
             frameGenerationTimer?.Stop();
+            frameGenerationTimer?.Dispose();
         }
 
         /// <summary>
-        /// Runs game frames. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
+        /// Runs game. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
         /// </summary>
-        private void RunGameFrames()
+        private async void RunGame()
         {
             var watch = Stopwatch.StartNew();
 
-            frameGenerationTimer = new DispatcherTimer();
-            frameGenerationTimer.Interval = TimeSpan.FromMilliseconds(frameDuration);
+            //while (isGameRunning)
+            //{
+            //    UpdateGameStats();
 
-            frameGenerationTimer.Tick += (s, e) =>
-            {                
-                GenerateFrame();
+            //    SpawnEnemy();
+
+            //    SpawnMeteor();
+
+            //    SpawnHealth();
+
+            //    SpawnPowerUp();
+
+            //    SpawnStar();
+
+            //    SpawnLaser(powerUpTriggered);
+
+            //    MovePlayer();
+
+            //    UpdateGameView();
+
+            //    UpdateStarView();
+
+            //    ShiftDifficulty();
+
+            //    HideInGameText();
+
+            //    TriggerPowerDown();
+
+            //    PlayerOpacity();
+
+            //    CheckPlayerDeath();
+
+            //    KeyboardFocus();
+
+            //    CalculateFps();
+
+            //    SetFrameAnalytics();
+
+            //    frameStartTime = watch.ElapsedMilliseconds;
+
+            //    await ElapseFrameDuration();
+            //}
+
+            frameGenerationTimer = new System.Timers.Timer(frameDuration);
+
+            frameGenerationTimer.Elapsed += (s, e) =>
+            {
+                UpdateGameStats();
+
+                SpawnEnemy();
+
+                SpawnMeteor();
+
+                SpawnHealth();
+
+                SpawnPowerUp();
+
+                SpawnStar();
+
+                SpawnLaser(powerUpTriggered);
+
+                MovePlayer();
+
+                UpdateGameView();
+
+                UpdateStarView();
+
+                ShiftDifficulty();
+
+                HideInGameText();
+
+                TriggerPowerDown();
+
+                PlayerOpacity();
+
+                CheckPlayerDeath();
+
+                KeyboardFocus();
 
                 CalculateFps();
 
-                SetFrameAnalytics();                
+                SetFrameAnalytics();
 
                 frameStartTime = watch.ElapsedMilliseconds;
             };
@@ -353,37 +344,6 @@ namespace AstroOdyssey
                 }
             }
         }
-
-        ///// <summary>
-        ///// Checks if a two rects intersect.
-        ///// </summary>
-        ///// <param name="source"></param>
-        ///// <param name="target"></param>
-        ///// <returns></returns>
-        //private bool RectsIntersect(Rect source, Rect target)
-        //{
-        //    var targetX = target.X;
-        //    var targetY = target.Y;
-        //    var sourceX = source.X;
-        //    var sourceY = source.Y;
-
-        //    var sourceWidth = source.Width - 5;
-        //    var sourceHeight = source.Height - 5;
-
-        //    var targetWidth = target.Width - 5;
-        //    var targetHeight = target.Height - 5;
-
-        //    if (source.Width >= 0.0
-        //        && target.Width >= 0.0
-        //        && targetX <= sourceX + sourceWidth
-        //        && targetX + targetWidth >= sourceX
-        //        && targetY <= sourceY + sourceHeight)
-        //    {
-        //        return targetY + targetHeight >= sourceY;
-        //    }
-
-        //    return false;
-        //}
 
         /// <summary>
         /// Sets the window and canvas size on startup.
@@ -584,6 +544,55 @@ namespace AstroOdyssey
         }
 
         #endregion
+
+        #region Frame Methods      
+
+        /// <summary>
+        /// Sets analytics of fps, frame time and objects currently in view.
+        /// </summary>
+        private void SetFrameAnalytics()
+        {
+            frameStatUpdateCounter -= 1;
+
+            if (frameStatUpdateCounter < 0)
+            {
+                FPSText.Text = "FPS: " + fpsCount;
+#if DEBUG
+                FrameDurationText.Text = "Frame duration: " + frameDuration + "ms";
+                ObjectsCountText.Text = "Objects count: " + GameView.Children.Count();
+#endif
+
+                frameStatUpdateCounter = frameStatUpdateLimit;
+            }
+        }
+
+        /// <summary>
+        /// Elapses the frame duration.
+        /// </summary>
+        /// <returns></returns>
+        private async Task ElapseFrameDuration()
+        {
+            await Task.Delay(frameDuration);
+        }
+
+        /// <summary>
+        /// Calculates frames per second.
+        /// </summary>
+        /// <param name="frameStartTime"></param>
+        private void CalculateFps()
+        {
+            // calculate FPS
+            if (lastFrameTime + 1000 < frameStartTime)
+            {
+                fpsCount = fpsCounter;
+                fpsCounter = 0;
+                lastFrameTime = frameStartTime;
+            }
+
+            fpsCounter++;
+        }
+
+        #endregion        
 
         #region Score Methods
 
