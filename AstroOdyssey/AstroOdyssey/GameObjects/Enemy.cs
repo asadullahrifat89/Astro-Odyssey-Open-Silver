@@ -33,6 +33,7 @@ namespace AstroOdyssey
         public void SetAttributes(double speed)
         {
             Speed = speed;
+            XDirection = XDirection.NONE;
 
             var rand = new Random();
 

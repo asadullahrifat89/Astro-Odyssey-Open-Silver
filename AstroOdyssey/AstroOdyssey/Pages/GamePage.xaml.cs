@@ -438,8 +438,8 @@ namespace AstroOdyssey
                     meteorElement.MoveY();
                 }
 
-                // if enemy or meteor object has gone below game view
-                if (gameObject.GetY() > GameView.Height)
+                // if enemy or meteor object has gone beyond game view
+                if (gameObject.GetY() > GameView.Height || gameObject.GetX() + gameObject.Width > GameView.Width || gameObject.GetX() < gameObject.Width)
                     GameView.AddDestroyableGameObject(gameObject);
 
                 Rect elementBounds = gameObject.GetRect();
@@ -939,15 +939,19 @@ namespace AstroOdyssey
         {
             var newEnemy = enemyStack.Any() ? enemyStack.Pop() as Enemy : new Enemy();
 
+            newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));
+
+            var left = rand.Next(10, (int)windowWidth - 100);
+            var top = 0 - newEnemy.Height;
+
             // when not noob anymore enemy moves sideways
-            if ((int)difficulty > 0 && enemySpawnCounter >= 100)
+            if ((int)difficulty > 0 && enemySpawnCounter >= enemySpawnLimit * (int)difficulty)
             {
-                newEnemy.XDirection = (XDirection)rand.Next(0, 3);
+                newEnemy.XDirection = (XDirection)rand.Next(1, 3);
                 enemySpawnCounter = 0;
             }
 
-            newEnemy.SetAttributes(enemySpeed + rand.Next(0, 4));
-            newEnemy.AddToGameEnvironment(top: 0 - newEnemy.Height, left: rand.Next(10, (int)windowWidth - 100), gameEnvironment: GameView);
+            newEnemy.AddToGameEnvironment(top: top, left: left, gameEnvironment: GameView);
         }
 
         /// <summary>
