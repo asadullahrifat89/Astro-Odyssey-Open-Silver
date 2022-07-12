@@ -254,11 +254,11 @@ namespace AstroOdyssey
 
             healthCounter = 1000;
             healthSpawnLimit = 1000;
-            healthSpeed = 3;
+            healthSpeed = 2;
 
             powerUpCounter = 1000;
             powerUpSpawnLimit = 1000;
-            powerUpSpeed = 3;
+            powerUpSpeed = 2;
 
             starCounter = 100;
             starSpawnLimit = 100;
@@ -439,7 +439,7 @@ namespace AstroOdyssey
                 }
 
                 // if enemy or meteor object has gone beyond game view
-                if (gameObject.GetY() > GameView.Height || gameObject.GetX() + gameObject.Width > GameView.Width || gameObject.GetX() < gameObject.Width)
+                if (gameObject.GetY() > GameView.Height || gameObject.GetX() > GameView.Width || gameObject.GetX() + gameObject.Width < 10)
                     GameView.AddDestroyableGameObject(gameObject);
 
                 Rect elementBounds = gameObject.GetRect();
@@ -945,7 +945,7 @@ namespace AstroOdyssey
             var top = 0 - newEnemy.Height;
 
             // when not noob anymore enemy moves sideways
-            if ((int)difficulty > 0 && enemySpawnCounter >= enemySpawnLimit * (int)difficulty)
+            if ((int)difficulty > 0 && enemySpawnCounter >= 10)
             {
                 newEnemy.XDirection = (XDirection)rand.Next(1, 3);
                 enemySpawnCounter = 0;
@@ -976,14 +976,17 @@ namespace AstroOdyssey
         /// </summary>
         private void SpawnMeteor()
         {
-            // each frame progress decreases this counter
-            meteorCounter -= 1;
-
-            // when counter reaches zero, create a meteor
-            if (meteorCounter < 0)
+            if ((int)difficulty > 0)
             {
-                GenerateMeteor();
-                meteorCounter = meteorSpawnLimit;
+                // each frame progress decreases this counter
+                meteorCounter -= 1;
+
+                // when counter reaches zero, create a meteor
+                if (meteorCounter < 0)
+                {
+                    GenerateMeteor();
+                    meteorCounter = meteorSpawnLimit;
+                }
             }
         }
 
