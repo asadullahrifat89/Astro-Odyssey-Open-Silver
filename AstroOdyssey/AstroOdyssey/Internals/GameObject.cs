@@ -22,7 +22,7 @@ namespace AstroOdyssey
 
         public bool IsDestructible { get; set; }
 
-        public bool MarkedToDelete { get; set; }
+        public bool MarkedForLazyDestruction { get; set; }
 
         public double Speed { get; set; } = 1;
 

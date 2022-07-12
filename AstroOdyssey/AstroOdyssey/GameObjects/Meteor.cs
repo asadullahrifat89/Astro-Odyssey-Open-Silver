@@ -49,7 +49,8 @@ namespace AstroOdyssey
         public void SetAttributes(double speed)
         {
             Speed = speed;
-            MarkedToDelete = false;
+            MarkedForLazyDestruction = false;
+            Opacity = 1;
 
             rotation = new Random().NextDouble();
             rotateTransform.Angle = rotation;

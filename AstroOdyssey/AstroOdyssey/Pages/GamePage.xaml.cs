@@ -246,7 +246,7 @@ namespace AstroOdyssey
         {
             enemyCounter = 100;
             enemySpawnLimit = 45;
-            enemySpeed = 5;
+            enemySpeed = 3;
 
             meteorCounter = 100;
             meteorSpawnLimit = 50;
@@ -424,123 +424,120 @@ namespace AstroOdyssey
         {
             //TODO: fade away MarkedToDestroy object
 
-            if (gameObject.IsDestructible)
+            if (gameObject.MarkedForLazyDestruction)
             {
-                // move enemy down
-                if (gameObject is Enemy enemyElement)
-                {
-                    enemyElement.MoveY();
-                    enemyElement.MoveX();
-                }
+                gameObject.Opacity -= 0.1d;
 
-                // move meteor down
-                if (gameObject is Meteor meteorElement)
-                {
-                    meteorElement.Rotate();
-                    meteorElement.MoveY();
-                }
-
-                // if enemy or meteor object has gone beyond game view
-                if (gameObject.GetY() > GameView.Height || gameObject.GetX() > GameView.Width || gameObject.GetX() + gameObject.Width < 10)
+                if (gameObject.Opacity <= 0)
                     GameView.AddDestroyableGameObject(gameObject);
+            }
 
-                Rect elementBounds = gameObject.GetRect();
+            var tag = gameObject.Tag;
 
-                // if enemy or meteor collides with player
-                if (IntersectsWith(playerBounds, elementBounds))
-                {
-                    GameView.AddDestroyableGameObject(gameObject);
-
-                    PlayerHealthLoss();
-                }
-                else
-                {
-                    var lasers = GameView.GetGameObjects<Laser>().Where(laser => IntersectsWith(laser.GetRect(), elementBounds));
-
-                    if (lasers is not null && lasers.Any())
+            switch (tag)
+            {
+                case "enemy":
                     {
-                        foreach (var laser in lasers)
-                        {
+                        var enemy = gameObject as Enemy;
+
+                        // move enemy down
+                        enemy.MoveY();
+                        enemy.MoveX();
+
+                        // if the object is marked for lazy destruction then no need to perform collisions
+                        if (enemy.MarkedForLazyDestruction)
+                            return;
+
+                        // if enemy or meteor object has gone beyond game view
+                        if (RemoveGameObject(enemy))
+                            return;
+
+                        Rect enemyBounds = enemy.GetRect();
+
+                        // check if enemy collides with player
+                        if (PlayerCollision(enemy, enemyBounds))
+                            return;
+
+                        // perform laser collisions
+                        LaserCollision(enemy, enemyBounds);
+                    }
+                    break;
+                case "meteor":
+                    {
+                        var meteor = gameObject as Meteor;
+
+                        // move meteor down
+                        meteor.Rotate();
+                        meteor.MoveY();
+
+                        // if the object is marked for lazy destruction then no need to perform collisions
+                        if (meteor.MarkedForLazyDestruction)
+                            return;
+
+                        // if enemy or meteor object has gone beyond game view
+                        if (RemoveGameObject(meteor))
+                            return;
+
+                        Rect meteorBounds = meteor.GetRect();
+
+                        // check if meteor collides with player
+                        if (PlayerCollision(meteor, meteorBounds))
+                            return;
+
+                        // perform laser collisions
+                        LaserCollision(meteor, meteorBounds);
+                    }
+                    break;
+                case "laser":
+                    {
+                        var laser = gameObject as Laser;
+
+                        // move laser up                
+                        laser.MoveY();
+
+                        // remove laser if outside game canvas
+                        if (laser.GetY() < 10)
                             GameView.AddDestroyableGameObject(laser);
+                    }
+                    break;
+                case "health":
+                    {
+                        var health = gameObject as Health;
 
-                            // if laser is powered up then execute one shot kill
-                            if (laser.IsPoweredUp)
-                                gameObject.LooseHealth(gameObject.Health);
-                            else
-                                gameObject.LooseHealth();
+                        // move Health down
+                        health.MoveY();
 
-                            if (gameObject is Meteor meteor)
-                            {
-                                // move the meteor backwards a bit on laser hit
-                                meteor.MoveY(meteor.Speed * 3 / 2, YDirection.UP);
+                        // if health object has gone below game view
+                        if (health.GetY() > GameView.Height)
+                            GameView.AddDestroyableGameObject(health);
 
-                                PlayLaserImpactSound();
-
-                                if (meteor.HasNoHealth)
-                                {
-                                    DestroyMeteor(meteor);
-                                }
-                            }
-
-                            if (gameObject is Enemy enemy)
-                            {
-                                // move the enemy backwards a bit on laser hit
-                                enemy.MoveY(enemy.Speed * 3 / 2, YDirection.UP);
-
-                                PlayLaserImpactSound();
-
-                                if (enemy.HasNoHealth)
-                                {
-                                    DestroyEnemy(enemy);
-                                }
-                            }
+                        if (IntersectsWith(playerBounds, health.GetRect()))
+                        {
+                            GameView.AddDestroyableGameObject(health);
+                            PlayerHealthGain(health);
                         }
                     }
-                }
-            }
-            else
-            {
-                if (gameObject is Laser laserElement)
-                {
-                    // move laser up                
-                    laserElement.MoveY();
-
-                    // remove laser if outside game canvas
-                    if (laserElement.GetY() < 10)
-                        GameView.AddDestroyableGameObject(laserElement);
-                }
-
-                if (gameObject is Health health)
-                {
-                    // move Health down
-                    health.MoveY();
-
-                    // if health object has gone below game view
-                    if (health.GetY() > GameView.Height)
-                        GameView.AddDestroyableGameObject(health);
-
-                    if (IntersectsWith(playerBounds, health.GetRect()))
+                    break;
+                case "powerUp":
                     {
-                        GameView.AddDestroyableGameObject(health);
-                        PlayerHealthGain(health);
+                        var powerUp = gameObject as PowerUp;
+
+                        // move PowerUp down
+                        powerUp.MoveY();
+
+                        // if PowerUp object has gone below game view
+                        if (powerUp.GetY() > GameView.Height)
+                            GameView.AddDestroyableGameObject(powerUp);
+
+                        if (IntersectsWith(playerBounds, powerUp.GetRect()))
+                        {
+                            GameView.AddDestroyableGameObject(powerUp);
+                            TriggerPowerUp();
+                        }
                     }
-                }
-
-                if (gameObject is PowerUp powerUp)
-                {
-                    // move PowerUp down
-                    powerUp.MoveY();
-
-                    // if PowerUp object has gone below game view
-                    if (powerUp.GetY() > GameView.Height)
-                        GameView.AddDestroyableGameObject(powerUp);
-
-                    if (IntersectsWith(playerBounds, powerUp.GetRect()))
-                    {
-                        GameView.AddDestroyableGameObject(powerUp);
-                        TriggerPowerUp();
-                    }
-                }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -562,11 +559,26 @@ namespace AstroOdyssey
 
                 // TODO: add storyboard animation for destruction then it will get removed automatically
                 GameView.RemoveGameObject(destroyable);
-
-                
             }
 
             GameView.ClearDestroyableGameObjects();
+        }
+
+        /// <summary>
+        /// Removes a game object from game view. 
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        private bool RemoveGameObject(GameObject gameObject)
+        {
+            if (gameObject.GetY() > GameView.Height || gameObject.GetX() > GameView.Width || gameObject.GetX() + gameObject.Width < 10)
+            {
+                GameView.AddDestroyableGameObject(gameObject);
+
+                return true;
+            }
+
+            return false;
         }
 
         #endregion
@@ -833,6 +845,25 @@ namespace AstroOdyssey
             PlayPlayerHealthGainSound();
         }
 
+        /// <summary>
+        /// Checks and performs player collision.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="gameObjectBounds"></param>
+        /// <returns></returns>
+        private bool PlayerCollision(GameObject gameObject, Rect gameObjectBounds)
+        {
+            if (IntersectsWith(playerBounds, gameObjectBounds))
+            {
+                GameView.AddDestroyableGameObject(gameObject);
+                PlayerHealthLoss();
+
+                return true;
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region Laser Methods
@@ -909,6 +940,53 @@ namespace AstroOdyssey
             newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
         }
 
+        /// <summary>
+        /// Checks and performs laser collision.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="gameObjectBounds"></param>
+        private void LaserCollision(GameObject gameObject, Rect gameObjectBounds)
+        {
+            var lasers = GameView.GetGameObjects<Laser>().Where(laser => IntersectsWith(laser.GetRect(), gameObjectBounds));
+
+            if (lasers is not null && lasers.Any())
+            {
+                foreach (var laser in lasers)
+                {
+                    GameView.AddDestroyableGameObject(laser);
+
+                    // if laser is powered up then execute one shot kill
+                    if (laser.IsPoweredUp)
+                        gameObject.LooseHealth(gameObject.Health);
+                    else
+                        gameObject.LooseHealth();
+
+                    // move the enemy backwards a bit on laser hit
+                    gameObject.MoveY(gameObject.Speed * 3 / 2, YDirection.UP);
+
+                    switch (gameObject.Tag)
+                    {
+                        case "enemy":
+                            {
+                                if (gameObject.HasNoHealth)
+                                    DestroyEnemy(gameObject as Enemy);
+                            }
+                            break;
+                        case "meteor":
+                            {
+                                if (gameObject.HasNoHealth)
+                                    DestroyMeteor(gameObject as Meteor);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    PlayLaserImpactSound();
+                }
+            }
+        }
+
         #endregion
 
         #region Enemy Methods
@@ -960,7 +1038,7 @@ namespace AstroOdyssey
         /// <param name="meteor"></param>
         private void DestroyEnemy(Enemy enemy)
         {
-            GameView.AddDestroyableGameObject(enemy);
+            enemy.MarkedForLazyDestruction = true;
 
             PlayerScoreByEnemyDestruction();
 
@@ -1007,8 +1085,7 @@ namespace AstroOdyssey
         /// <param name="meteor"></param>
         private void DestroyMeteor(Meteor meteor)
         {
-            // TODO: this occurs after opcity goes zero
-            GameView.AddDestroyableGameObject(meteor);
+            meteor.MarkedForLazyDestruction = true;
 
             PlayerScoreByMeteorDestruction();
 
