@@ -17,7 +17,7 @@ namespace AstroOdyssey
 
         public Health()
         {
-            Tag = "health";
+            Tag = Constants.HEALTH;
             Height = 100;
             Width = 100;
             Child = content;

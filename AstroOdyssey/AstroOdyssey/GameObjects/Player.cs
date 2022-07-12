@@ -37,6 +37,8 @@ namespace AstroOdyssey
 
         public Player()
         {
+            Tag = Constants.PLAYER;
+
             Background = new SolidColorBrush(Colors.Transparent);
             Height = 150;
             Width = 100;

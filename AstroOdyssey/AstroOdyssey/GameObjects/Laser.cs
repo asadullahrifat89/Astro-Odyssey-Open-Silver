@@ -10,7 +10,7 @@ namespace AstroOdyssey
 
         public Laser()
         {
-            Tag = "laser";
+            Tag = Constants.LASER;
 
             Height = 20;
             Width = 5;

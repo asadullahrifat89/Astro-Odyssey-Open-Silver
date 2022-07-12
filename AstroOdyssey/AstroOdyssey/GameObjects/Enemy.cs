@@ -17,7 +17,7 @@ namespace AstroOdyssey
         
         public Enemy()
         {
-            Tag = "enemy";
+            Tag = Constants.ENEMY;
             Height = 100;
             Width = 100;
 

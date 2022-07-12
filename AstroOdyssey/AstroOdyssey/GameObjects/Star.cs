@@ -17,7 +17,7 @@ namespace AstroOdyssey
 
         public Star()
         {
-            Tag = "star";
+            Tag = Constants.STAR;
             Child = content;
         } 
 

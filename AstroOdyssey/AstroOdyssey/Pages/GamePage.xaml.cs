@@ -454,7 +454,7 @@ namespace AstroOdyssey
 
             switch (tag)
             {
-                case "enemy":
+                case Constants.ENEMY:
                     {
                         var enemy = gameObject as Enemy;
 
@@ -480,7 +480,7 @@ namespace AstroOdyssey
                         LaserCollision(enemy, enemyBounds);
                     }
                     break;
-                case "meteor":
+                case Constants.METEOR:
                     {
                         var meteor = gameObject as Meteor;
 
@@ -506,7 +506,7 @@ namespace AstroOdyssey
                         LaserCollision(meteor, meteorBounds);
                     }
                     break;
-                case "laser":
+                case Constants.LASER:
                     {
                         var laser = gameObject as Laser;
 
@@ -518,7 +518,7 @@ namespace AstroOdyssey
                             GameView.AddDestroyableGameObject(laser);
                     }
                     break;
-                case "health":
+                case Constants.HEALTH:
                     {
                         var health = gameObject as Health;
 
@@ -536,7 +536,7 @@ namespace AstroOdyssey
                         }
                     }
                     break;
-                case "powerUp":
+                case Constants.POWERUP:
                     {
                         var powerUp = gameObject as PowerUp;
 
@@ -984,13 +984,13 @@ namespace AstroOdyssey
 
                     switch (gameObject.Tag)
                     {
-                        case "enemy":
+                        case Constants.ENEMY:
                             {
                                 if (gameObject.HasNoHealth)
                                     DestroyEnemy(gameObject as Enemy);
                             }
                             break;
-                        case "meteor":
+                        case Constants.METEOR:
                             {
                                 if (gameObject.HasNoHealth)
                                     DestroyMeteor(gameObject as Meteor);

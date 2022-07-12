@@ -17,7 +17,7 @@ namespace AstroOdyssey
 
         public PowerUp()
         {
-            Tag = "powerUp";
+            Tag = Constants.POWERUP;
             Height = 100;
             Width = 100;
             Child = content;
