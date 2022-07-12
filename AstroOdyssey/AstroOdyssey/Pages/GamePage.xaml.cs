@@ -17,8 +17,6 @@ namespace AstroOdyssey
 
         private string baseUrl;
 
-        //private const float FRAME_CAP_MS = 1000.0f / 60.0f;
-
         private int fpsCount;
         private int fpsCounter;
         private int frameStatUpdateCounter;
@@ -27,10 +25,7 @@ namespace AstroOdyssey
         private float lastFrameTime;
         private long frameStartTime;
 
-        //private long frameTime;
-        private int frameDuration = 10;
-
-        private bool gameIsRunning;
+        private int frameDuration = 13;
 
         private int enemyCounter;
         private int enemySpawnLimit;
@@ -106,6 +101,8 @@ namespace AstroOdyssey
 
         private bool moveLeft = false, moveRight = false;
 
+        private DispatcherTimer frameGenerationTimer;
+
         #endregion
 
         #region Ctor
@@ -127,13 +124,11 @@ namespace AstroOdyssey
         #region Frame Methods
 
         /// <summary>
-        /// Updates a frame of the game.
+        /// Generates a frame for the game view.
         /// </summary>
-        private void UpdateFrame()
+        private void GenerateFrame()
         {
-            UpdateGameStats();
-
-            UpdateFrameStats();
+            UpdateGameStats();            
 
             SpawnEnemy();
 
@@ -161,17 +156,15 @@ namespace AstroOdyssey
 
             PlayerOpacity();
 
-            CheckPlayerDeath();
-
-            CalculateFps();
+            CheckPlayerDeath();          
 
             KeyboardFocus();
         }
 
         /// <summary>
-        /// Updates the fps, frame time and objects currently in view.
+        /// Sets analytics of fps, frame time and objects currently in view.
         /// </summary>
-        private void UpdateFrameStats()
+        private void SetFrameAnalytics()
         {
             frameStatUpdateCounter -= 1;
 
@@ -194,20 +187,8 @@ namespace AstroOdyssey
         /// <returns></returns>
         private async Task ElapseFrameDuration(Stopwatch watch)
         {
-            //CalculateFrameDuration(watch);
             await Task.Delay(frameDuration);
         }
-
-        ///// <summary>
-        ///// Calculates the duration of a frame.
-        ///// </summary>
-        ///// <param name="watch"></param>
-        ///// <returns></returns>
-        //private void CalculateFrameDuration(Stopwatch watch)
-        //{
-        //    frameTime = watch.ElapsedMilliseconds - frameStartTime;
-        //    frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
-        //}
 
         /// <summary>
         /// Calculates frames per second.
@@ -239,10 +220,7 @@ namespace AstroOdyssey
             SetDefaultGameEnvironment();
             SpawnPlayer();
             SpawnStar();
-
-            gameIsRunning = true;
-
-            RunGameLoop();
+            RunGameFrames();
         }
 
         /// <summary>
@@ -297,24 +275,31 @@ namespace AstroOdyssey
         private void StopGame()
         {
             StopBackgroundMusic();
-            gameIsRunning = false;
+            frameGenerationTimer?.Stop();
         }
 
         /// <summary>
-        /// Runs the game loop if game is running. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
+        /// Runs game frames. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
         /// </summary>
-        private async void RunGameLoop()
+        private void RunGameFrames()
         {
             var watch = Stopwatch.StartNew();
 
-            while (gameIsRunning)
-            {
+            frameGenerationTimer = new DispatcherTimer();
+            frameGenerationTimer.Interval = TimeSpan.FromMilliseconds(frameDuration);
+
+            frameGenerationTimer.Tick += (s, e) =>
+            {                
+                GenerateFrame();
+
+                CalculateFps();
+
+                SetFrameAnalytics();                
+
                 frameStartTime = watch.ElapsedMilliseconds;
+            };
 
-                UpdateFrame();
-
-                await ElapseFrameDuration(watch);
-            }
+            frameGenerationTimer.Start();
         }
 
         /// <summary>
@@ -1004,7 +989,7 @@ namespace AstroOdyssey
 
                     // move the enemy backwards a bit on laser hit
                     gameObject.MoveY(gameObject.Speed * 3 / 2, YDirection.UP);
-                    
+
                     PlayLaserImpactSound();
 
                     if (gameObject.HasNoHealth)
@@ -1024,7 +1009,7 @@ namespace AstroOdyssey
                             default:
                                 break;
                         }
-                    }                    
+                    }
                 }
             }
         }
