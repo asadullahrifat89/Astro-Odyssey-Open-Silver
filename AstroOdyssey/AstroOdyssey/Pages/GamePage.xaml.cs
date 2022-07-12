@@ -78,6 +78,7 @@ namespace AstroOdyssey
         private object levelUpAudio = null;
         private object powerUpAudio = null;
         private object powerDownAudio = null;
+        private object laserPoweredUpAudio = null;
 
         private Player player;
         private Rect playerBounds;
@@ -895,10 +896,7 @@ namespace AstroOdyssey
             {
                 // any object falls within player range
                 if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
-                {
                     SpawnLaser();
-                    PlayLaserSound();
-                }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
             }
@@ -956,6 +954,11 @@ namespace AstroOdyssey
             newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: powerUpTriggered);
 
             newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
+
+            if (newLaser.IsPoweredUp)
+                PlayLaserPoweredUpSound();
+            else
+                PlayLaserSound();
         }
 
         /// <summary>
@@ -1436,20 +1439,40 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayLaserSound()
         {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
+            //TODO: change default laser audio
 
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
+            
             if (laserAudio is null)
             {
                 laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
                     var laserAudio = new Audio($0);
-                    laserAudio.volume = 0.1;
+                    laserAudio.volume = 0.8;
                     return laserAudio;
                 }())", host);
             }
 
             PlayAudio(laserAudio);
+        }
+
+        private void PlayLaserPoweredUpSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/plasmablaster-37114.mp3";
+
+            if (laserPoweredUpAudio is null)
+            {
+                laserPoweredUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var laserPoweredUpAudio = new Audio($0);
+                    laserPoweredUpAudio.volume = 0.8;
+                    return laserPoweredUpAudio;
+                }())", host);
+            }
+
+            PlayAudio(laserPoweredUpAudio);
         }
 
         /// <summary>
