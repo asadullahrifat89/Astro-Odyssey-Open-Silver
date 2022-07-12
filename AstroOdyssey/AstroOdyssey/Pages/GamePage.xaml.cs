@@ -338,7 +338,7 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Shows the level up text in game view.
+        /// Shows the in game text in game view.
         /// </summary>
         private void ShowInGameText(string text)
         {
@@ -348,7 +348,7 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Hides the level up text after keeping it visible.
+        /// Hides the in game text after keeping it visible.
         /// </summary>
         private void HideInGameText()
         {
