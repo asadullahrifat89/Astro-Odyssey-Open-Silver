@@ -17,7 +17,7 @@ namespace AstroOdyssey
 
         private string baseUrl;
 
-        private const float FRAME_CAP_MS = 1000.0f / 60.0f;
+        //private const float FRAME_CAP_MS = 1000.0f / 60.0f;
 
         private int fpsCount;
         private int fpsCounter;
@@ -26,7 +26,8 @@ namespace AstroOdyssey
 
         private float lastFrameTime;
         private long frameStartTime;
-        private long frameTime;
+
+        //private long frameTime;
         private int frameDuration = 10;
 
         private bool gameIsRunning;
@@ -197,16 +198,16 @@ namespace AstroOdyssey
             await Task.Delay(frameDuration);
         }
 
-        /// <summary>
-        /// Calculates the duration of a frame.
-        /// </summary>
-        /// <param name="watch"></param>
-        /// <returns></returns>
-        private void CalculateFrameDuration(Stopwatch watch)
-        {
-            frameTime = watch.ElapsedMilliseconds - frameStartTime;
-            frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
-        }
+        ///// <summary>
+        ///// Calculates the duration of a frame.
+        ///// </summary>
+        ///// <param name="watch"></param>
+        ///// <returns></returns>
+        //private void CalculateFrameDuration(Stopwatch watch)
+        //{
+        //    frameTime = watch.ElapsedMilliseconds - frameStartTime;
+        //    frameDuration = Math.Max((int)(FRAME_CAP_MS - frameTime), 1);
+        //}
 
         /// <summary>
         /// Calculates frames per second.
