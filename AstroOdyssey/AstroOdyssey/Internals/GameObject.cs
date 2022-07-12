@@ -5,16 +5,24 @@ namespace AstroOdyssey
 {
     public class GameObject : Border
     {
+        #region Ctor
+
         public GameObject()
         {
 
         }
 
+        #endregion
+
+        #region Properties
+
         public int Health { get; set; }
 
         public int HealthSlot { get; set; } = 1;
 
-        public bool IsDestroyable { get; set; }
+        public bool IsDestructible { get; set; }
+
+        public bool MarkedForFadedRemoval { get; set; }
 
         public double Speed { get; set; } = 1;
 
@@ -23,6 +31,12 @@ namespace AstroOdyssey
         public XDirection XDirection { get; set; } = XDirection.NONE;
 
         public bool HasNoHealth => Health <= 0;
+
+        public bool HasFadedAway => Opacity <= 0;
+
+        #endregion
+
+        #region Methods
 
         public void GainHealth()
         {
@@ -153,6 +167,13 @@ namespace AstroOdyssey
             SetPosition(top, left);
             gameEnvironment.AddGameObject(this);
         }
+
+        public void Fade()
+        {
+            Opacity -= 0.1d;
+        }
+
+        #endregion
     }
 
     public enum YDirection
