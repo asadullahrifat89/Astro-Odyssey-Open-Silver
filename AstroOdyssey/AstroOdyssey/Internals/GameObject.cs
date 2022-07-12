@@ -168,7 +168,7 @@ namespace AstroOdyssey
             gameEnvironment.AddGameObject(this);
         }
 
-        public void FadeAway()
+        public void Fade()
         {
             Opacity -= 0.1d;
         }

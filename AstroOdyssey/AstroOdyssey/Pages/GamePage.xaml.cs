@@ -441,10 +441,13 @@ namespace AstroOdyssey
 
             if (gameObject.MarkedForFadedRemoval)
             {
-                gameObject.FadeAway();
+                gameObject.Fade();
 
                 if (gameObject.HasFadedAway)
+                {
                     GameView.AddDestroyableGameObject(gameObject);
+                    return;
+                }
             }
 
             var tag = gameObject.Tag;
