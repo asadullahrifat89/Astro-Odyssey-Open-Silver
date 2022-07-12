@@ -887,6 +887,63 @@ namespace AstroOdyssey
             return false;
         }
 
+        /// <summary>
+        /// Plays the sound effect when the player looses health.
+        /// </summary>
+        private void PlayPlayerHealthLossSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3";
+
+            if (playerHealthLossAudio is null)
+                playerHealthLossAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var playerHealthDecreaseAudio = new Audio($0);
+                    playerHealthDecreaseAudio.volume = 1.0;
+                   return playerHealthDecreaseAudio;
+                }())", host);
+
+            AudioService.PlayAudio(playerHealthLossAudio);
+        }
+
+        /// <summary>
+        /// Plays the sound effect when the player gains health.
+        /// </summary>
+        private void PlayPlayerHealthGainSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/scale-e6-14577.mp3";
+
+            if (playerHealthGainAudio is null)
+                playerHealthGainAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var playerHealthGainAudio = new Audio($0);
+                    playerHealthGainAudio.volume = 1.0;
+                   return playerHealthGainAudio;
+                }())", host);
+
+            AudioService.PlayAudio(playerHealthGainAudio);
+        }
+
+        /// <summary>
+        /// Plays the level up audio.
+        /// </summary>
+        private void PlayLevelUpSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/8-bit-powerup-6768.mp3";
+
+            if (levelUpAudio is null)
+                levelUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var levelUpAudio = new Audio($0);
+                    levelUpAudio.volume = 1.0;
+                   return levelUpAudio;
+                }())", host);
+
+            AudioService.PlayAudio(levelUpAudio);
+        }
+
         #endregion
 
         #region Laser Methods        
@@ -936,7 +993,7 @@ namespace AstroOdyssey
                             break;
                     }
 
-                    GenerateLaser(laserHeight, laserWidth);
+                    GenerateLaser(laserHeight: laserHeight, laserWidth: laserWidth, isPoweredUp: powerUpTriggered);
                 }
 
                 laserCounter = laserSpawnLimit;
@@ -948,11 +1005,11 @@ namespace AstroOdyssey
         /// </summary>
         /// <param name="laserHeight"></param>
         /// <param name="laserWidth"></param>
-        private void GenerateLaser(double laserHeight, double laserWidth)
+        private void GenerateLaser(double laserHeight, double laserWidth, bool isPoweredUp)
         {
             var newLaser = new Laser();
 
-            newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: powerUpTriggered);
+            newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: isPoweredUp);
 
             newLaser.AddToGameEnvironment(top: player.GetY() - 20, left: player.GetX() + player.Width / 2 - newLaser.Width / 2, gameEnvironment: GameView);
 
@@ -1007,6 +1064,65 @@ namespace AstroOdyssey
                     PlayLaserImpactSound();
                 }
             }
+        }
+
+        /// <summary>
+        /// Plays the sound effect when a laser hits a meteor or an enemy.
+        /// </summary>
+        private void PlayLaserImpactSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-sfx-43814.mp3";
+
+            if (laserImpactAudio is null)
+                laserImpactAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var laserImpactAudio = new Audio($0);
+                    laserImpactAudio.volume = 0.6;
+                    return laserImpactAudio;
+                }())", host);
+
+            AudioService.PlayAudio(laserImpactAudio);
+        }
+
+        /// <summary>
+        /// Plays the laser sound efect.
+        /// </summary>
+        private void PlayLaserSound()
+        {
+            //TODO: change default laser audio
+
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/shoot02wav-14562.mp3";
+
+            if (laserAudio is null)
+                laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var laserAudio = new Audio($0);
+                    laserAudio.volume = 0.4;
+                    return laserAudio;
+                }())", host);
+
+            AudioService.PlayAudio(laserAudio);
+        }
+
+        /// <summary>
+        /// Plays the laser power up sound effect.
+        /// </summary>
+        private void PlayLaserPoweredUpSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/plasmablaster-37114.mp3";
+
+            if (laserPoweredUpAudio is null)
+                laserPoweredUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var laserPoweredUpAudio = new Audio($0);
+                    laserPoweredUpAudio.volume = 1;
+                    return laserPoweredUpAudio;
+                }())", host);
+
+            AudioService.PlayAudio(laserPoweredUpAudio);
         }
 
         #endregion
@@ -1067,6 +1183,25 @@ namespace AstroOdyssey
             PlayEnemyDestructionSound();
         }
 
+        /// <summary>
+        /// Plays the enemy destruction sound effect.
+        /// </summary>
+        private void PlayEnemyDestructionSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
+
+            if (enemyDestructionAudio is null)
+                enemyDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var enemyDestructionAudio = new Audio($0);
+                    enemyDestructionAudio.volume = 0.8;                
+                    return enemyDestructionAudio;
+                }())", host);
+
+            AudioService.PlayAudio(enemyDestructionAudio);
+        }
+
         #endregion
 
         #region Meteor Methods
@@ -1112,6 +1247,25 @@ namespace AstroOdyssey
             PlayerScoreByMeteorDestruction();
 
             PlayMeteorDestructionSound();
+        }
+
+        /// <summary>
+        /// Plays the meteor destruction sound effect.
+        /// </summary>
+        private void PlayMeteorDestructionSound()
+        {
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
+
+            if (meteorDestructionAudio is null)
+                meteorDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
+                (function() {
+                    //play audio with out html audio tag
+                    var meteorDestructionAudio = new Audio($0);
+                    meteorDestructionAudio.volume = 0.8;
+                    return meteorDestructionAudio;
+                }())", host);
+
+            AudioService.PlayAudio(meteorDestructionAudio);
         }
 
         #endregion
@@ -1436,173 +1590,6 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Plays the laser sound efect.
-        /// </summary>
-        private void PlayLaserSound()
-        {
-            //TODO: change default laser audio
-
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/shoot02wav-14562.mp3";
-
-            if (laserAudio is null)
-            {
-                laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var laserAudio = new Audio($0);
-                    laserAudio.volume = 0.4;
-                    return laserAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(laserAudio);
-        }
-
-        private void PlayLaserPoweredUpSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/plasmablaster-37114.mp3";
-
-            if (laserPoweredUpAudio is null)
-            {
-                laserPoweredUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var laserPoweredUpAudio = new Audio($0);
-                    laserPoweredUpAudio.volume = 1;
-                    return laserPoweredUpAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(laserPoweredUpAudio);
-        }
-
-        /// <summary>
-        /// Plays the enemy destruction sound effect.
-        /// </summary>
-        private void PlayEnemyDestructionSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
-
-            if (enemyDestructionAudio is null)
-            {
-                enemyDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var enemyDestructionAudio = new Audio($0);
-                    enemyDestructionAudio.volume = 0.8;                
-                    return enemyDestructionAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(enemyDestructionAudio);
-        }
-
-        /// <summary>
-        /// Plays the sound effect when a laser hits a meteor or an enemy.
-        /// </summary>
-        private void PlayLaserImpactSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-sfx-43814.mp3";
-
-            if (laserImpactAudio is null)
-            {
-                laserImpactAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var laserImpactAudio = new Audio($0);
-                    laserImpactAudio.volume = 0.6;
-                    return laserImpactAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(laserImpactAudio);
-        }
-
-        /// <summary>
-        /// Plays the meteor destruction sound effect.
-        /// </summary>
-        private void PlayMeteorDestructionSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-36210.mp3";
-
-            if (meteorDestructionAudio is null)
-            {
-                meteorDestructionAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var meteorDestructionAudio = new Audio($0);
-                    meteorDestructionAudio.volume = 0.8;
-                    return meteorDestructionAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(meteorDestructionAudio);
-        }
-
-        /// <summary>
-        /// Plays the sound effect when the player looses health.
-        /// </summary>
-        private void PlayPlayerHealthLossSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/explosion-39897.mp3";
-
-            if (playerHealthLossAudio is null)
-            {
-                playerHealthLossAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var playerHealthDecreaseAudio = new Audio($0);
-                    playerHealthDecreaseAudio.volume = 1.0;
-                   return playerHealthDecreaseAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(playerHealthLossAudio);
-        }
-
-        /// <summary>
-        /// Plays the sound effect when the player gains health.
-        /// </summary>
-        private void PlayPlayerHealthGainSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/scale-e6-14577.mp3";
-
-            if (playerHealthGainAudio is null)
-            {
-                playerHealthGainAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var playerHealthGainAudio = new Audio($0);
-                    playerHealthGainAudio.volume = 1.0;
-                   return playerHealthGainAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(playerHealthGainAudio);
-        }
-
-        /// <summary>
-        /// Plays the level up audio.
-        /// </summary>
-        private void PlayLevelUpSound()
-        {
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/8-bit-powerup-6768.mp3";
-
-            if (levelUpAudio is null)
-            {
-                levelUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    //play audio with out html audio tag
-                    var levelUpAudio = new Audio($0);
-                    levelUpAudio.volume = 1.0;
-                   return levelUpAudio;
-                }())", host);
-            }
-
-            AudioService.PlayAudio(levelUpAudio);
-        }
-
-        /// <summary>
         /// Plays the power up audio.
         /// </summary>
         private void PlayPowerUpSound()
@@ -1610,14 +1597,13 @@ namespace AstroOdyssey
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/spellcast-46164.mp3";
 
             if (powerUpAudio is null)
-            {
                 powerUpAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {                 
                     var powerUpAudio = new Audio($0);
                     powerUpAudio.volume = 1.0;
                    return powerUpAudio;
                 }())", host);
-            }
+
 
             AudioService.PlayAudio(powerUpAudio);
         }
@@ -1630,44 +1616,15 @@ namespace AstroOdyssey
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/power-down-7103.mp3";
 
             if (powerDownAudio is null)
-            {
                 powerDownAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {                 
                     var powerDownAudio = new Audio($0);
                     powerDownAudio.volume = 1.0;
                    return powerDownAudio;
                 }())", host);
-            }
 
             AudioService.PlayAudio(powerDownAudio);
         }
-
-        ///// <summary>
-        ///// Plays the provided js audio object.
-        ///// </summary>
-        ///// <param name="audio"></param>
-        //private void PlayAudio(object audio)
-        //{
-        //    OpenSilver.Interop.ExecuteJavaScript(@"
-        //    (function() { 
-        //        //play audio with out html audio tag
-        //        $0.currentTime =0;
-        //        $0.play();           
-        //    }())", audio);
-        //}
-
-        ///// <summary>
-        ///// Pauses the provided js audio object.
-        ///// </summary>
-        ///// <param name="audio"></param>
-        //private void PauseAudio(object audio)
-        //{
-        //    OpenSilver.Interop.ExecuteJavaScript(@"
-        //    (function() { 
-        //        //play audio with out html audio tag              
-        //        $0.pause();           
-        //    }())", audio);
-        //}
 
         #endregion
 
