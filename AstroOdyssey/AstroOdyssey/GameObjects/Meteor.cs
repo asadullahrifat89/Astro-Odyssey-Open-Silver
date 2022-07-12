@@ -29,14 +29,11 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
 
-            IsDestroyable = true;
+            IsDestructible = true;
             Child = content;
             YDirection = YDirection.DOWN;
 
-            RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);
-
-            rotateTransform.Angle = rotation;
-
+            RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);            
             RenderTransform = rotateTransform;
         } 
 
@@ -52,8 +49,10 @@ namespace AstroOdyssey
         public void SetAttributes(double speed)
         {
             Speed = speed;
+            MarkedToDelete = false;
 
             rotation = new Random().NextDouble();
+            rotateTransform.Angle = rotation;
 
             Uri uri = null;
 

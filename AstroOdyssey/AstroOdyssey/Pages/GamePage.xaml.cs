@@ -422,7 +422,9 @@ namespace AstroOdyssey
         /// <param name="gameObject"></param>
         private void UpdateGameViewObjects(GameObject gameObject)
         {
-            if (gameObject.IsDestroyable)
+            //TODO: fade away MarkedToDestroy object
+
+            if (gameObject.IsDestructible)
             {
                 // move enemy down
                 if (gameObject is Enemy enemyElement)
@@ -549,8 +551,6 @@ namespace AstroOdyssey
         {
             foreach (var destroyable in GameView.GetDestroyableGameObjects())
             {
-                GameView.RemoveGameObject(destroyable);
-
                 if (destroyable is Enemy enemy)
                     enemyStack.Push(enemy);
 
@@ -560,10 +560,10 @@ namespace AstroOdyssey
                 if (destroyable is Health health)
                     healthStack.Push(health);
 
-                //if (destroyable is Laser laser)
-                //    laserStack.Push(laser);
+                // TODO: add storyboard animation for destruction then it will get removed automatically
+                GameView.RemoveGameObject(destroyable);
 
-                // TODO: add storyboard animation for destruction
+                
             }
 
             GameView.ClearDestroyableGameObjects();
@@ -845,7 +845,7 @@ namespace AstroOdyssey
             while (gameIsRunning)
             {
                 // any object falls within player range
-                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestroyable).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
+                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
                 {
                     SpawnLaser();
                     PlayLaserSound();
@@ -902,7 +902,7 @@ namespace AstroOdyssey
         /// <param name="laserWidth"></param>
         private void GenerateLaser(double laserHeight, double laserWidth)
         {
-            var newLaser = /*laserStack.Count() > 10 ? laserStack.Pop() as Laser :*/ new Laser();
+            var newLaser = new Laser();
 
             newLaser.SetAttributes(speed: laserSpeed, height: laserHeight, width: laserWidth, isPoweredUp: powerUpTriggered);
 
@@ -1007,6 +1007,7 @@ namespace AstroOdyssey
         /// <param name="meteor"></param>
         private void DestroyMeteor(Meteor meteor)
         {
+            // TODO: this occurs after opcity goes zero
             GameView.AddDestroyableGameObject(meteor);
 
             PlayerScoreByMeteorDestruction();

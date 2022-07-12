@@ -21,7 +21,7 @@ namespace AstroOdyssey
             Height = 100;
             Width = 100;
 
-            IsDestroyable = true;
+            IsDestructible = true;
             Child = content;
             YDirection = YDirection.DOWN;
         } 
@@ -34,6 +34,7 @@ namespace AstroOdyssey
         {
             Speed = speed;
             XDirection = XDirection.NONE;
+            MarkedToDelete = false;
 
             var rand = new Random();
 
