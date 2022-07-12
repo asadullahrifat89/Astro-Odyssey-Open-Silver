@@ -105,11 +105,11 @@ namespace AstroOdyssey
 
         private int FrameStatUpdateLimit { get; set; } = 5;
 
-        private int LaserSpawnLimit { get; set; } = 16;
+        private int LaserSpawnLimit { get; set; } = 18;
 
         private int PowerUpTriggerLimit { get; set; } = 500;
 
-        private int EnemySpawnLimit { get; set; } = 40;
+        private int EnemySpawnLimit { get; set; } = 35;
 
         private int MeteorSpawnLimit { get; set; } = 40;
 
@@ -131,7 +131,7 @@ namespace AstroOdyssey
 
         private double PointerX { get; set; }
 
-        private int FrameDuration { get; set; } = 10;
+        private int FrameDuration { get; set; } = 13;
 
         private bool IsGameRunning { get; set; }
 
@@ -168,11 +168,56 @@ namespace AstroOdyssey
         /// <summary>
         /// Runs game. Updates stats, gets player bounds, spawns enemies and meteors, moves the player, updates the frame, scales difficulty, checks player health, calculates fps and frame time.
         /// </summary>
-        private async void RunGame()
+        private void RunGame()
         {
             var watch = Stopwatch.StartNew();
 
-            while (IsGameRunning)
+            //while (IsGameRunning)
+            //{
+            //    UpdateGameStats();
+
+            //    SpawnEnemy();
+
+            //    SpawnMeteor();
+
+            //    SpawnHealth();
+
+            //    SpawnPowerUp();
+
+            //    SpawnStar();
+
+            //    SpawnLaser(PowerUpTriggered);
+
+            //    MovePlayer();
+
+            //    UpdateGameView();
+
+            //    UpdateStarView();
+
+            //    ShiftGameLevel();
+
+            //    HideInGameText();
+
+            //    TriggerPowerDown();
+
+            //    PlayerOpacity();
+
+            //    CheckPlayerDeath();
+
+            //    KeyboardFocus();
+
+            //    CalculateFps();
+
+            //    SetFrameAnalytics();
+
+            //    FrameStartTime = watch.ElapsedMilliseconds;
+
+            //    await ElapseFrameDuration();
+            //}
+
+            frameGenerationTimer = new System.Timers.Timer(FrameDuration);
+
+            frameGenerationTimer.Elapsed += (s, e) =>
             {
                 UpdateGameStats();
 
@@ -211,54 +256,9 @@ namespace AstroOdyssey
                 SetFrameAnalytics();
 
                 FrameStartTime = watch.ElapsedMilliseconds;
+            };
 
-                await ElapseFrameDuration();
-            }
-
-            //frameGenerationTimer = new System.Timers.Timer(frameDuration);
-
-            //frameGenerationTimer.Elapsed += (s, e) =>
-            //{
-            //    UpdateGameStats();
-
-            //    SpawnEnemy();
-
-            //    SpawnMeteor();
-
-            //    SpawnHealth();
-
-            //    SpawnPowerUp();
-
-            //    SpawnStar();
-
-            //    SpawnLaser(powerUpTriggered);
-
-            //    MovePlayer();
-
-            //    UpdateGameView();
-
-            //    UpdateStarView();
-
-            //    ShiftDifficulty();
-
-            //    HideInGameText();
-
-            //    TriggerPowerDown();
-
-            //    PlayerOpacity();
-
-            //    CheckPlayerDeath();
-
-            //    KeyboardFocus();
-
-            //    CalculateFps();
-
-            //    SetFrameAnalytics();
-
-            //    frameStartTime = watch.ElapsedMilliseconds;
-            //};
-
-            //frameGenerationTimer.Start();
+            frameGenerationTimer.Start();
         }
 
         /// <summary>
@@ -323,13 +323,13 @@ namespace AstroOdyssey
 
             PointerX = windowWidth / 2;
 
-            SetCanvasSize();
+            SetViewSizes();
         }
 
         /// <summary>
-        /// Sets the game canvas size according to current window size.
+        /// Sets the game and star view sizes according to current window size.
         /// </summary>
-        private void SetCanvasSize()
+        private void SetViewSizes()
         {
             GameView.SetSize(windowHeight, windowWidth);
             StarView.SetSize(windowHeight, windowWidth);
@@ -624,13 +624,7 @@ namespace AstroOdyssey
             switch (GameLevel)
             {
                 case GameLevel.Level_1:
-                    break;
-                case GameLevel.Level_2:
-                    {
-                        MeteorSpawnLimit -= 5;
-                        LaserSpawnLimit -= 1;
-                    }
-                    break;
+                    break;              
                 default:
                     {
                         EnemySpawnLimit -= 3;
@@ -887,28 +881,28 @@ namespace AstroOdyssey
                     switch (GameLevel)
                     {
                         case GameLevel.Level_1:
-                            { laserHeight = 20; laserWidth = 5; }
+                            { laserHeight = 25; laserWidth = 5; }
                             break;
                         case GameLevel.Level_2:
-                            { laserHeight = 25; laserWidth = 10; }
+                            { laserHeight = 30; laserWidth = 10; }
                             break;
                         case GameLevel.Level_3:
-                            { laserHeight = 30; laserWidth = 15; }
+                            { laserHeight = 35; laserWidth = 15; }
                             break;
                         case GameLevel.Level_4:
-                            { laserHeight = 35; laserWidth = 20; }
+                            { laserHeight = 40; laserWidth = 20; }
                             break;
                         case GameLevel.Level_5:
-                            { laserHeight = 40; laserWidth = 25; }
+                            { laserHeight = 45; laserWidth = 25; }
                             break;
                         case GameLevel.Level_6:
-                            { laserHeight = 45; laserWidth = 30; }
+                            { laserHeight = 50; laserWidth = 30; }
                             break;
                         case GameLevel.Level_7:
-                            { laserHeight = 50; laserWidth = 35; }
+                            { laserHeight = 55; laserWidth = 35; }
                             break;
                         case GameLevel.Level_8:
-                            { laserHeight = 55; laserWidth = 40; }
+                            { laserHeight = 60; laserWidth = 40; }
                             break;
                         default:
                             break;
@@ -1446,7 +1440,7 @@ namespace AstroOdyssey
             windowWidth = Window.Current.Bounds.Width;
             windowHeight = Window.Current.Bounds.Height;
 
-            SetCanvasSize();
+            SetViewSizes();
             SetPlayerY();
         }
 
