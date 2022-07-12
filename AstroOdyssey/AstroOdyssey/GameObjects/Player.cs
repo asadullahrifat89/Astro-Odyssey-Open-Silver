@@ -43,6 +43,8 @@ namespace AstroOdyssey
 
         public Player()
         {
+            //TODO: acquire sides which shoot additional laser, lost on impact with enemy or meteor
+
             Tag = Constants.PLAYER;
 
             Background = new SolidColorBrush(Colors.Transparent);
