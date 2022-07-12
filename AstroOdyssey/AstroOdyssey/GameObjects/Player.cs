@@ -163,6 +163,24 @@ namespace AstroOdyssey
             contentShipPowerGauge.Width = 0;
         }
 
+        /// <summary>
+        /// Gets the player health points.
+        /// </summary>
+        /// <returns></returns>
+        public string GetHealthPoints()
+        {
+            var healthPoints = Health / HealthSlot;
+            var healthIcon = "❤️";
+            var health = string.Empty;
+
+            for (int i = 0; i < healthPoints; i++)
+            {
+                health += healthIcon;
+            }
+
+            return health;
+        }
+
         #endregion
     }
 }

@@ -59,7 +59,6 @@ namespace AstroOdyssey
 
         private double pointerX;
         private double windowWidth, windowHeight;
-        private double playerX, playerWidthHalf;
 
         private int laserCounter;
         private int laserSpawnLimit;
@@ -87,7 +86,6 @@ namespace AstroOdyssey
         private object laserPoweredUpAudio = null;
 
         private Player player;
-        private Rect playerBounds;
 
         private int playerDamagedOpacityCount;
         private int playerDamagedOpacityLimit;
@@ -135,7 +133,7 @@ namespace AstroOdyssey
 
             UpdateFrameStats();
 
-            GetPlayerBounds();
+            //GetPlayerBounds();
 
             SpawnEnemy();
 
@@ -333,7 +331,7 @@ namespace AstroOdyssey
         private void UpdateGameStats()
         {
             ScoreText.Text = "Score: " + score;
-            HealthText.Text = GetPlayerHealthPoints();
+            HealthText.Text = player.GetHealthPoints();
         }
 
         /// <summary>
@@ -535,7 +533,7 @@ namespace AstroOdyssey
                         if (health.GetY() > GameView.Height)
                             GameView.AddDestroyableGameObject(health);
 
-                        if (playerBounds.Intersects(health.GetRect()))
+                        if (player.GetRect().Intersects(health.GetRect()))
                         {
                             GameView.AddDestroyableGameObject(health);
                             PlayerHealthGain(health);
@@ -553,7 +551,7 @@ namespace AstroOdyssey
                         if (powerUp.GetY() > GameView.Height)
                             GameView.AddDestroyableGameObject(powerUp);
 
-                        if (playerBounds.Intersects(powerUp.GetRect()))
+                        if (player.GetRect().Intersects(powerUp.GetRect()))
                         {
                             GameView.AddDestroyableGameObject(powerUp);
                             TriggerPowerUp();
@@ -712,17 +710,6 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Gets the players x axis position and bounds.
-        /// </summary>
-        private void GetPlayerBounds()
-        {
-            playerWidthHalf = player.Width / 2;
-
-            playerX = player.GetX();
-            playerBounds = player.GetRect();
-        }
-
-        /// <summary>
         /// Sets the y axis position of the player on game canvas.
         /// </summary>
         private void SetPlayerY()
@@ -747,6 +734,7 @@ namespace AstroOdyssey
         private bool AnyObjectWithinPlayersLeftSideRange(GameObject go)
         {
             var left = go.GetX();
+            var playerX = player.GetX();
 
             return left + go.Width / 2 < playerX && left + go.Width / 2 > playerX - 250;
         }
@@ -759,6 +747,8 @@ namespace AstroOdyssey
         private bool AnyObjectWithinPlayersRightRange(GameObject go)
         {
             var left = go.GetX();
+            var playerX = player.GetX();
+
 
             return left + go.Width / 2 > playerX && left + go.Width / 2 <= playerX + 250;
         }
@@ -768,6 +758,9 @@ namespace AstroOdyssey
         /// </summary>
         private void MovePlayer()
         {
+            var playerX = player.GetX();
+            var playerWidthHalf = player.Width / 2;
+
             if (moveLeft && playerX > 0)
                 pointerX -= player.Speed;
 
@@ -790,23 +783,23 @@ namespace AstroOdyssey
             }
         }
 
-        /// <summary>
-        /// Gets the player health points.
-        /// </summary>
-        /// <returns></returns>
-        private string GetPlayerHealthPoints()
-        {
-            var healthPoints = player.Health / player.HealthSlot;
-            var healthIcon = "❤️";
-            var health = string.Empty;
+        ///// <summary>
+        ///// Gets the player health points.
+        ///// </summary>
+        ///// <returns></returns>
+        //private string GetPlayerHealthPoints()
+        //{
+        //    var healthPoints = player.Health / player.HealthSlot;
+        //    var healthIcon = "❤️";
+        //    var health = string.Empty;
 
-            for (int i = 0; i < healthPoints; i++)
-            {
-                health += healthIcon;
-            }
+        //    for (int i = 0; i < healthPoints; i++)
+        //    {
+        //        health += healthIcon;
+        //    }
 
-            return health;
-        }
+        //    return health;
+        //}
 
         /// <summary>
         /// Check if player is dead.
@@ -876,7 +869,7 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool PlayerCollision(GameObject gameObject, Rect gameObjectBounds)
         {
-            if (playerBounds.Intersects(gameObjectBounds))
+            if (player.GetRect().Intersects(gameObjectBounds))
             {
                 GameView.AddDestroyableGameObject(gameObject);
                 PlayerHealthLoss();
@@ -1629,5 +1622,10 @@ namespace AstroOdyssey
         #endregion
 
         #endregion
+    }
+
+    public static class PlayerService
+    {
+
     }
 }
