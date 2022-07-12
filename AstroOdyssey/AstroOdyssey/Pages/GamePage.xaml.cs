@@ -57,27 +57,33 @@ namespace AstroOdyssey
 
         private double score;
 
+        private double pointerX;
         private double windowWidth, windowHeight;
         private double playerX, playerWidthHalf;
 
-        private double pointerX;
-
-        private double laserTime;
+        private int laserCounter;
+        private int laserSpawnLimit;
         private double laserSpeed;
+
         private bool powerUpTriggered;
         private int powerUpTriggerCounter;
         private int powerUpTriggerLimit;
 
         private object backgroundAudio = null;
-        private object laserAudio = null;
+        
         private object enemyDestructionAudio = null;
         private object meteorDestructionAudio = null;
-        private object laserImpactAudio = null;
+        
         private object playerHealthLossAudio = null;
         private object playerHealthGainAudio = null;
+
         private object levelUpAudio = null;
+
         private object powerUpAudio = null;
         private object powerDownAudio = null;
+
+        private object laserImpactAudio = null;
+        private object laserAudio = null;
         private object laserPoweredUpAudio = null;
 
         private Player player;
@@ -140,6 +146,8 @@ namespace AstroOdyssey
             SpawnPowerUp();
 
             SpawnStar();
+
+            SpawnLaser();
 
             MovePlayer();
 
@@ -237,7 +245,6 @@ namespace AstroOdyssey
             gameIsRunning = true;
 
             RunGameLoop();
-            RunLaserLoop();
         }
 
         /// <summary>
@@ -275,7 +282,7 @@ namespace AstroOdyssey
             lastFrameTime = 0;
             frameStatUpdateLimit = 5;
 
-            laserTime = 235;
+            laserSpawnLimit = 15;
             laserSpeed = 20;
             powerUpTriggerLimit = 500;
 
@@ -438,8 +445,6 @@ namespace AstroOdyssey
         /// <param name="gameObject"></param>
         private void UpdateGameViewObjects(GameObject gameObject)
         {
-            //TODO: fade away MarkedToDestroy object
-
             if (gameObject.MarkedForFadedRemoval)
             {
                 gameObject.Fade();
@@ -576,7 +581,6 @@ namespace AstroOdyssey
                 if (destroyable is Health health)
                     healthStack.Push(health);
 
-                // TODO: add storyboard animation for destruction then it will get removed automatically
                 GameView.RemoveGameObject(destroyable);
             }
 
@@ -671,7 +675,7 @@ namespace AstroOdyssey
                 case Difficulty.StartUp:
                     {
                         meteorSpawnLimit -= 5;
-                        laserTime -= 5;
+                        laserSpawnLimit -= 1;
                     }
                     break;
                 default:
@@ -682,7 +686,7 @@ namespace AstroOdyssey
                         meteorSpawnLimit -= 5;
                         meteorSpeed += 2;
 
-                        laserTime -= 5;
+                        laserSpawnLimit -= 1;
 
                         healthSpeed += 2;
                         powerUpSpeed += 2;
@@ -885,61 +889,58 @@ namespace AstroOdyssey
 
         #endregion
 
-        #region Laser Methods
-
-        /// <summary>
-        /// Runs the laser loop if game is running.
-        /// </summary>
-        private async void RunLaserLoop()
-        {
-            while (gameIsRunning)
-            {
-                // any object falls within player range
-                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
-                    SpawnLaser();
-
-                await Task.Delay(TimeSpan.FromMilliseconds(laserTime));
-            }
-        }
+        #region Laser Methods        
 
         /// <summary>
         /// Spawns a laser.
         /// </summary>
         private void SpawnLaser()
         {
-            double laserHeight = 0, laserWidth = 0;
+            // each frame progress decreases this counter
+            laserCounter -= 1;
 
-            switch (difficulty)
+            if (laserCounter<=0)
             {
-                case Difficulty.Noob:
-                    { laserHeight = 20; laserWidth = 5; }
-                    break;
-                case Difficulty.StartUp:
-                    { laserHeight = 25; laserWidth = 10; }
-                    break;
-                case Difficulty.Easy:
-                    { laserHeight = 30; laserWidth = 15; }
-                    break;
-                case Difficulty.Medium:
-                    { laserHeight = 35; laserWidth = 20; }
-                    break;
-                case Difficulty.Hard:
-                    { laserHeight = 40; laserWidth = 25; }
-                    break;
-                case Difficulty.VeryHard:
-                    { laserHeight = 45; laserWidth = 30; }
-                    break;
-                case Difficulty.Extreme:
-                    { laserHeight = 50; laserWidth = 35; }
-                    break;
-                case Difficulty.Pro:
-                    { laserHeight = 55; laserWidth = 40; }
-                    break;
-                default:
-                    break;
-            }
+                // any object falls within player range
+                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
+                {
+                    double laserHeight = 0, laserWidth = 0;
 
-            GenerateLaser(laserHeight, laserWidth);
+                    switch (difficulty)
+                    {
+                        case Difficulty.Noob:
+                            { laserHeight = 20; laserWidth = 5; }
+                            break;
+                        case Difficulty.StartUp:
+                            { laserHeight = 25; laserWidth = 10; }
+                            break;
+                        case Difficulty.Easy:
+                            { laserHeight = 30; laserWidth = 15; }
+                            break;
+                        case Difficulty.Medium:
+                            { laserHeight = 35; laserWidth = 20; }
+                            break;
+                        case Difficulty.Hard:
+                            { laserHeight = 40; laserWidth = 25; }
+                            break;
+                        case Difficulty.VeryHard:
+                            { laserHeight = 45; laserWidth = 30; }
+                            break;
+                        case Difficulty.Extreme:
+                            { laserHeight = 50; laserWidth = 35; }
+                            break;
+                        case Difficulty.Pro:
+                            { laserHeight = 55; laserWidth = 40; }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    GenerateLaser(laserHeight, laserWidth);
+                }
+
+                laserCounter = laserSpawnLimit;
+            }
         }
 
         /// <summary>
@@ -1187,7 +1188,7 @@ namespace AstroOdyssey
             powerUpTriggered = true;
             powerUpTriggerCounter = powerUpTriggerLimit;
 
-            laserTime -= 50;
+            laserSpawnLimit -= 1;
             ShowInGameText("POWER UP!");
             PlayPowerUpSound();
             player.TriggerPowerUp();
@@ -1209,7 +1210,7 @@ namespace AstroOdyssey
                 if (powerUpTriggerCounter <= 0)
                 {
                     powerUpTriggered = false;
-                    laserTime += 50;
+                    laserSpawnLimit += 1;
                     PlayPowerDownSound();
                     player.TriggerPowerDown();
                 }
@@ -1441,15 +1442,15 @@ namespace AstroOdyssey
         {
             //TODO: change default laser audio
 
-            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/beam-8-43831.mp3";
-            
+            var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/shoot02wav-14562.mp3";
+
             if (laserAudio is null)
             {
                 laserAudio = OpenSilver.Interop.ExecuteJavaScript(@"
                 (function() {
                     //play audio with out html audio tag
                     var laserAudio = new Audio($0);
-                    laserAudio.volume = 0.8;
+                    laserAudio.volume = 0.4;
                     return laserAudio;
                 }())", host);
             }
@@ -1467,7 +1468,7 @@ namespace AstroOdyssey
                 (function() {
                     //play audio with out html audio tag
                     var laserPoweredUpAudio = new Audio($0);
-                    laserPoweredUpAudio.volume = 0.8;
+                    laserPoweredUpAudio.volume = 1;
                     return laserPoweredUpAudio;
                 }())", host);
             }
