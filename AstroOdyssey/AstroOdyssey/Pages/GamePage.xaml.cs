@@ -473,14 +473,12 @@ namespace AstroOdyssey
                         if (RemoveGameObject(enemy))
                             return;
 
-                        Rect enemyBounds = enemy.GetRect();
-
                         // check if enemy collides with player
-                        if (PlayerCollision(enemy, enemyBounds))
+                        if (PlayerCollision(enemy))
                             return;
 
                         // perform laser collisions
-                        LaserCollision(enemy, enemyBounds);
+                        LaserCollision(enemy);
                     }
                     break;
                 case Constants.METEOR:
@@ -499,14 +497,12 @@ namespace AstroOdyssey
                         if (RemoveGameObject(meteor))
                             return;
 
-                        Rect meteorBounds = meteor.GetRect();
-
                         // check if meteor collides with player
-                        if (PlayerCollision(meteor, meteorBounds))
+                        if (PlayerCollision(meteor))
                             return;
 
                         // perform laser collisions
-                        LaserCollision(meteor, meteorBounds);
+                        LaserCollision(meteor);
                     }
                     break;
                 case Constants.LASER:
@@ -837,11 +833,11 @@ namespace AstroOdyssey
         /// Checks and performs player collision.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="gameObjectBounds"></param>
+        /// 
         /// <returns></returns>
-        private bool PlayerCollision(GameObject gameObject, Rect gameObjectBounds)
+        private bool PlayerCollision(GameObject gameObject)
         {
-            if (player.GetRect().Intersects(gameObjectBounds))
+            if (player.GetRect().Intersects(gameObject.GetRect()))
             {
                 GameView.AddDestroyableGameObject(gameObject);
                 PlayerHealthLoss();
@@ -988,10 +984,10 @@ namespace AstroOdyssey
         /// Checks and performs laser collision.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="gameObjectBounds"></param>
-        private void LaserCollision(GameObject gameObject, Rect gameObjectBounds)
+        /// 
+        private void LaserCollision(GameObject gameObject)
         {
-            var lasers = GameView.GetGameObjects<Laser>().Where(laser => laser.GetRect().Intersects(gameObjectBounds));
+            var lasers = GameView.GetGameObjects<Laser>().Where(laser => laser.GetRect().Intersects(gameObject.GetRect()));
 
             if (lasers is not null && lasers.Any())
             {
@@ -1007,26 +1003,27 @@ namespace AstroOdyssey
 
                     // move the enemy backwards a bit on laser hit
                     gameObject.MoveY(gameObject.Speed * 3 / 2, YDirection.UP);
-
-                    switch (gameObject.Tag)
-                    {
-                        case Constants.ENEMY:
-                            {
-                                if (gameObject.HasNoHealth)
-                                    DestroyEnemy(gameObject as Enemy);
-                            }
-                            break;
-                        case Constants.METEOR:
-                            {
-                                if (gameObject.HasNoHealth)
-                                    DestroyMeteor(gameObject as Meteor);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-
+                    
                     PlayLaserImpactSound();
+
+                    if (gameObject.HasNoHealth)
+                    {
+                        switch (gameObject.Tag)
+                        {
+                            case Constants.ENEMY:
+                                {
+                                    DestroyEnemy(gameObject as Enemy);
+                                }
+                                break;
+                            case Constants.METEOR:
+                                {
+                                    DestroyMeteor(gameObject as Meteor);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }                    
                 }
             }
         }
