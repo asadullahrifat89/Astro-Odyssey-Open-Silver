@@ -133,8 +133,6 @@ namespace AstroOdyssey
 
             UpdateFrameStats();
 
-            //GetPlayerBounds();
-
             SpawnEnemy();
 
             SpawnMeteor();
@@ -145,7 +143,7 @@ namespace AstroOdyssey
 
             SpawnStar();
 
-            SpawnLaser();
+            SpawnLaser(powerUpTriggered);
 
             MovePlayer();
 
@@ -917,7 +915,7 @@ namespace AstroOdyssey
         /// <summary>
         /// Spawns a laser.
         /// </summary>
-        private void SpawnLaser()
+        private void SpawnLaser(bool isPoweredUp)
         {
             // each frame progress decreases this counter
             laserCounter -= 1;
@@ -959,7 +957,7 @@ namespace AstroOdyssey
                             break;
                     }
 
-                    GenerateLaser(laserHeight: laserHeight, laserWidth: laserWidth, isPoweredUp: powerUpTriggered);
+                    GenerateLaser(laserHeight: laserHeight, laserWidth: laserWidth, isPoweredUp: isPoweredUp);
                 }
 
                 laserCounter = laserSpawnLimit;
@@ -1310,6 +1308,7 @@ namespace AstroOdyssey
 
             laserSpawnLimit -= 1;
             ShowInGameText("POWER UP!");
+
             PlayPowerUpSound();
             player.TriggerPowerUp();
         }
@@ -1331,6 +1330,7 @@ namespace AstroOdyssey
                 {
                     powerUpTriggered = false;
                     laserSpawnLimit += 1;
+
                     PlayPowerDownSound();
                     player.TriggerPowerDown();
                 }
