@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -12,7 +13,12 @@ namespace AstroOdyssey
 
         private Grid content = new Grid();
 
-        private Image contentShip = new Image() { Stretch = Stretch.Uniform };
+        private Image contentShip = new Image()
+        {
+            Stretch = Stretch.Uniform,
+            Height = 100,
+            Width = 100,
+        };
 
         private Image contentShipBlaze = new Image()
         {
@@ -58,6 +64,11 @@ namespace AstroOdyssey
         #endregion
 
         #region Methods
+
+        public new Rect GetRect()
+        {
+            return new Rect(Canvas.GetLeft(this) + 15, Canvas.GetTop(this) + 50, contentShip.Width, contentShip.Height);
+        }
 
         public void SetAttributes(double speed)
         {
