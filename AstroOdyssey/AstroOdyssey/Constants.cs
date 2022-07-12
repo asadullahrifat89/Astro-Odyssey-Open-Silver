@@ -16,16 +16,16 @@ namespace AstroOdyssey
 
         public const string STAR = "star";
 
-        public enum Difficulty
+        public enum GameLevel
         {
-            Noob,
-            StartUp,
-            Easy,
-            Medium,
-            Hard,
-            VeryHard,
-            Extreme,
-            Pro,
+            Level_1,
+            Level_2,
+            Level_3,
+            Level_4,
+            Level_5,
+            Level_6,
+            Level_7,
+            Level_8,
         }
 
         /// <summary>
