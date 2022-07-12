@@ -109,6 +109,7 @@
 		<Compile Include="GameObjects\Meteor.cs" />
 		<Compile Include="GameObjects\Player.cs" />
 		<Compile Include="GameObjects\Star.cs" />
+		<Compile Include="Services\AudioService.cs" />
 		<Compile Include="Pages\GamePage.xaml.cs" />
 		<Compile Include="Pages\GameStartPage.xaml.cs" />
 		<Compile Include="Windows\MessageDialogueWindow.xaml.cs" />

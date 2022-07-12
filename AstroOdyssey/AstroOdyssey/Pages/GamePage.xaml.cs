@@ -70,10 +70,10 @@ namespace AstroOdyssey
         private int powerUpTriggerLimit;
 
         private object backgroundAudio = null;
-        
+
         private object enemyDestructionAudio = null;
         private object meteorDestructionAudio = null;
-        
+
         private object playerHealthLossAudio = null;
         private object playerHealthGainAudio = null;
 
@@ -371,36 +371,36 @@ namespace AstroOdyssey
             }
         }
 
-        /// <summary>
-        /// Checks if a two rects intersect.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        private bool RectsIntersect(Rect source, Rect target)
-        {
-            var targetX = target.X;
-            var targetY = target.Y;
-            var sourceX = source.X;
-            var sourceY = source.Y;
+        ///// <summary>
+        ///// Checks if a two rects intersect.
+        ///// </summary>
+        ///// <param name="source"></param>
+        ///// <param name="target"></param>
+        ///// <returns></returns>
+        //private bool RectsIntersect(Rect source, Rect target)
+        //{
+        //    var targetX = target.X;
+        //    var targetY = target.Y;
+        //    var sourceX = source.X;
+        //    var sourceY = source.Y;
 
-            var sourceWidth = source.Width - 5;
-            var sourceHeight = source.Height - 5;
+        //    var sourceWidth = source.Width - 5;
+        //    var sourceHeight = source.Height - 5;
 
-            var targetWidth = target.Width - 5;
-            var targetHeight = target.Height - 5;
+        //    var targetWidth = target.Width - 5;
+        //    var targetHeight = target.Height - 5;
 
-            if (source.Width >= 0.0
-                && target.Width >= 0.0
-                && targetX <= sourceX + sourceWidth
-                && targetX + targetWidth >= sourceX
-                && targetY <= sourceY + sourceHeight)
-            {
-                return targetY + targetHeight >= sourceY;
-            }
+        //    if (source.Width >= 0.0
+        //        && target.Width >= 0.0
+        //        && targetX <= sourceX + sourceWidth
+        //        && targetX + targetWidth >= sourceX
+        //        && targetY <= sourceY + sourceHeight)
+        //    {
+        //        return targetY + targetHeight >= sourceY;
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
         /// <summary>
         /// Sets the window and canvas size on startup.
@@ -535,7 +535,7 @@ namespace AstroOdyssey
                         if (health.GetY() > GameView.Height)
                             GameView.AddDestroyableGameObject(health);
 
-                        if (RectsIntersect(playerBounds, health.GetRect()))
+                        if (playerBounds.Intersects(health.GetRect()))
                         {
                             GameView.AddDestroyableGameObject(health);
                             PlayerHealthGain(health);
@@ -553,7 +553,7 @@ namespace AstroOdyssey
                         if (powerUp.GetY() > GameView.Height)
                             GameView.AddDestroyableGameObject(powerUp);
 
-                        if (RectsIntersect(playerBounds, powerUp.GetRect()))
+                        if (playerBounds.Intersects(powerUp.GetRect()))
                         {
                             GameView.AddDestroyableGameObject(powerUp);
                             TriggerPowerUp();
@@ -876,7 +876,7 @@ namespace AstroOdyssey
         /// <returns></returns>
         private bool PlayerCollision(GameObject gameObject, Rect gameObjectBounds)
         {
-            if (RectsIntersect(playerBounds, gameObjectBounds))
+            if (playerBounds.Intersects(gameObjectBounds))
             {
                 GameView.AddDestroyableGameObject(gameObject);
                 PlayerHealthLoss();
@@ -899,7 +899,7 @@ namespace AstroOdyssey
             // each frame progress decreases this counter
             laserCounter -= 1;
 
-            if (laserCounter<=0)
+            if (laserCounter <= 0)
             {
                 // any object falls within player range
                 if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
@@ -969,7 +969,7 @@ namespace AstroOdyssey
         /// <param name="gameObjectBounds"></param>
         private void LaserCollision(GameObject gameObject, Rect gameObjectBounds)
         {
-            var lasers = GameView.GetGameObjects<Laser>().Where(laser => RectsIntersect(laser.GetRect(), gameObjectBounds));
+            var lasers = GameView.GetGameObjects<Laser>().Where(laser => laser.GetRect().Intersects(gameObjectBounds));
 
             if (lasers is not null && lasers.Any())
             {
@@ -1421,7 +1421,7 @@ namespace AstroOdyssey
                 }())", backgroundAudio, host);
             }
 
-            PlayAudio(backgroundAudio);
+            AudioService.PlayAudio(backgroundAudio);
         }
 
         /// <summary>
@@ -1431,7 +1431,7 @@ namespace AstroOdyssey
         {
             if (backgroundAudio is not null)
             {
-                PauseAudio(backgroundAudio);
+                AudioService.PauseAudio(backgroundAudio);
             }
         }
 
@@ -1455,7 +1455,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(laserAudio);
+            AudioService.PlayAudio(laserAudio);
         }
 
         private void PlayLaserPoweredUpSound()
@@ -1473,7 +1473,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(laserPoweredUpAudio);
+            AudioService.PlayAudio(laserPoweredUpAudio);
         }
 
         /// <summary>
@@ -1494,7 +1494,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(enemyDestructionAudio);
+            AudioService.PlayAudio(enemyDestructionAudio);
         }
 
         /// <summary>
@@ -1515,7 +1515,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(laserImpactAudio);
+            AudioService.PlayAudio(laserImpactAudio);
         }
 
         /// <summary>
@@ -1536,7 +1536,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(meteorDestructionAudio);
+            AudioService.PlayAudio(meteorDestructionAudio);
         }
 
         /// <summary>
@@ -1557,7 +1557,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(playerHealthLossAudio);
+            AudioService.PlayAudio(playerHealthLossAudio);
         }
 
         /// <summary>
@@ -1578,7 +1578,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(playerHealthGainAudio);
+            AudioService.PlayAudio(playerHealthGainAudio);
         }
 
         /// <summary>
@@ -1599,7 +1599,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(levelUpAudio);
+            AudioService.PlayAudio(levelUpAudio);
         }
 
         /// <summary>
@@ -1619,7 +1619,7 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(powerUpAudio);
+            AudioService.PlayAudio(powerUpAudio);
         }
 
         /// <summary>
@@ -1639,35 +1639,35 @@ namespace AstroOdyssey
                 }())", host);
             }
 
-            PlayAudio(powerDownAudio);
+            AudioService.PlayAudio(powerDownAudio);
         }
 
-        /// <summary>
-        /// Plays the provided js audio object.
-        /// </summary>
-        /// <param name="audio"></param>
-        private void PlayAudio(object audio)
-        {
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() { 
-                //play audio with out html audio tag
-                $0.currentTime =0;
-                $0.play();           
-            }())", audio);
-        }
+        ///// <summary>
+        ///// Plays the provided js audio object.
+        ///// </summary>
+        ///// <param name="audio"></param>
+        //private void PlayAudio(object audio)
+        //{
+        //    OpenSilver.Interop.ExecuteJavaScript(@"
+        //    (function() { 
+        //        //play audio with out html audio tag
+        //        $0.currentTime =0;
+        //        $0.play();           
+        //    }())", audio);
+        //}
 
-        /// <summary>
-        /// Pauses the provided js audio object.
-        /// </summary>
-        /// <param name="audio"></param>
-        private void PauseAudio(object audio)
-        {
-            OpenSilver.Interop.ExecuteJavaScript(@"
-            (function() { 
-                //play audio with out html audio tag              
-                $0.pause();           
-            }())", audio);
-        }
+        ///// <summary>
+        ///// Pauses the provided js audio object.
+        ///// </summary>
+        ///// <param name="audio"></param>
+        //private void PauseAudio(object audio)
+        //{
+        //    OpenSilver.Interop.ExecuteJavaScript(@"
+        //    (function() { 
+        //        //play audio with out html audio tag              
+        //        $0.pause();           
+        //    }())", audio);
+        //}
 
         #endregion
 
