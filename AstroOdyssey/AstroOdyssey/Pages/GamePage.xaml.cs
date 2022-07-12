@@ -727,33 +727,6 @@ namespace AstroOdyssey
         }
 
         /// <summary>
-        /// Checks if there is any game object within the left side range of the player
-        /// </summary>
-        /// <param name="go"></param>
-        /// <returns></returns>
-        private bool AnyObjectWithinPlayersLeftSideRange(GameObject go)
-        {
-            var left = go.GetX();
-            var playerX = player.GetX();
-
-            return left + go.Width / 2 < playerX && left + go.Width / 2 > playerX - 250;
-        }
-
-        /// <summary>
-        /// Checks if there is any game object within the right side range of the player
-        /// </summary>
-        /// <param name="go"></param>
-        /// <returns></returns>
-        private bool AnyObjectWithinPlayersRightRange(GameObject go)
-        {
-            var left = go.GetX();
-            var playerX = player.GetX();
-
-
-            return left + go.Width / 2 > playerX && left + go.Width / 2 <= playerX + 250;
-        }
-
-        /// <summary>
         /// Moves the player to last pointer pressed position by x axis.
         /// </summary>
         private void MovePlayer()
@@ -952,7 +925,7 @@ namespace AstroOdyssey
             if (laserCounter <= 0)
             {
                 // any object falls within player range
-                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => AnyObjectWithinPlayersRightRange(x) || AnyObjectWithinPlayersLeftSideRange(x)))
+                if (GameView.GetGameObjects<GameObject>().Where(x => x.IsDestructible).Any(x => player.AnyNearbyObjectsOnTheRight(gameObject: x) || player.AnyNearbyObjectsOnTheLeft(gameObject: x)))
                 {
                     double laserHeight = 0, laserWidth = 0;
 
@@ -1622,10 +1595,5 @@ namespace AstroOdyssey
         #endregion
 
         #endregion
-    }
-
-    public static class PlayerService
-    {
-
     }
 }

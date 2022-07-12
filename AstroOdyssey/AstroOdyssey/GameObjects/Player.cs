@@ -181,6 +181,32 @@ namespace AstroOdyssey
             return health;
         }
 
+        /// <summary>
+        /// Checks if there is any game object within the left side range of the player.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public bool AnyNearbyObjectsOnTheLeft(GameObject gameObject)
+        {
+            var left = gameObject.GetX();
+            var playerX = GetX();
+
+            return left + gameObject.Width / 2 < playerX && left + gameObject.Width / 2 > playerX - 250;
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the right side range of the player.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public bool AnyNearbyObjectsOnTheRight(GameObject gameObject)
+        {
+            var left = gameObject.GetX();
+            var playerX = GetX();
+
+            return left + gameObject.Width / 2 > playerX && left + gameObject.Width / 2 <= playerX + 250;
+        }
+
         #endregion
     }
 }
