@@ -20,9 +20,6 @@
                     <UriMapping MappedUri="/Pages/{page_name}.xaml" Uri="/{page_name}" />
                 </UriMapper>
             </Frame.UriMapper>
-            <Frame.RenderTransform>
-                <TranslateTransform />
-            </Frame.RenderTransform>
         </Frame>
 
     </Grid>
