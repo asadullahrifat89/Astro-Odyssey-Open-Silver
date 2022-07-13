@@ -25,7 +25,7 @@ namespace AstroOdyssey
 
         public Meteor()
         {
-            Tag = "meteor";
+            Tag = Constants.METEOR;
             Height = 100;
             Width = 100;
 

@@ -1,5 +1,7 @@
 ﻿using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace AstroOdyssey
 {
@@ -9,7 +11,10 @@ namespace AstroOdyssey
 
         public GameObject()
         {
-
+//#if DEBUG
+//            BorderBrush = new SolidColorBrush(Colors.White);
+//            BorderThickness = new Windows.UI.Xaml.Thickness(1);
+//#endif
         }
 
         #endregion

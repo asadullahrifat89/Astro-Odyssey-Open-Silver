@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -12,7 +13,12 @@ namespace AstroOdyssey
 
         private Grid content = new Grid();
 
-        private Image contentShip = new Image() { Stretch = Stretch.Uniform };
+        private Image contentShip = new Image()
+        {
+            Stretch = Stretch.Uniform,
+            Height = 100,
+            Width = 100,
+        };
 
         private Image contentShipBlaze = new Image()
         {
@@ -37,6 +43,10 @@ namespace AstroOdyssey
 
         public Player()
         {
+            //TODO: acquire sides which shoot additional laser, lost on impact with enemy or meteor
+
+            Tag = Constants.PLAYER;
+
             Background = new SolidColorBrush(Colors.Transparent);
             Height = 150;
             Width = 100;
@@ -56,6 +66,11 @@ namespace AstroOdyssey
         #endregion
 
         #region Methods
+
+        public new Rect GetRect()
+        {
+            return new Rect(Canvas.GetLeft(this) + 15, Canvas.GetTop(this) + 50, contentShip.Width, contentShip.Height);
+        }
 
         public void SetAttributes(double speed)
         {
@@ -136,7 +151,7 @@ namespace AstroOdyssey
         {
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_yellow.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
-            Speed += 5;
+            Speed += 2;
             contentShipPowerGauge.Width = Width / 2;
         }
 
@@ -144,8 +159,52 @@ namespace AstroOdyssey
         {
             var exhaustUri = new Uri("ms-appx:///Assets/Images/effect_purple.png", UriKind.RelativeOrAbsolute);
             contentShipBlaze.Source = new BitmapImage(exhaustUri);
-            Speed -= 5;
+            Speed -= 2;
             contentShipPowerGauge.Width = 0;
+        }
+
+        /// <summary>
+        /// Gets the player health points.
+        /// </summary>
+        /// <returns></returns>
+        public string GetHealthPoints()
+        {
+            var healthPoints = Health / HealthSlot;
+            var healthIcon = "❤️";
+            var health = string.Empty;
+
+            for (int i = 0; i < healthPoints; i++)
+            {
+                health += healthIcon;
+            }
+
+            return health;
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the left side range of the player.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public bool AnyNearbyObjectsOnTheLeft(GameObject gameObject)
+        {
+            var left = gameObject.GetX();
+            var playerX = GetX();
+
+            return left + gameObject.Width / 2 < playerX && left + gameObject.Width / 2 > playerX - 250;
+        }
+
+        /// <summary>
+        /// Checks if there is any game object within the right side range of the player.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public bool AnyNearbyObjectsOnTheRight(GameObject gameObject)
+        {
+            var left = gameObject.GetX();
+            var playerX = GetX();
+
+            return left + gameObject.Width / 2 > playerX && left + gameObject.Width / 2 <= playerX + 250;
         }
 
         #endregion

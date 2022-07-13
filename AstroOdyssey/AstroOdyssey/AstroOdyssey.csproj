@@ -25,8 +25,10 @@
 		<Content Include="Assets\Sounds\drone-space-main-9706.mp3" />
 		<Content Include="Assets\Sounds\insurrection-10941.mp3" />
 		<Content Include="Assets\Sounds\music-807dfe09ce23793891674eb022b38c1b.mp3" />
+		<Content Include="Assets\Sounds\plasmablaster-37114.mp3" />
 		<Content Include="Assets\Sounds\power-down-7103.mp3" />
 		<Content Include="Assets\Sounds\scale-e6-14577.mp3" />
+		<Content Include="Assets\Sounds\shoot02wav-14562.mp3" />
 		<Content Include="Assets\Sounds\slow-thoughtful-sad-piano-114586.mp3" />
 		<Content Include="Assets\Sounds\space-age-10714.mp3" />
 		<Content Include="Assets\Sounds\space-trip-114102.mp3" />
@@ -107,6 +109,7 @@
 		<Compile Include="GameObjects\Meteor.cs" />
 		<Compile Include="GameObjects\Player.cs" />
 		<Compile Include="GameObjects\Star.cs" />
+		<Compile Include="Services\AudioService.cs" />
 		<Compile Include="Pages\GamePage.xaml.cs" />
 		<Compile Include="Pages\GameStartPage.xaml.cs" />
 		<Compile Include="Windows\MessageDialogueWindow.xaml.cs" />
