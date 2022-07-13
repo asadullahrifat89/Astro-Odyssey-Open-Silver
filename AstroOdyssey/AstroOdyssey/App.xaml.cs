@@ -19,8 +19,7 @@ namespace AstroOdyssey
 
             this.configuration = configuration;
 
-            Startup += App_Startup;
-            Application.Current.UnhandledException += Current_UnhandledException;
+            Startup += App_Startup;            
 
             mainPage = new MainPage();
             Window.Current.Content = mainPage;
