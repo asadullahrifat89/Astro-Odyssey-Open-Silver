@@ -151,7 +151,7 @@ namespace AstroOdyssey
             SpawnStar();
             IsGameRunning = true;
             RunGame();
-        }      
+        }
 
         /// <summary>
         /// Stops the game.
@@ -624,7 +624,7 @@ namespace AstroOdyssey
             switch (GameLevel)
             {
                 case GameLevel.Level_1:
-                    break;              
+                    break;
                 default:
                     {
                         EnemySpawnLimit -= 3;
@@ -704,24 +704,6 @@ namespace AstroOdyssey
                 SetPlayerX(playerX - Player.Speed);
             }
         }
-
-        ///// <summary>
-        ///// Gets the player health points.
-        ///// </summary>
-        ///// <returns></returns>
-        //private string GetPlayerHealthPoints()
-        //{
-        //    var healthPoints = player.Health / player.HealthSlot;
-        //    var healthIcon = "❤️";
-        //    var health = string.Empty;
-
-        //    for (int i = 0; i < healthPoints; i++)
-        //    {
-        //        health += healthIcon;
-        //    }
-
-        //    return health;
-        //}
 
         /// <summary>
         /// Check if player is dead.
@@ -1006,8 +988,6 @@ namespace AstroOdyssey
         /// </summary>
         private void PlayLaserSound()
         {
-            //TODO: change default laser audio
-
             var host = $"{baseUrl}resources/AstroOdyssey/Assets/Sounds/shoot02wav-14562.mp3";
 
             if (laserAudio is null)
